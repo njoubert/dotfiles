@@ -1,3 +1,17 @@
+#######################################################################
+# Niels Joubert .bashrc file
+#
+#   NOTE ON BASHRC VS BASH_PROFILE:
+#     - I store everything in bashrc, and bash_profile loads bashrc
+#     - bashrc is loaded on non-login interactive shells.
+#     - bash_profile is loaded on login interactive shells.
+#######################################################################
+
+#
+# USEFUL ALIASES
+#
+
+alias ll="ls -lah"
 #
 # Tridge's Git Terminal Extention
 #
@@ -51,3 +65,7 @@ export GDAL_DATA=/usr/local/Cellar/gdal/1.11.5_2/share/gdal
 # The original version is saved in .bash_profile.pysave
 PATH="/Library/Frameworks/Python.framework/Versions/3.6/bin:${PATH}"
 export PATH
+
+#
+#
+#
