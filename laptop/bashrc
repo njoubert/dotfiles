@@ -8,11 +8,16 @@
 #######################################################################
 
 #
-# ALIASES
+# ALIASES and QUICK COMMANDS
 #
 
 # general
 alias ll="ls -lah"
+alias bg1="set_bg 255 179 186"
+alias bg2="set_bg 255 223 186"
+alias bg3="set_bg 255 255 186"
+alias bg4="set_bg 186 255 201"
+alias bg5="set_bg 186 225 255"
 
 # git secific
 alias g="git"
@@ -20,6 +25,37 @@ alias gs="git status"
 alias ga="git add"
 alias gc="git commit"
 alias gp="git push"
+
+# Convert 8 bit r,g,b,a (0-255) to 16 bit r,g,b,a (0-65535)
+# to set terminal background.
+# r, g, b, a values default to 255
+set_bg () {
+    r=${1:-255}
+    g=${2:-255}
+    b=${3:-255}
+    a=${4:-255}
+
+    r=$(($r * 256 + $r))
+    g=$(($g * 256 + $g))
+    b=$(($b * 256 + $b))
+    a=$(($a * 256 + $a))
+
+    osascript -e "tell application \"Terminal\" to set background color of window 1 to {$r, $g, $b, $a}"
+}
+
+# Set terminal background based on hex rgba values
+# r,g,b,a default to FF
+set_bg_from_hex() {
+    r=${1:-FF}
+    g=${2:-FF}
+    b=${3:-FF}
+    a=${4:-FF}
+
+    set_bg $((16#$r)) $((16#$g)) $((16#$b)) $((16#$s))
+}
+
+
+
 #
 # Tridge's Git Terminal Extention
 #
