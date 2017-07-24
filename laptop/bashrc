@@ -47,3 +47,7 @@ export PATH="/Users/njoubert/.local/bin:$PATH"
 # Added for GDAL (FlightWave)
 #
 export GDAL_DATA=/usr/local/Cellar/gdal/1.11.5_2/share/gdal
+# Setting PATH for Python 3.6
+# The original version is saved in .bash_profile.pysave
+PATH="/Library/Frameworks/Python.framework/Versions/3.6/bin:${PATH}"
+export PATH
