@@ -8,14 +8,13 @@
 #######################################################################
 
 #
-# USEFUL ALIASES
+# ALIASES
 #
-
 alias ll="ls -lah"
+
 #
 # Tridge's Git Terminal Extention
 #
-
 function parse_git_branch {
   /usr/bin/git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
 }
@@ -51,7 +50,6 @@ proml
 alias activate_canopy="source '/Users/njoubert/Library/Enthought/Canopy_64bit/User/bin/activate'"
 VIRTUAL_ENV_DISABLE_PROMPT=1 source '/Users/njoubert/Library/Enthought/Canopy_64bit/User/bin/activate'
 
-
 #
 # Added by Haskell Stack
 #
@@ -66,6 +64,3 @@ export GDAL_DATA=/usr/local/Cellar/gdal/1.11.5_2/share/gdal
 PATH="/Library/Frameworks/Python.framework/Versions/3.6/bin:${PATH}"
 export PATH
 
-#
-#
-#
