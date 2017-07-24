@@ -10,8 +10,15 @@
 #
 # ALIASES
 #
+
+# general
 alias ll="ls -lah"
 
+# git secific
+alias gs="git status"
+alias ga="git add"
+alias gc="git commit"
+alias gp="git push"
 #
 # Tridge's Git Terminal Extention
 #
