@@ -11,6 +11,7 @@
 if [[ $- == *i* ]]; then
   echo "##########################################"
   echo "$(tput bold)Useful Shortcuts:$(tput sgr0)"
+  echo "  ll             ls -lah"
   echo "  bg(1-6)        changes background color"
   echo "  g( |s|a|c|p)   git, status, add, commit, push"    
   echo "##########################################"
