@@ -83,6 +83,7 @@ set_bg_from_list() {
 set_bg_randomly() {
   set_bg_from_list $(( ( RANDOM % 5 )  + 1 ))
 }
+set_bg_randomly
 
 #
 # Tridge's Git Terminal Extention
