@@ -15,3 +15,7 @@ alias ll="ls -lah"
 Customize bash behavior with special variables.
 
 **PS1** sets the value of the current prompt. You can use special escape strings and even call functions to customize your prompt.
+
+### Special Bash Variables
+
+http://tldp.org/LDP/abs/html/internalvariables.html

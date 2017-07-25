@@ -7,18 +7,27 @@
 #     - bash_profile is loaded on login interactive shells.
 #######################################################################
 
+# Don't 
+if [[ $- == *i* ]]; then
+  echo "##########################################"
+  echo "$(tput bold)Useful Shortcuts:$(tput sgr0)"
+  echo "  bg(1-6)        changes background color"
+  echo "  g( |s|a|c|p)   git, status, add, commit, push"    
+  echo "##########################################"
+fi
+
 #
 # ALIASES and QUICK COMMANDS
 #
 
 # general
 alias ll="ls -lah"
-alias bg1="set_bg ${color_pastel[0]}" #red
-alias bg2="set_bg ${color_pastel[1]}" #orange
-alias bg3="set_bg ${color_pastel[2]}" #yellow
-alias bg4="set_bg ${color_pastel[3]}" #green
-alias bg5="set_bg ${color_pastel[4]}" #blue
-alias bg6="set_bg ${color_pastel[5]}" #purple
+alias bg1="set_bg \${color_pastel[0]}" #red
+alias bg2="set_bg \${color_pastel[1]}" #orange
+alias bg3="set_bg \${color_pastel[2]}" #yellow
+alias bg4="set_bg \${color_pastel[3]}" #green
+alias bg5="set_bg \${color_pastel[4]}" #blue
+alias bg6="set_bg \${color_pastel[5]}" #purple
 
 # git secific
 alias g="git"
@@ -73,7 +82,6 @@ set_bg_from_list() {
 set_bg_randomly() {
   set_bg_from_list $(( ( RANDOM % 5 )  + 1 ))
 }
-set_bg_randomly
 
 #
 # Tridge's Git Terminal Extention
