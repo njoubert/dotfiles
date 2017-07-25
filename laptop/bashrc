@@ -13,11 +13,12 @@
 
 # general
 alias ll="ls -lah"
-alias bg1="set_bg 255 179 186"
-alias bg2="set_bg 255 223 186"
-alias bg3="set_bg 255 255 186"
-alias bg4="set_bg 186 255 201"
-alias bg5="set_bg 186 225 255"
+alias bg1="set_bg ${color_pastel[0]}" #red
+alias bg2="set_bg ${color_pastel[1]}" #orange
+alias bg3="set_bg ${color_pastel[2]}" #yellow
+alias bg4="set_bg ${color_pastel[3]}" #green
+alias bg5="set_bg ${color_pastel[4]}" #blue
+alias bg6="set_bg ${color_pastel[5]}" #purple
 
 # git secific
 alias g="git"
@@ -25,6 +26,17 @@ alias gs="git status"
 alias ga="git add"
 alias gc="git commit"
 alias gp="git push"
+
+
+# Working with colors
+declare color_pastel
+color_pastel[0]="255 179 186" #red
+color_pastel[1]="255 223 186" #orange
+color_pastel[2]="255 255 186" #yellow
+color_pastel[3]="186 255 201" #green
+color_pastel[4]="186 225 255" #blue
+color_pastel[5]="210 172 209" #purple
+
 
 # Convert 8 bit r,g,b,a (0-255) to 16 bit r,g,b,a (0-65535)
 # to set terminal background.
@@ -54,7 +66,14 @@ set_bg_from_hex() {
     set_bg $((16#$r)) $((16#$g)) $((16#$b)) $((16#$s))
 }
 
+set_bg_from_list() {
+  set_bg ${color_pastel[$1]}
+}
 
+set_bg_randomly() {
+  set_bg_from_list $(( ( RANDOM % 5 )  + 1 ))
+}
+set_bg_randomly
 
 #
 # Tridge's Git Terminal Extention
