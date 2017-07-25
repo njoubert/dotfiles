@@ -46,6 +46,7 @@ color_pastel[2]="255 255 186" #yellow
 color_pastel[3]="186 255 201" #green
 color_pastel[4]="186 225 255" #blue
 color_pastel[5]="210 172 209" #purple
+COLOR_PASTEL_COUNT=5
 
 
 # Convert 8 bit r,g,b,a (0-255) to 16 bit r,g,b,a (0-65535)
@@ -81,9 +82,24 @@ set_bg_from_list() {
 }
 
 set_bg_randomly() {
-  set_bg_from_list $(( ( RANDOM % 5 )  + 1 ))
+  set_bg_from_list $(( ( RANDOM % COLOR_PASTEL_COUNT )  + 1 ))
 }
-set_bg_randomly
+set_bg_sequentially() {
+  COUNTERFILE=$HOME/.bash_njoubert_bg_seq
+  if [ ! -f $COUNTERFILE ]; then
+    echo 0 > $COUNTERFILE
+  fi
+  COUNTER=$(cat $COUNTERFILE)
+
+  set_bg_from_list $COUNTER
+  
+  COUNTER=$(($COUNTER + 1))
+  if [ $COUNTER -gt $COLOR_PASTEL_COUNT ]; then
+    COUNTER=0;
+  fi
+  echo $COUNTER > $COUNTERFILE
+}
+set_bg_sequentially
 
 #
 # Tridge's Git Terminal Extention
