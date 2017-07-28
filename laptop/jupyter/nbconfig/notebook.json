@@ -1,0 +1,6 @@
+{
+  "load_extensions": {
+    "canopy/catalyst": true, 
+    "canopy/training/exercise": true
+  }
+}
