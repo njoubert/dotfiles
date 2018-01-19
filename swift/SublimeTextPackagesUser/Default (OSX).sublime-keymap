@@ -1,0 +1,3 @@
+[
+	{ "keys": ["super+g"], "command": "find_under_expand" }
+]

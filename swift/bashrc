@@ -9,24 +9,29 @@
 
 # Don't 
 usage() {
-  echo "$(tput bold)##########################################$(tput sgr0)"
-  echo "$(tput bold)☀️ 🌵 WELCOME NIELS $(tput sgr0)"
+  echo -n "$(tput bold)"
+  echo "🌵🌴☠️  WELCOME NIELS ☕☕☕"
   echo "Useful Shortcuts:"
   echo "  ll             ls -lah"
   echo "  bg(1-6)        changes background color"
-  echo "  g( |s|a|c|p)   git, status, add, commit, push"    
-  echo "$(tput bold)##########################################$(tput sgr0)"
+  echo "  g( |s|a|c|p)   git, status, add, commit, push"   
+  echo "💥💥💥 NOW GO BUILD EPIC SHIT 🔥🔥🔥" 
+  echo -n "$(tput sgr0)"
 }
 
 if [[ $- == *i* ]]; then
   usage
 fi
 
+export CLICOLOR=1
+export LSCOLORS=ExFxBxDxCxegedabagacad
+
 #
 # ALIASES and QUICK COMMANDS
 #
 
 # general
+alias ls='ls -GFh'
 alias ll="ls -lah"
 alias bg1="set_bg \${color_pastel[0]}" #red
 alias bg2="set_bg \${color_pastel[1]}" #orange
@@ -138,7 +143,7 @@ function proml {
   esac
 
 PS1="${TITLEBAR}\
-\u\w$BLUE\$(parse_git_branch)$NORMAL\\$ "
+\u:\w$BLUE\$(parse_git_branch)$NORMAL\\$ "
 PS2='> '
 PS4='+ '
 }
