@@ -5,8 +5,8 @@
 Manually make symbolic links from your home directory. For example:
 
 ```bash
-ln -s ~/.bash_profile bash_profile
-ln -s ~/.bash_rc bash_rc
+ln -s /Users/njoubert/Code/dotfiles/swift/bash_profile .bash_profile
+ln -s /Users/njoubert/Code/dotfiles/swift/bashrc .bashrc
 ```
 
 ## Mac Terminal Settings

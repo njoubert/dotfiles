@@ -138,7 +138,7 @@ function proml {
   esac
 
 PS1="${TITLEBAR}\
-\u:\w$BLUE\$(parse_git_branch)$NORMAL\\$ "
+\u\w$BLUE\$(parse_git_branch)$NORMAL\\$ "
 PS2='> '
 PS4='+ '
 }
