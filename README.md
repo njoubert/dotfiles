@@ -1,5 +1,10 @@
 # Niels Joubert's dotfiles
 
+## Non-dotfile-related utilities I use
+
+- Quicksilver
+- Divvy
+
 ## Installing
 
 Manually make symbolic links from your home directory. For example:
