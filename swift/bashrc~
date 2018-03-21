@@ -23,15 +23,6 @@ if [[ $- == *i* ]]; then
   usage
 fi
 
-#
-# March 20 2018
-# Added by Canopy V2 
-# https://support.enthought.com/hc/en-us/articles/115001454163-Make-Canopy-2-User-Python-be-your-default-Python
-#
-source '/Users/njoubert/Library/Enthought/Canopy/edm/envs/User/bin/activate' 
-
-#
-
 export CLICOLOR=1
 export LSCOLORS=ExFxBxDxCxegedabagacad
 
@@ -163,4 +154,3 @@ proml
 # Added by Haskell Stack
 #
 export PATH="/Users/njoubert/.local/bin:$PATH"
-

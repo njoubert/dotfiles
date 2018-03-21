@@ -5,6 +5,7 @@
 	],
 	"installed_packages":
 	[
+		"EditorConfig",
 		"GitGutter",
 		"Package Control"
 	]
