@@ -164,3 +164,20 @@ proml
 #
 export PATH="/Users/njoubert/.local/bin:$PATH"
 
+#
+# Added for Adrien's streamlet
+#
+
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+#
+# Added for virtualenv gnss-analysis compatiblity with framework python matplotlib requirements
+#
+function frameworkpython {
+    if [[ ! -z "$VIRTUAL_ENV" ]]; then
+        PYTHONHOME=$VIRTUAL_ENV /Users/njoubert/Library/Enthought/Canopy/edm/envs/User/bin/python "$@"
+    else
+        /Users/njoubert/Library/Enthought/Canopy/edm/envs/User/bin/python "$@"
+    fi
+}
