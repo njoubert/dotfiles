@@ -1,0 +1,6 @@
+{
+  "load_extensions": {
+    "canopy/training/exercise": true
+  },
+  "lineNumbers":true
+}
