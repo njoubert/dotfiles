@@ -8,3 +8,7 @@ a hack to deal with our current css styles and no new styling should be added in
 #jupyter-main-app {
     position: relative;
 }
+
+.container { 
+	width:100% !important; 
+}
