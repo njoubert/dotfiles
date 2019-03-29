@@ -1,3 +1,6 @@
+/* Niels Joubert, March 29, 2019
+ * Here is the documentation: https://codemirror.net/doc/manual.html#option_indentUnit
+ */
 define([
     'base/js/namespace',
     'base/js/events'
