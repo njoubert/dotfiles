@@ -9,6 +9,11 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/bash_profile /Users/njoubert/.bash_p
 ln -s /Users/njoubert/Code/dotfiles/macmini/bashrc /Users/njoubert/.bashrc
 ```
 
+```bash
+ln -s /Users/njoubert/Code/dotfiles/macmini/gitconfig /Users/njoubert/.gitconfig
+ln -s /Users/njoubert/Code/dotfiles/swift/gitignore_global /Users/njoubert/.gitignore_global
+```
+
 ## Mac Defaults
 
 * App Store: Enable Automatic Updates
