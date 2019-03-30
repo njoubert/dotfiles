@@ -87,7 +87,12 @@ ln -s /Users/njoubert/Code/dotfiles/swift/gitignore_global /Users/njoubert/.giti
 * VirtualBox
 
 ### Data Science
-https://jakevdp.github.io/PythonDataScienceHandbook/
+
+**References**
+- https://jakevdp.github.io/PythonDataScienceHandbook/
+- https://nbviewer.jupyter.org/github/jakevdp/WhirlwindTourOfPython/blob/master/00-Introduction.ipynb
+
+
 
 * Git
     * brew install git
@@ -104,9 +109,36 @@ https://jakevdp.github.io/PythonDataScienceHandbook/
     * `conda create --name py2 python=2.7`
     * `conda create --name py3 python=3.7`
     * Update the conda config in bashrc to activate py2 environment by default
-* Jupyter
-    * `conda install jupyter matplotlib numpy scipy pandas seaborn plotly`
+* Jupyter and datascience packages
+    * `conda install jupyter matplotlib numpy scipy scikit-learn pandas seaborn plotly`
 
+
+Default Python Imports:
+```
+# Python System Packages
+import os
+import sys
+import math
+import cmath
+import itertools
+import functools
+import random
+import pickle
+import json
+import csv
+import urllib
+
+# Data Science Packages
+import numpy as np
+import scipy as sp
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Jupyter Setup
+%matplotlib inline
+%load_ext autoreload
+%autoreload
+```
 
 
 
@@ -115,6 +147,8 @@ https://jakevdp.github.io/PythonDataScienceHandbook/
 * Spotify
 
 * Vox
+
+* somaFM app
 
 Youtube-dl
 * brew install youtube-dl
@@ -145,6 +179,7 @@ Youtube-dl
 * https://hackernoon.com/personal-macos-workspace-setup-adf61869cd79
 * https://www.stuartellis.name/articles/mac-setup/
 * https://sourabhbajaj.com/mac-setup/SublimeText/
-* 
+
+
 
 
