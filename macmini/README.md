@@ -99,6 +99,13 @@ https://jakevdp.github.io/PythonDataScienceHandbook/
    * `subl` https://www.sublimetext.com/docs/3/osx_command_line.html
 * Miniconda
     * https://docs.conda.io/en/latest/miniconda.html
+    * Install `Miniconda3-latest-MacOSX-x86_64.sh` which is Python 3
+    * It stores config in bash_profile. Rip that out and put it in bashrc
+    * `conda create --name py2 python=2.7`
+    * `conda create --name py3 python=3.7`
+    * Update the conda config in bashrc to activate py2 environment by default
+* Jupyter
+    * `conda install jupyter matplotlib numpy scipy pandas seaborn plotly`
 
 
 
