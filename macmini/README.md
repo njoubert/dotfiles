@@ -1,5 +1,13 @@
 # Mac Mini Personal Server
 
+## INSTALLATION
+
+### Bash and Git dotfiles
+
+```bash
+ln -s /Users/njoubert/Code/dotfiles/macmini/bash_profile /Users/njoubert/.bash_profile
+ln -s /Users/njoubert/Code/dotfiles/macmini/bashrc /Users/njoubert/.bashrc
+```
 
 ## Mac Defaults
 
@@ -81,7 +89,9 @@ https://jakevdp.github.io/PythonDataScienceHandbook/
     * Setup SSH Keys in Github
         * https://help.github.com/en/articles/connecting-to-github-with-ssh
 * Sublime Text
-    * 
+   * Package Control https://packagecontrol.io/installation
+   * GitGutter
+   * `subl` https://www.sublimetext.com/docs/3/osx_command_line.html
 * Miniconda
     * https://docs.conda.io/en/latest/miniconda.html
 
