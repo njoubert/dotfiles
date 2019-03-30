@@ -11,7 +11,7 @@ ln -s /Users/njoubert/Code/dotfiles/swift/bashrc /Users/njoubert/.bashrc
 ## Git dotfiles
 
 ```bash
-ln -s /Users/njoubert/Code/dotfiles/swift/gitignore /Users/njoubert/.gitignore
+ln -s /Users/njoubert/Code/dotfiles/swift/gitconfig /Users/njoubert/.gitconfig
 ln -s /Users/njoubert/Code/dotfiles/swift/gitignore_global /Users/njoubert/.gitignore_global
 ```
 
