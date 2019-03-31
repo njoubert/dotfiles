@@ -21,7 +21,7 @@ ln -s /Users/njoubert/Code/dotfiles/swift/gitignore_global /Users/njoubert/.giti
 ln -s /Users/njoubert/Code/dotfiles/swift/SublimeTextPackagesUser/ /Users/njoubert/Library/Application\ Support/Sublime\ Text\ 3/Packages/User
 ```
 
-## Python Miniconda Distribution
+## Python for Datascience: Using the Miniconda Distribution
 
 *  Miniconda
     * https://docs.conda.io/en/latest/miniconda.html
