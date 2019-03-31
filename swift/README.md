@@ -23,3 +23,17 @@ ln -s /Users/njoubert/Code/dotfiles/swift/SublimeTextPackagesUser/ /Users/njoube
 
 ## Python Miniconda Distribution
 
+ Miniconda
+    * https://docs.conda.io/en/latest/miniconda.html
+    * Install `Miniconda3-latest-MacOSX-x86_64.sh` which is Python 3
+    * It stores config in bash_profile. Rip that out and put it in bashrc
+    * `conda create --name py2 python=2.7`
+    * `conda create --name py3 python=3.7`
+    * Update the conda config in bashrc to activate py2 environment by default
+* Jupyter and datascience packages
+	* Install in Python 2 environment:
+		* `conda activate py2`
+		* `conda install numpy pandas scipy scikit-learn scikit-image pillow matplotlib seaborn jupyter notebook ipykernel line_profiler memory_profiler numexpr pandas-datareader plotly`
+	* Install in Python 3 environment:
+		* `conda activate py3`
+		* `conda install numpy pandas scipy scikit-learn scikit-image pillow matplotlib seaborn jupyter notebook ipykernel line_profiler memory_profiler numexpr pandas-datareader plotly`

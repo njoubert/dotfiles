@@ -161,6 +161,7 @@ if [ $? -eq 0 ]; then
 else
     if [ -f "/Users/njoubert/miniconda3/etc/profile.d/conda.sh" ]; then
         . "/Users/njoubert/miniconda3/etc/profile.d/conda.sh"
+        ## Modified by njoubert to activate py2 environment by default
         CONDA_CHANGEPS1=false conda activate py2
     else
         \export PATH="/Users/njoubert/miniconda3/bin:$PATH"
