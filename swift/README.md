@@ -1,7 +1,7 @@
 # INSTALLING
 
 
-## Bash and Git dotfiles
+## Bash dotfiles
 
 ```bash
 ln -s /Users/njoubert/Code/dotfiles/swift/bash_profile /Users/njoubert/.bash_profile
@@ -20,3 +20,6 @@ ln -s /Users/njoubert/Code/dotfiles/swift/gitignore_global /Users/njoubert/.giti
 ```bash
 ln -s /Users/njoubert/Code/dotfiles/swift/SublimeTextPackagesUser/ /Users/njoubert/Library/Application\ Support/Sublime\ Text\ 3/Packages/User
 ```
+
+## Python Miniconda Distribution
+
