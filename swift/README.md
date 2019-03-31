@@ -23,7 +23,7 @@ ln -s /Users/njoubert/Code/dotfiles/swift/SublimeTextPackagesUser/ /Users/njoube
 
 ## Python Miniconda Distribution
 
- Miniconda
+*  Miniconda
     * https://docs.conda.io/en/latest/miniconda.html
     * Install `Miniconda3-latest-MacOSX-x86_64.sh` which is Python 3
     * It stores config in bash_profile. Rip that out and put it in bashrc
