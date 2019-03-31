@@ -34,6 +34,9 @@ ln -s /Users/njoubert/Code/dotfiles/swift/SublimeTextPackagesUser/ /Users/njoube
 	* Install in Python 2 environment:
 		* `conda activate py2`
 		* `conda install numpy pandas scipy scikit-learn scikit-image pillow matplotlib seaborn jupyter notebook ipykernel line_profiler memory_profiler numexpr pandas-datareader plotly`
+		* `ipython kernel install --user` enables this environment from jupyter notebooks
 	* Install in Python 3 environment:
 		* `conda activate py3`
 		* `conda install numpy pandas scipy scikit-learn scikit-image pillow matplotlib seaborn jupyter notebook ipykernel line_profiler memory_profiler numexpr pandas-datareader plotly`
+		* `ipython kernel install --user` enables this environment from jupyter notebooks
+
