@@ -110,7 +110,7 @@ ln -s /Users/njoubert/Code/dotfiles/swift/gitignore_global /Users/njoubert/.giti
     * `conda create --name py3 python=3.7`
     * Update the conda config in bashrc to activate py2 environment by default
 * Jupyter and datascience packages
-    * `conda install numpy pandas scipy scikit-learn scikit-image pillow matplotlib seaborn jupyter notebook line_profiler memory_profiler numexpr pandas-datareader plotly`
+    * `conda install numpy pandas scipy scikit-learn scikit-image pillow matplotlib seaborn jupyter notebook ipykernel line_profiler memory_profiler numexpr pandas-datareader plotly`
 
 
 Default Python Imports:
