@@ -102,7 +102,7 @@ ln -s /Users/njoubert/Code/dotfiles/swift/gitignore_global /Users/njoubert/.giti
    * Package Control https://packagecontrol.io/installation
    * GitGutter
    * `subl` https://www.sublimetext.com/docs/3/osx_command_line.html
-* Miniconda
+*  Miniconda
     * https://docs.conda.io/en/latest/miniconda.html
     * Install `Miniconda3-latest-MacOSX-x86_64.sh` which is Python 3
     * It stores config in bash_profile. Rip that out and put it in bashrc
@@ -110,8 +110,14 @@ ln -s /Users/njoubert/Code/dotfiles/swift/gitignore_global /Users/njoubert/.giti
     * `conda create --name py3 python=3.7`
     * Update the conda config in bashrc to activate py2 environment by default
 * Jupyter and datascience packages
-    * `conda install numpy pandas scipy scikit-learn scikit-image pillow matplotlib seaborn jupyter notebook ipykernel line_profiler memory_profiler numexpr pandas-datareader plotly`
-
+    * Install in Python 2 environment:
+        * `conda activate py2`
+        * `conda install numpy pandas scipy scikit-learn scikit-image pillow matplotlib seaborn jupyter notebook ipykernel line_profiler memory_profiler numexpr pandas-datareader plotly`
+        * `ipython kernel install --user` enables this environment from jupyter notebooks
+    * Install in Python 3 environment:
+        * `conda activate py3`
+        * `conda install numpy pandas scipy scikit-learn scikit-image pillow matplotlib seaborn jupyter notebook ipykernel line_profiler memory_profiler numexpr pandas-datareader plotly`
+        * `ipython kernel install --user` enables this environment from jupyter notebooks
 
 Default Python Imports:
 ```
