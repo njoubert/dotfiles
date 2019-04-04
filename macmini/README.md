@@ -141,6 +141,7 @@ import os
 import sys
 import math
 import cmath
+import re
 import itertools
 import functools
 import random
