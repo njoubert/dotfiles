@@ -150,6 +150,7 @@ import pickle
 import json
 import csv
 import urllib
+import requests
 
 # Data Science Packages
 import numpy as np
