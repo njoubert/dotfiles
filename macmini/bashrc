@@ -7,6 +7,9 @@
 #     - bash_profile is loaded on login interactive shells.
 #######################################################################
 
+# Put local bin directory in path
+export PATH="/Users/njoubert/Code/dotfiles/bin:$PATH"
+
 # Don't 
 usage() {
   echo -n "$(tput bold)"

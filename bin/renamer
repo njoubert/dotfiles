@@ -1,0 +1,133 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Coyright (C) 2019 Niels Joubert
+# Contact: Niels Joubert <njoubert@gmail.com>
+#
+# This source is subject to the license found in the file 'LICENSE' which must
+# be be distributed together with this source. All other rights reserved.
+#
+# THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
+# EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
+"""
+
+RENAMER
+
+Workflow:
+
+	(1) First argument is the files you are considering. 
+	eg: "*.mp4"
+	when only this argument is supplied, the list of matched files is printed
+
+
+	(2) First argument is your regular expression matching files. Write a regular expression.
+	eg: "./(.*) - American Hipster(.*) #(\d+) \((.*?) - (.*?)\)-(.*?).mp4"
+	when up to this argument is supplied, the resulting list of matches is printed, allowing iteration.
+
+	(3) Third statement is your f-string for reformatting the regular expression into a new format. The 
+	regular expression match is provided as variable "m" for every file.
+	eg: "./American Hipster Presents - #{int(m.group(3)):02d} - {m.group(4)} - {m.group(5)} - {m.group(1)}.mp4"
+	when up to this argument is supplied, the resulting list of new filenames are printed, but not moved yes
+
+	(4) Confirm move by adding "-f"
+
+Example:
+
+./renamer.py -g "*.mp4" -s "American Hispter - #(\d+) - (.*?) - (.*?) - (.*?).mp4" -n "American Hipster Presents - #{m.group(1)} - {m.group(2)} - {m.group(3)} - {m.group(4)}.mp4" -f
+
+"""
+# Python System Packages
+import os
+import sys
+import glob
+import math
+import cmath
+import re
+import itertools
+import functools
+import random
+import pickle
+import json
+import csv
+import urllib
+import requests
+import argparse
+
+# Data Science Packages
+import numpy as np
+import scipy as sp
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def pprint_files(filelist):
+	'''
+	Pretty-prints an array of filenames
+	'''
+	for entry in filelist:
+		print(entry)
+
+def pprint_matches(matchlist, filelist):
+	'''
+	Prepp-prints an array of re match objects
+	'''
+	for idx, entry in enumerate(matchlist):
+		if entry is None:
+			raise Exception(filelist[idx]) 
+		print(filelist[idx], "\t=>\t", entry.groups())
+
+def pprint_matches(newfilelist, filelist):
+	'''
+	Prepp-prints an array of re match objects
+	'''
+	for idx, entry in enumerate(newfilelist):
+		print(filelist[idx], "\t=>\t", entry)
+
+
+def main(parser, args):
+	'''
+	Entrypoint and logic container for renamer
+	'''
+	if not args.glob:
+		parser.print_help()
+		return
+
+	# Workflow step 1: get the file list
+	files = glob.glob(args.glob)
+	if not args.searchpattern:
+		pprint_files(files)
+		return
+
+	# Workflow step 2: Try out matching
+	matches = [re.search(args.searchpattern, f) for f in files]
+	if not args.newname:
+		pprint_matches(matches, files)
+		return
+
+	# Workflow step 3: Try out newname
+	newfiles = []
+	for idx, file in enumerate(files):
+		m = matches[idx]
+		newfiles.append(eval("f\""+args.newname+"\""))
+
+	if not args.forreal:
+		pprint_matches(newfiles, files)
+		return
+
+	for idx, file in enumerate(files):
+		os.rename(file, newfiles[idx])
+
+
+
+
+if __name__ == "__main__":
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-g", "--glob", type=str,
+	                    help="glob of files to match")
+	parser.add_argument("-s", "--searchpattern", type=str,
+	                    help="regular expression to search for in every filename")
+	parser.add_argument("-n", "--newname", type=str,
+	                    help="fstrings formatted new name using search pattern bound to `m`")
+	parser.add_argument("-f", "--forreal", action="store_true",
+	                    help="executes the rename, rather than the default behavior of simulation")
+	args = parser.parse_args()
+	main(parser, args)
