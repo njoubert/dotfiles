@@ -1,0 +1,5 @@
+# See https://github.com/ytdl-org/youtube-dl/
+# Lines starting with # are comments
+
+# Modify the default saved filename
+-o '%(uploader)s - %(upload_date)s - %(title)s - %(id)s.%(ext)s'

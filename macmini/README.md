@@ -2,7 +2,7 @@
 
 ## INSTALLATION
 
-### Bash and Git dotfiles
+### Bash and Git and general Config dotfiles
 
 ```bash
 ln -s /Users/njoubert/Code/dotfiles/macmini/bash_profile /Users/njoubert/.bash_profile
@@ -14,6 +14,9 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/gitconfig /Users/njoubert/.gitconfig
 ln -s /Users/njoubert/Code/dotfiles/swift/gitignore_global /Users/njoubert/.gitignore_global
 ```
 
+```bash
+ln -s /Users/njoubert/Code/dotfiles/macmini/config /Users/njoubert/.config
+```
 ## Mac Defaults
 
 * App Store: Enable Automatic Updates
