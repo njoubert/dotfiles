@@ -77,6 +77,10 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/config /Users/njoubert/.config
 * iState Menus 5
 * GrandPerspective
 
+## Cloud Storage and Data Management
+
+* Dropbox
+	* Sync to external harddrive
 
 ## Communication
 
