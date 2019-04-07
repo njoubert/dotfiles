@@ -12,7 +12,7 @@
 """
 
 """
-# Python 2<>3 Compatibility
+# Python 2to3 Compatibility
 from __future__ import print_function
 
 # Python System Packages
