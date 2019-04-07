@@ -2,21 +2,33 @@
 
 ## INSTALLATION
 
-### Bash and Git and general Config dotfiles
+### dotfiles symlinks
 
+**Bash**
 ```bash
 ln -s /Users/njoubert/Code/dotfiles/macmini/bash_profile /Users/njoubert/.bash_profile
 ln -s /Users/njoubert/Code/dotfiles/macmini/bashrc /Users/njoubert/.bashrc
 ```
 
+** Git**
 ```bash
 ln -s /Users/njoubert/Code/dotfiles/macmini/gitconfig /Users/njoubert/.gitconfig
 ln -s /Users/njoubert/Code/dotfiles/swift/gitignore_global /Users/njoubert/.gitignore_global
 ```
 
+**General Config**
 ```bash
 ln -s /Users/njoubert/Code/dotfiles/macmini/config /Users/njoubert/.config
 ```
+
+**Python**
+```bash
+ln -s /Users/njoubert/Code/dotfiles/macmini/jupyter /Users/njoubert/.jupyter
+ln -s /Users/njoubert/Code/dotfiles/macmini/ipython /Users/njoubert/.ipython
+ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotlib
+```
+
+
 ## Mac Defaults
 
 * App Store: Enable Automatic Updates
@@ -151,6 +163,7 @@ import sys
 import glob
 import math
 import cmath
+import datetime
 import re
 import itertools
 import functools
@@ -161,6 +174,7 @@ import csv
 import urllib
 import requests
 import argparse
+print(sys.version)
 
 # Data Science Packages
 import numpy as np
