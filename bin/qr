@@ -1,0 +1,19 @@
+#!/bin/bash
+# 2019-04-07 Copyright Niels Joubert
+# QREncodes the first argument, then opens preview to display the result.
+# Depends on "qrencode", install with `brew install qrencode`
+
+if [ -z "$1" ]; then
+cat << EOF
+USAGE: qr "STRING"
+Encodes input data into QR Code using qrencode and opens using Preview
+
+Example encodings:
+   WIFI: "WIFI:T:WPA;S:<SSID>;P:<password>;;"
+   URL:  "<URL>"
+   SMS:  "SMSTO:+16508231662:You're cute"
+EOF
+else
+	echo $1 | qrencode -o - | open -f -a /Applications/Preview.app/
+fi
+

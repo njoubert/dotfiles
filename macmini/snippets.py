@@ -50,3 +50,12 @@ Useful Python and Jupyter Snippets.
 '''
 
 
+###
+### Jupyer Notebooks
+###
+
+
+''' Time loops with a visual progress bar. https://github.com/tqdm/tqdm '''
+for i in tqdm.tqdm_notebook(np.arange(3), desc='1st loop'):
+    for j in tqdm.tqdm_notebook(np.arange(100), desc='2nd loop'):
+        time.sleep(0.01)
