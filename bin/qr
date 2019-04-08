@@ -16,6 +16,10 @@ Example usage:
    GEO:    qr "geo:<lat>,<lon>"
    EMAIL:  qr "mailto:<name@domain>"
    MECARD: qr "MECARD:N:<Full Name>;ORG:<>;TEL:<tel>;EMAIL:<>;ADR:<>;URL:<>;;"
+
+Install dependencies:
+   brew install qrencode
+
 EOF
 else
 	echo $1
