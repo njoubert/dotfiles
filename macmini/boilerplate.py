@@ -42,6 +42,7 @@ import tqdm
 import numpy as np
 import scipy as sp
 import pandas as pd
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 # Jupyter Setup
