@@ -9,11 +9,16 @@ USAGE: qr "STRING"
 Encodes input data into QR Code using qrencode and opens using Preview
 
 Example encodings:
-   WIFI: "WIFI:T:WPA;S:<SSID>;P:<password>;;"
-   URL:  "<URL>"
-   SMS:  "SMSTO:+16508231662:You're cute"
+   WIFI:   "WIFI:T:WPA;S:<SSID>;P:<password>;;"
+   URL:    "<URL>"
+   SMS:    "SMSTO:+16508231662:You're cute"
+   TEL:    "tel:<nr>"
+   GEO:    "geo:<lat>,<lon>"
+   EMAIL:  "mailto:<name@domain>"
+   MECARD: "MECARD:N:<Full Name>;ORG:<>;TEL:<tel>;EMAIL:<>;ADR:<>;URL:<>;;"
 EOF
 else
+	echo $1
 	echo $1 | qrencode -o - | open -f -a /Applications/Preview.app/
 fi
 
