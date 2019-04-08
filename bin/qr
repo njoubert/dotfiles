@@ -8,17 +8,17 @@ cat << EOF
 USAGE: qr "STRING"
 Encodes input data into QR Code using qrencode and opens using Preview
 
-Example encodings:
-   WIFI:   "WIFI:T:WPA;S:<SSID>;P:<password>;;"
-   URL:    "<URL>"
-   SMS:    "SMSTO:+16508231662:You're cute"
-   TEL:    "tel:<nr>"
-   GEO:    "geo:<lat>,<lon>"
-   EMAIL:  "mailto:<name@domain>"
-   MECARD: "MECARD:N:<Full Name>;ORG:<>;TEL:<tel>;EMAIL:<>;ADR:<>;URL:<>;;"
+Example usage:
+   WIFI:   qr "WIFI:T:WPA;S:<SSID>;P:<password>;;"
+   URL:    qr "<URL>"
+   SMS:    qr "SMSTO:+16508231662:You're cute"
+   TEL:    qr "tel:<nr>"
+   GEO:    qr "geo:<lat>,<lon>"
+   EMAIL:  qr "mailto:<name@domain>"
+   MECARD: qr "MECARD:N:<Full Name>;ORG:<>;TEL:<tel>;EMAIL:<>;ADR:<>;URL:<>;;"
 EOF
 else
 	echo $1
-	echo $1 | qrencode -o - | open -f -a /Applications/Preview.app/
+	echo $1 | qrencode -l H -o - | open -f -a /Applications/Preview.app/
 fi
 
