@@ -28,6 +28,12 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/ipython /Users/njoubert/.ipython
 ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotlib
 ```
 
+### public/private keys
+
+* Setup SSH Keys 
+    * https://help.github.com/en/articles/connecting-to-github-with-ssh
+* Install keys in Github
+* Install keys in my private servers
 
 ## Mac Defaults
 
@@ -61,7 +67,6 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotl
     * Setup custom DNS (see below)
 * Spotlight
     * Turn off Command-Space Keyboard Shortcut (We will be using Quicksilver)
-
 
 ### Custom DNS
 ```
