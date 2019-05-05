@@ -67,14 +67,15 @@ if 'autoreload' not in ipython.extension_manager.loaded:
 pd.options.display.max_columns = 50
 pd.options.display.max_rows = 30
 
-
 ### Display all cell outputs
 from IPython.core.interactiveshell import InteractiveShell
 InteractiveShell.ast_node_interactivity = 'all'`)
     Jupyter.notebook.insert_cell_at_index('markdown', 3)
       .set_text(`# Analysis and Modeling`)
-    Jupyter.notebook.insert_cell_at_index('markdown', 4).set_text(`# Results`)
-    Jupyter.notebook.insert_cell_at_index('markdown', 5)
+    Jupyter.notebook.insert_cell_at_index('code', 4).set_text(``)
+    Jupyter.notebook.insert_cell_at_index('markdown', 5).set_text(`# Results`)
+    Jupyter.notebook.insert_cell_at_index('code', 6).set_text(``)
+    Jupyter.notebook.insert_cell_at_index('markdown', 7)
       .set_text(`# Conclusions and Next Steps`)
     // Run all cells
     Jupyter.notebook.execute_all_cells()
