@@ -59,3 +59,7 @@ Useful Python and Jupyter Snippets.
 for i in tqdm.tqdm_notebook(np.arange(3), desc='1st loop'):
     for j in tqdm.tqdm_notebook(np.arange(100), desc='2nd loop'):
         time.sleep(0.01)
+
+''' Displaying function output as HTML inside Jupyter Notebook'''
+from IPython.display import HTML, display
+display(HTML("<h1>Hello</h1>"))

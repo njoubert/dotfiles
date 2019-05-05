@@ -28,6 +28,12 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/ipython /Users/njoubert/.ipython
 ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotlib
 ```
 
+### public/private keys
+
+* Setup SSH Keys 
+    * https://help.github.com/en/articles/connecting-to-github-with-ssh
+* Install keys in Github
+* Install keys in my private servers
 
 ## Mac Defaults
 
@@ -57,12 +63,29 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotl
     * Check “Install macOS updates”
 * Users
     * Disable Guest Account
+* Network
+    * Setup custom DNS (see below)
+* Spotlight
+    * Turn off Command-Space Keyboard Shortcut (We will be using Quicksilver)
+
+### Custom DNS
+```
+1.1.1.1         # Cloudflare
+208.67.222.222  # OpenDNS
+8.8.8.8         # Google
+1.0.0.1         # Cloudflare
+208.67.220.220  # OpenDNS
+8.8.4.4         # Google
+```
 
 
 ## General Software
 
 *Can use Home-brew Cask!*
 
+* Quicksilver
+    * https://qsapp.com/download.php
+    * Setup Keyboard Shortcut as Command-Spave 
 * Avast Antivirus
     * https://www.avast.com/en-us/index
 * VLC
