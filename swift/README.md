@@ -40,3 +40,23 @@ ln -s /Users/njoubert/Code/dotfiles/swift/SublimeTextPackagesUser/ /Users/njoube
 		* `conda install numpy pandas scipy scikit-learn scikit-image pillow matplotlib seaborn jupyter notebook ipykernel line_profiler memory_profiler numexpr pandas-datareader plotly`
 		* `ipython kernel install --user` enables this environment from jupyter notebooks
 
+## Setup Jupyter Notebook Defaults and Extentions
+
+from https://towardsdatascience.com/set-your-jupyter-notebook-up-right-with-this-extension-24921838a332
+
+* Setup Jupyter Notebook Extentions
+	* `pip install jupyter_contrib_nbextensions && jupyter contrib nbextension install`
+* Link our `nbextention-setup` to the appropriate directory
+	* Find the directory with `pip show jupyter_contrib_nbextensions`
+	* navigate to `jupyter_contrib_nbextensions/nbextensions`
+	* Create symbolic link: `ln -s /Users/njoubert/Code/dotfiles/swift/nbextention-setup setup`
+* Install extentions
+	* `jupyter contrib nbextensions install`
+	* **NOTE:** You need to rerun this any time you change the `nbextention-setup` files.
+* Enable extentions
+	* Run jupyter notebook
+	* go to `nbextentions` tab
+	* enable "setup" extention
+
+
+
