@@ -133,11 +133,11 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotl
 * Jupyter and datascience packages
     * Install in Python 2 environment:
         * `conda activate py2`
-        * `conda install numpy pandas scipy scikit-learn scikit-image pillow matplotlib seaborn jupyter notebook ipykernel line_profiler memory_profiler numexpr pandas-datareader plotly opencv tqdm`
+        * `conda install numpy pandas scipy scikit-learn scikit-image pillow matplotlib seaborn jupyter notebook ipykernel line_profiler memory_profiler numexpr pandas-datareader plotly opencv tqdm basemap basemap-data-hires`
         * `ipython kernel install --user` enables this environment from jupyter notebooks
     * Install in Python 3 environment:
         * `conda activate py3`
-        * `conda install numpy pandas scipy scikit-learn scikit-image pillow matplotlib seaborn jupyter notebook ipykernel line_profiler memory_profiler numexpr pandas-datareader plotly opencv tqdm`
+        * `conda install numpy pandas scipy scikit-learn scikit-image pillow matplotlib seaborn jupyter notebook ipykernel line_profiler memory_profiler numexpr pandas-datareader plotly opencv tqdm basemap basemap-data-hires`
         * `ipython kernel install --user` enables this environment from jupyter notebooks
 
 [See `boilerplate.py` for default Python Imports.](https://raw.githubusercontent.com/njoubert/dotfiles/master/macmini/boilerplate.py)

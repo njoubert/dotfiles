@@ -12,10 +12,14 @@
 """
 
 """
+############################
 # Python 2to3 Compatibility
+############################
 from __future__ import print_function
 
+############################
 # Python System Packages
+############################
 import os
 import sys
 import glob
@@ -35,17 +39,43 @@ import requests
 import argparse
 print(sys.version)
 
-# UI packaged
+############################
+# UI packages
+############################
 import tqdm
 
+############################
 # Data Science Packages
+############################
+
 import numpy as np
 import scipy as sp
 import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-# Jupyter Setup
+############################
+# Jupyter Setup 
+############################
+### Get local variable for ipython
+from IPython import get_ipython
+ipython = get_ipython()
+
+### autoreload extension
+if 'autoreload' not in ipython.extension_manager.loaded:
+    %load_ext autoreload
+%autoreload 2
+
+### Magic for matplotlib
 %matplotlib inline
-%load_ext autoreload
-%autoreload
+
+### Options for pandas
+pd.options.display.max_columns = 50
+pd.options.display.max_rows = 30
+
+
+### Display all cell outputs
+from IPython.core.interactiveshell import InteractiveShell
+InteractiveShell.ast_node_interactivity = 'all'
+
+
