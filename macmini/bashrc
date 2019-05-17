@@ -26,7 +26,6 @@ if [[ $- == *i* ]]; then
   usage
 fi
 
-
 # Add Colors to Terminal
 export CLICOLOR=1
 export LSCOLORS=ExFxBxDxCxegedabagacad
@@ -154,7 +153,6 @@ PS4='+ '
 }
 proml
 
-
 # added by Miniconda3 4.5.12 installer
 # >>> conda init >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -171,5 +169,6 @@ else
     fi
 fi
 unset __conda_setup
+export CONDA_CHANGEPS1=false
 # <<< conda init <<<
 
