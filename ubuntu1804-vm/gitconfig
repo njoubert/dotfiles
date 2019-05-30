@@ -4,4 +4,4 @@
 	email = njoubert@gmail.com
 [core]
 	editor = subl -n -w
-	excludesfile = /Users/njoubert/.gitignore_global
+	excludesfile = /home/njoubert/.gitignore_global
