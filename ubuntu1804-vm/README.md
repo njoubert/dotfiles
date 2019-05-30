@@ -24,6 +24,23 @@
 * Install keys in Github
 * Install keys in my private servers
 
+## INSTALLATION
+
+### dotfiles symlinks
+
+**Bash**
+```bash
+ln -s /home/njoubert/Code/dotfiles/ubuntu1804-vm/bash_profile /home/njoubert/.bash_profile
+ln -s /home/njoubert/Code/dotfiles/ubuntu1804-vm/bashrc /home/njoubert/.bashrc
+```
+
+** Git**
+```bash
+ln -s /home/njoubert/Code/dotfiles/ubuntu1804-vm/gitconfig /home/njoubert/.gitconfig
+ln -s /home/njoubert/Code/dotfiles/ubuntu1804-vm/gitignore_global /home/njoubert/.gitignore_global
+```
+
+
 ## Installing supporting apps
 
 * Sublime Text 3
