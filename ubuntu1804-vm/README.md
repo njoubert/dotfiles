@@ -17,13 +17,17 @@
 		* `rm -rf /var/lib/xkb/*` to clear the cache
 		* reboot
 
+### public/private keys
+
+* Setup SSH Keys 
+    * https://help.github.com/en/articles/connecting-to-github-with-ssh
+* Install keys in Github
+* Install keys in my private servers
 
 ## Installing supporting apps
 
 * Sublime Text 3
 	* Follow the instructions on the website. This adds sublime text to Apt package manager.
-
-
-
-
+* git
+	* `apt-get install git`
 
