@@ -1,0 +1,7 @@
+# This is Git's per-user configuration file.
+[user]
+	name = Niels Joubert
+	email = njoubert@gmail.com
+[core]
+	editor = subl -n -w
+	excludesfile = /home/njoubert/.gitignore_global
