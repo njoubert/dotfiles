@@ -1,7 +1,9 @@
 {
   "load_extensions": {
     "canopy/training/exercise": true,
-    "setup/main": true
+    "setup/main": true,
+    "hinterland/hinterland": true,
+    "code_prettify/autopep8": true
   },
   "lineNumbers": true
 }

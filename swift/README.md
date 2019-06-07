@@ -58,5 +58,6 @@ from https://towardsdatascience.com/set-your-jupyter-notebook-up-right-with-this
 	* go to `nbextentions` tab
 	* enable "setup" extention
 
+See more Jupyter tricks here: https://towardsdatascience.com/bringing-the-best-out-of-jupyter-notebooks-for-data-science-f0871519ca29
 
 
