@@ -1,0 +1,133 @@
+; Get rid of Toolbar
+(when (>= emacs-major-version 21)
+  (tool-bar-mode -1))
+;scroll bars are all fucked up on 18.04
+(scroll-bar-mode -1)
+;this looks like a toggle, and if you do it from Xresources too, it undoes it.
+(menu-bar-mode -1)
+(column-number-mode t)
+(global-set-key "\M-p" "\C-u10\C-p")
+(global-set-key "\M-n" "\C-u10\C-n")
+(global-set-key [f2] 'p4-edit)
+(global-set-key [f3] 'indent-region)
+(global-set-key [f4] 'comment-region)
+(global-set-key [f5] 'uncomment-region)
+(global-set-key [f6] 'revert-buffer)
+(global-set-key [f7] 'gdb)
+(global-set-key [f8] 'compile)
+(global-set-key [f9] 'font-lock-mode)
+(global-font-lock-mode t)
+(define-key global-map "\M-g" 'goto-line)
+(setq font-lock-maximum-decoration t)
+(setq-default tab-width 4)
+(setq tab-width 4)
+(setq ediff-split-window-function 'split-window-horizontally)
+(setq-default indent-tabs-mode nil)
+(setq text-mode-hook
+      '(lambda nil
+         (setq fill-column 72)
+         (auto-fill-mode 1)))
+                                        ;(set-default-font "-Misc-Fixed-Medium-R-Normal--13-120-75-75-C-70-ISO8859-1")
+                                        ;(set-default-font "9x15")
+;(set-scroll-bar-mode 'right)
+(add-to-list 'default-frame-alist '(scroll-bar-width . 14))
+;; (custom-set-variables
+;;   ;; custom-set-variables was added by Custom -- don't edit or cut/paste it!
+;;   ;; Your init file should contain only one such instance.
+;;  )
+;; (custom-set-faces
+;;   ;; custom-set-faces was added by Custom -- don't edit or cut/paste it!
+;;   ;; Your init file should contain only one such instance.
+;;  '(font-lock-builtin-face ((((class color) (background dark)) (:foreground "yellow1" :weight light))))
+;;  '(font-lock-comment-face ((((class color) (background dark)) (:foreground "red"))))
+;;  '(font-lock-constant-face ((((class color) (background dark)) (:foreground "yellow1"))))
+;;  '(font-lock-string-face ((((class color) (background dark)) (:foreground "goldenrod1"))))
+;;  '(font-lock-type-face ((((class color) (background dark)) (:foreground "spring green"))))
+;;  '(font-lock-variable-name-face ((((class color) (background dark)) (:foreground "magenta"))))
+;;  '(font-lock-warning-face ((t (:foreground "red" :weight bold)))))
+;; (setq c-mode-common-hook 'pie-cc-startup)
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ;; CC Mode Hook                          ;;
+;; ;;                                       ;;
+;; ;;   C Hybrids (C,C++,Objective-C,etc.)  ;;
+;; ;;   all share the CC Mode, and thus     ;;
+;; ;;   the CC Mode Hook.                   ;;
+;; ;;                                       ;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; (defun pie-cc-startup ()
+;;   (interactive)
+;;   (setq c-basic-offset   4) ;; primary indent width
+;;   (setq c-offsets-alist 
+;;    (append (list 
+;;             (cons 'brace-list-open           0)
+;;             (cons 'substatement-open         0)  ; open brace position
+;;             (cons 'substatement              4)  ; like after if()
+;;             (cons 'defun-block-intro         4)  ; first line in a block
+;;             (cons 'statement-block-intro     4)
+;;             (cons 'statement-case-intro      4)  ; first line after case
+;;             ;; C++ Stuff
+;;             ;; (inclass)
+;;             (cons 'topmost-intro             0)  ; first-level paren C
+;;             (cons 'inextern-lang             0)  ; extern "C" {...}
+;;             (cons 'access-label              -2)
+;;            )
+;;            c-offsets-alist
+;;    )
+;;   )
+;;   ;;
+;;   ;; I want to type newlines myself after semicolos dammit!
+;;   ;;
+;;   (setq c-auto-newline nil)
+;;   ;;
+;;   ;; Echo syntatic info when pressing TAB
+;;   ;; Turn on to see what the syntax tag is for any
+;;   ;; particular line of C/C++ code.
+;;   ;;
+;;   (setq c-echo-syntactic-information-p nil) ;; nil is off, 1 is on
+;;   ;;
+;;   ;; Compile command on per-buffer basis
+;;   ;;
+;; ;;  (set (make-local-variable 'compile-command)
+;; ;;      (concat "make " (pie-dot-o (buffer-name))))
+;; )
+(defun ga-coding-standard-hook ()
+  (setq indent-tabs-mode nil)
+    (setq c-offsets-alist 
+      (append (list 
+               (cons 'brace-list-open           0)
+               (cons 'substatement-open         0)  ; open brace position
+               (cons 'innamespace               0)  
+               (cons 'substatement              2)  ; like after if()
+               (cons 'defun-block-intro         2)  ; first line in a block
+               (cons 'statement-block-intro     2)
+               (cons 'statement-case-intro      2)  ; first line after case
+               )
+              c-offsets-alist)))
+(add-hook 'c-mode-common-hook 'ga-coding-standard-hook)
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(column-number-mode t)
+ '(inhibit-startup-screen t)
+ '(tool-bar-mode nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:family "Ubuntu Mono" :foundry "DAMA" :slant normal :weight normal :height 151 :width normal))))
+ '(font-lock-comment-face ((((type x)) (:foreground "royal blue")) (((type tty)) (:foreground "red"))))
+ '(font-lock-constant-face ((((class color) (min-colors 88) (background dark)) (:foreground "yellow"))))
+ '(font-lock-keyword-face ((((type x)) (:foreground "red")) (((type tty)) (:foreground "cyan"))))
+ '(font-lock-string-face ((((type x)) (:foreground "medium sea green")) (((type tty)) (:foreground "green"))))
+ '(font-lock-variable-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "medium orchid"))))
+ '(nxml-tag-delimiter ((t (:inherit nxml-delimiter :foreground "red"))))
+ '(scroll-bar ((t (:background "black" :foreground "dark olive green"))))
+ '(smerge-refined-change ((t (:background "yellow" :foreground "navy"))))
+ '(underline ((t (:foreground "medium orchid" :underline t)))))
+(setq load-home-init-file t) ; don't load init file from ~/.xemacs/init.el
+                                        ;(set-default-font "-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-1")
+(set-default-font "10x20")
