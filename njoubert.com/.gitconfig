@@ -1,3 +1,5 @@
 [user]
 	email = njoubert@gmail.com
 	name = Niels Joubert
+[push]
+	default = simple
