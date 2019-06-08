@@ -74,8 +74,23 @@ sudo dd if=linuxmint-19.1-cinnamon-32bit.img of=/dev/rdisk2 bs=1m
 
 ## Installing ROS
 
-* From http://wiki.ros.org/melodic/Installation/Ubuntu
-* Change `/etc/apt/sources.list.d/ros-latest.list` to say `... bionic main`
+Must install Melodic from source to build for i386.
+From http://wiki.ros.org/melodic/Installation/Source
+
+`sudo apt-get install python-rosdep python-rosinstall-generator python-wstool python-rosinstall build-essential`
+
+```
+sudo rosdep init
+rosdep update
+```
+Yes! see it adding Melodic distro! Let's do the desktop install without all the simulators and stuff. Seems the most prudent balance between easy to build and full-featured.
+
+```
+mkdir ~/ros_catkin_ws
+cd ~/ros_catkin_ws
+rosinstall_generator desktop --rosdistro melodic --deps --tar > melodic-desktop.rosinstall
+wstool init -j2 src melodic-desktop.rosinstall
+```
 
 
 
