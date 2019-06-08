@@ -49,4 +49,9 @@ sudo dd if=linuxmint-19.1-cinnamon-32bit.img of=/dev/rdisk2 bs=1m
 	* `apt-get install git`
 	* Add SSH Keys. Follow Github guide.
 	* `mkdir -p ~/Code; cd ~/Code; git clone git@github.com:njoubert/dotfiles.git`
-	
+* sublime text
+	* `sudo apt-get install sublime-text`
+* tmux
+	* `sudo apt-get install tmux`
+	* Install tmux package manager. `git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm`
+	* Edit tmux.conf (linked into dotfiles here)	
