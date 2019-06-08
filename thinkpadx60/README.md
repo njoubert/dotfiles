@@ -91,7 +91,8 @@ cd ~/ros_catkin_ws
 rosinstall_generator desktop --rosdistro melodic --deps --tar > melodic-desktop.rosinstall
 wstool init -j2 src melodic-desktop.rosinstall
 ```
-
+Now force a setup for ubuntu:bionic since we're on mint:
+`rosdep install --from-paths src --ignore-src --rosdistro melodic -y --os ubuntu:bionic`
 
 
 # User's Manual for this setup
