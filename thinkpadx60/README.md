@@ -55,3 +55,18 @@ sudo dd if=linuxmint-19.1-cinnamon-32bit.img of=/dev/rdisk2 bs=1m
 	* `sudo apt-get install tmux`
 	* Install tmux package manager. `git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm`
 	* Edit tmux.conf (linked into dotfiles here)	
+* fish shell
+	* `sudo apt-get install fish`
+* mosh for remote shell
+	* `sudo apt-get install mosh`
+
+
+# User's Manual for this setup
+
+Use the **`fish`** shell. autocomplete is amazing.
+
+
+When connecting to remote servers, use **`mosh`**, it keeps connections alive!
+
+
+
