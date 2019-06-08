@@ -60,4 +60,19 @@ from https://towardsdatascience.com/set-your-jupyter-notebook-up-right-with-this
 
 See more Jupyter tricks here: https://towardsdatascience.com/bringing-the-best-out-of-jupyter-notebooks-for-data-science-f0871519ca29
 
+## Using Fish Shell
 
+`brew install fish`
+
+```
+You will need to add:
+  /usr/local/bin/fish
+to /etc/shells.
+
+Then run:
+  chsh -s /usr/local/bin/fish
+to make fish your default shell.
+
+```
+
+It looks great, but I am concerned about lack of interop with Bash. 

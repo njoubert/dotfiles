@@ -57,6 +57,18 @@ sudo dd if=linuxmint-19.1-cinnamon-32bit.img of=/dev/rdisk2 bs=1m
 	* Edit tmux.conf (linked into dotfiles here)	
 * fish shell
 	* `sudo apt-get install fish`
+	* Create /usr/local/bin/fishlogin with contents
+		```
+		#!/bin/bash -l
+		exec -l fish "$@"
+		```
+	* Make it executable
+		```sudo chmod +x /usr/local/bin/fishlogin```
+	* Add it to /etc/shells
+		```echo /usr/local/bin/fishlogin | sudo tee -a /etc/shells```
+	* Set it as your default shell
+		```sudo usermod -s /usr/local/bin/fishlogin $USER```
+	* log out and log back in
 * mosh for remote shell
 	* `sudo apt-get install mosh`
 
