@@ -72,6 +72,12 @@ sudo dd if=linuxmint-19.1-cinnamon-32bit.img of=/dev/rdisk2 bs=1m
 * mosh for remote shell
 	* `sudo apt-get install mosh`
 
+## Installing ROS
+
+* From http://wiki.ros.org/melodic/Installation/Ubuntu
+* Change `/etc/apt/sources.list.d/ros-latest.list` to say `... bionic main`
+
+
 
 # User's Manual for this setup
 
