@@ -120,6 +120,7 @@ set_bg_sequentially() {
 # uncomment if you want rotating background colors on terminal launch
 set_bg_sequentially
 
+
 #
 # Tridge's Git Terminal Extention
 #
@@ -147,7 +148,7 @@ function proml {
   esac
 
 PS1="${TITLEBAR}\
-\u:\w$BLUE\$(parse_git_branch)$NORMAL\\$ "
+\u@macmini:\w$BLUE\$(parse_git_branch)$NORMAL\\$ "
 PS2='> '
 PS4='+ '
 }
@@ -171,4 +172,3 @@ fi
 unset __conda_setup
 export CONDA_CHANGEPS1=false
 # <<< conda init <<<
-

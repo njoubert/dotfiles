@@ -112,6 +112,11 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotl
 * iState Menus 5
 * GrandPerspective
 
+## Setup proper shell commands
+
+* mosh
+    `brew install mosh`
+
 ## Cloud Storage and Data Management
 
 * Dropbox
