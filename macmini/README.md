@@ -28,6 +28,12 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/ipython /Users/njoubert/.ipython
 ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotlib
 ```
 
+**tmux**
+```bash
+ln -s /Users/njoubert/Code/dotfiles/tmux /Users/njoubert/.tmux
+ln -s /Users/njoubert/Code/dotfiles/tmux.conf /Users/njoubert/.tmux.conf
+```
+
 ### public/private keys
 
 * Setup SSH Keys 
@@ -129,6 +135,12 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotl
 * VirtualBox
 * HexFiend
     * https://ridiculousfish.com/hexfiend/
+
+### Terminal Apps and Configuration
+
+**tmux**
+
+`brew install tmux`
     
 ### Data Science
 

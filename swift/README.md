@@ -21,6 +21,13 @@ ln -s /Users/njoubert/Code/dotfiles/swift/gitignore_global /Users/njoubert/.giti
 ln -s /Users/njoubert/Code/dotfiles/swift/SublimeTextPackagesUser/ /Users/njoubert/Library/Application\ Support/Sublime\ Text\ 3/Packages/User
 ```
 
+## Hosts
+
+```bash
+rm /etc/hosts
+ln -s /Users/njoubert/Code/dotfiles/swift/hosts /etc/hosts
+```
+
 ## Python for Datascience: Using the Miniconda Distribution
 
 *  Miniconda
