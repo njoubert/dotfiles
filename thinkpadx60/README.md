@@ -7,6 +7,8 @@ sudo apt-get install git tmux sublime-text mosh
 ```
 
 ```bash
+rm -rf .bashrc
+ln -s /home/njoubert/Code/dotfiles/thinkpadx60/bashrc.sh /home/njoubert/.bashrc
 rm -rf /home/njoubert/.config
 ln -s /home/njoubert/Code/dotfiles/thinkpadx60/config /home/njoubert/.config
 ln -s /home/njoubert/Code/dotfiles/thinkpadx60/tmux /home/njoubert/.tmux
