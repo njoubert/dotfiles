@@ -130,6 +130,10 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/tmux.conf /Users/njoubert/.tmux.conf
 
 ## Communication
 
+## Design
+
+* OmniGraffle 6 Professional
+    * Install details on `Walvis`
 
 ## Software Development
 
