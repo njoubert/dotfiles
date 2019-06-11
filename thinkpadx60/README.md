@@ -1,4 +1,21 @@
 # Thinkpad X60 Setup and Dotfiles
+ 
+# Installation
+
+```bash
+sudo apt-get install git tmux sublime-text mosh
+```
+
+```bash
+rm -rf /home/njoubert/.config
+ln -s /home/njoubert/Code/dotfiles/thinkpadx60/config /home/njoubert/.config
+ln -s /home/njoubert/Code/dotfiles/thinkpadx60/tmux /home/njoubert/.tmux
+ln -s /home/njoubert/Code/dotfiles/thinkpadx60/tmux.conf /home/njoubert/.tmux.conf
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+```
+
+# Info
 
 Reviving an old Thinkpad X60 1709CTO
 
