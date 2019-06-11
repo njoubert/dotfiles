@@ -7,6 +7,15 @@
 #     - bash_profile is loaded on login interactive shells.
 #######################################################################
 
+WORKSTATIONALIAS="swift"
+
+# Check to see if a local connection
+if [[ $(ps -o comm= -p $PPID) =~ sshd* ]]; then 
+  ORIGIN="remote/sshd"
+else
+  ORIGIN="local"
+fi
+
 # Put local bin directory in path
 export PATH="/Users/njoubert/Code/dotfiles/bin:$PATH"
 
@@ -118,7 +127,9 @@ set_bg_sequentially() {
 }
 
 # uncomment if you want rotating background colors on terminal launch
-set_bg_sequentially
+if [ "$ORIGIN" == "local" ]; then
+  set_bg_sequentially
+fi
 
 
 #
@@ -148,7 +159,7 @@ function proml {
   esac
 
 PS1="${TITLEBAR}\
-\u@macmini:\w$BLUE\$(parse_git_branch)$NORMAL\\$ "
+\u@${WORKSTATIONALIAS}:\w$BLUE\$(parse_git_branch)$NORMAL\\$ "
 PS2='> '
 PS4='+ '
 }
