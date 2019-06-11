@@ -7,9 +7,11 @@
 #     - bash_profile is loaded on login interactive shells.
 #######################################################################
 
-WORKSTATIONALIAS="swift"
 
-# Check to see if a local connection
+### setup global variables {{{
+###  
+
+# Check to see if a local or SSH connection and save as global variable
 if [[ $(ps -o comm= -p $PPID) =~ sshd* ]]; then 
   ORIGIN="remote/sshd"
 else
@@ -19,7 +21,12 @@ fi
 # Put local bin directory in path
 export PATH="/Users/njoubert/Code/dotfiles/bin:$PATH"
 
-# Don't 
+# Shows in the prompt
+WORKSTATION_ALIAS="macmini"
+
+###
+### setup global variables }}}
+
 usage() {
   echo -n "$(tput bold)"
   echo "🌵🌴☠️  WELCOME NIELS ☕☕☕"
@@ -31,40 +38,11 @@ usage() {
   echo -n "$(tput sgr0)"
 }
 
-if [[ $- == *i* ]]; then
-  usage
-fi
 
-# Add Colors to Terminal
-export CLICOLOR=1
-export LSCOLORS=ExFxBxDxCxegedabagacad
+### background color rotation {{{ 
+###
 
-#
-# ALIASES and QUICK COMMANDS
-#
-
-# general
-alias ls='ls -GFh'
-alias ll="ls -lah"
-alias bg1="set_bg \${color_pastel[0]}" #red
-alias bg2="set_bg \${color_pastel[1]}" #orange
-alias bg3="set_bg \${color_pastel[2]}" #yellow
-alias bg4="set_bg \${color_pastel[3]}" #green
-alias bg5="set_bg \${color_pastel[4]}" #blue
-alias bg6="set_bg \${color_pastel[5]}" #purple
-
-# git secific
-alias g="git"
-alias gd="git diff"
-alias gs="git status"
-alias ga="git add"
-alias gc="git commit"
-alias gp="git push"
-alias gpf="git push --force"
-alias gl="git log"
-
-
-# Working with colors
+# Setting up pretty colors
 declare color_pastel
 color_pastel[0]="255 179 186" #red
 color_pastel[1]="255 223 186" #orange
@@ -73,7 +51,6 @@ color_pastel[3]="186 255 201" #green
 color_pastel[4]="186 225 255" #blue
 color_pastel[5]="210 172 209" #purple
 COLOR_PASTEL_COUNT=5
-
 
 # Convert 8 bit r,g,b,a (0-255) to 16 bit r,g,b,a (0-65535)
 # to set terminal background.
@@ -126,15 +103,54 @@ set_bg_sequentially() {
   echo $COUNTER > $COUNTERFILE
 }
 
-# uncomment if you want rotating background colors on terminal launch
-if [ "$ORIGIN" == "local" ]; then
-  set_bg_sequentially
+###
+### }}} background color rotation
+
+# Show usage if this is an interactive shell, and rotate background if also local
+if [[ $- == *i* ]]; then
+  usage
+  if [ "$ORIGIN" == "local" ]; then
+    set_bg_sequentially
+  fi
 fi
 
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-#
-# Tridge's Git Terminal Extention
-#
+# Add Colors to Terminal
+export CLICOLOR=1
+export LSCOLORS=ExFxBxDxCxegedabagacad
+
+
+## aliases {{{
+##
+
+# general
+alias ls='ls -GFh'
+alias ll="ls -lah"
+alias bg1="set_bg \${color_pastel[0]}" #red
+alias bg2="set_bg \${color_pastel[1]}" #orange
+alias bg3="set_bg \${color_pastel[2]}" #yellow
+alias bg4="set_bg \${color_pastel[3]}" #green
+alias bg5="set_bg \${color_pastel[4]}" #blue
+alias bg6="set_bg \${color_pastel[5]}" #purple
+
+# git secific
+alias g="git"
+alias gd="git diff"
+alias gs="git status"
+alias ga="git add"
+alias gc="git commit"
+alias gp="git push"
+alias gpf="git push --force"
+alias gl="git log"
+
+##
+## }}} aliases 
+
+
+## Tridge's Git Prompt {{{
+##
 function parse_git_branch {
   /usr/bin/git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
 }
@@ -142,6 +158,7 @@ function parse_git_branch {
 function proml {
   local      NORMAL="\[\033[0;0m\]"
   local        BLUE="\[\033[0;34m\]"
+  local  LIGHT_BLUE="\[\033[1;34m\]"
   local       BLACK="\[\033[0;30m\]"
   local         RED="\[\033[0;31m\]"
   local   LIGHT_RED="\[\033[1;31m\]"
@@ -159,12 +176,17 @@ function proml {
   esac
 
 PS1="${TITLEBAR}\
-\u@${WORKSTATIONALIAS}:\w$BLUE\$(parse_git_branch)$NORMAL\\$ "
+$LIGHT_GREEN\u@$WORKSTATION_ALIAS$NORMAL:$LIGHT_BLUE\w$BLUE\$(parse_git_branch)$NORMAL\\$ "
 PS2='> '
 PS4='+ '
 }
 proml
 
+##
+## }}} Tridge's Git Prompt
+
+## Miniconda3 {{{ 
+##
 # added by Miniconda3 4.5.12 installer
 # >>> conda init >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -183,3 +205,5 @@ fi
 unset __conda_setup
 export CONDA_CHANGEPS1=false
 # <<< conda init <<<
+##
+## }}} Miniconda3 
