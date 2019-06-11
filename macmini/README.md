@@ -30,8 +30,8 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotl
 
 **tmux**
 ```bash
-ln -s /Users/njoubert/Code/dotfiles/tmux /Users/njoubert/.tmux
-ln -s /Users/njoubert/Code/dotfiles/tmux.conf /Users/njoubert/.tmux.conf
+ln -s /Users/njoubert/Code/dotfiles/macmini/tmux /Users/njoubert/.tmux
+ln -s /Users/njoubert/Code/dotfiles/macmini/tmux.conf /Users/njoubert/.tmux.conf
 ```
 
 ### public/private keys
@@ -146,6 +146,7 @@ ln -s /Users/njoubert/Code/dotfiles/tmux.conf /Users/njoubert/.tmux.conf
 **tmux**
 
 `brew install tmux`
+follow instructions to install plugins
     
 ### Data Science
 
