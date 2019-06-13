@@ -74,6 +74,11 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/tmux.conf /Users/njoubert/.tmux.conf
 * Spotlight
     * Turn off Command-Space Keyboard Shortcut (We will be using Quicksilver)
 
+Configure no sleep:
+
+`sudo pmset -a sleep 0`
+
+
 ### Custom DNS
 ```
 1.1.1.1         # Cloudflare
