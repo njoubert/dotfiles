@@ -149,6 +149,7 @@ Configure no sleep:
 * VirtualBox
 * HexFiend
     * https://ridiculousfish.com/hexfiend/
+* Wireshark
 
 ### Terminal Apps and Configuration
 

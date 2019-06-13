@@ -11,8 +11,9 @@
 
 ## Setting up custom local IPs for fun and profit
 192.168.0.1     router
+192.168.0.1	router.local
 192.168.0.50	macmini
-
+192.168.0.50	macmini.local
 
 
 # START ADOBE LICENSE DENY
