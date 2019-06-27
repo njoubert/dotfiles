@@ -39,8 +39,6 @@ CXXOBJS     := $(CXXFILES:.cpp=.o)
 	$(CXX) -c $< -o $@ $(CXXFLAGS)
 
 $(TARGET): $(CXXOBJS) $(HEADERS) $(LIBS)
-	echo $(CXXFILES)
-	echo $(HEADERS)
 	$(LINKER) -o $(TARGET) $(CXXOBJS) $(LIBS) $(LDFLAGS) 
 
 lint:
