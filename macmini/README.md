@@ -123,6 +123,12 @@ Configure no sleep:
 * iState Menus 5
 * GrandPerspective
 
+## Setup proper shell
+
+* iTerm2
+    * install Menlo-for-Powerfline fonts, 14pt
+    * add `vscode-iterm.itermcolors`
+
 ## Setup proper shell commands
 
 * mosh
