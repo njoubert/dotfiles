@@ -10,7 +10,8 @@ https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04
 
 * Changed `/etc/mysql/my.cnf` to `innodb_buffer_pool_size = 20M`
 * Changed `/etc/apache2/mods-enabled/mpm_prefork.conf`
-* Enabled SWAP space https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04 
+
+If it gets worse, we'll enabled SWAP space https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04 
 
 ## Mosh
 
