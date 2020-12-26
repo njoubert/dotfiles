@@ -28,6 +28,12 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/ipython /Users/njoubert/.ipython
 ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotlib
 ```
 
+**tmux**
+```bash
+ln -s /Users/njoubert/Code/dotfiles/macmini/tmux /Users/njoubert/.tmux
+ln -s /Users/njoubert/Code/dotfiles/macmini/tmux.conf /Users/njoubert/.tmux.conf
+```
+
 ### public/private keys
 
 * Setup SSH Keys 
@@ -67,6 +73,11 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotl
     * Setup custom DNS (see below)
 * Spotlight
     * Turn off Command-Space Keyboard Shortcut (We will be using Quicksilver)
+
+Configure no sleep:
+
+`sudo pmset -a sleep 0`
+
 
 ### Custom DNS
 ```
@@ -112,6 +123,17 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotl
 * iState Menus 5
 * GrandPerspective
 
+## Setup proper shell
+
+* iTerm2
+    * install Menlo-for-Powerfline fonts, 14pt
+    * add `vscode-iterm.itermcolors`
+
+## Setup proper shell commands
+
+* mosh
+    `brew install mosh`
+
 ## Cloud Storage and Data Management
 
 * Dropbox
@@ -119,6 +141,10 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotl
 
 ## Communication
 
+## Design
+
+* OmniGraffle 6 Professional
+    * Install details on `Walvis`
 
 ## Software Development
 
@@ -129,6 +155,14 @@ ln -s /Users/njoubert/Code/dotfiles/macmini/matplotlib /Users/njoubert/.matplotl
 * VirtualBox
 * HexFiend
     * https://ridiculousfish.com/hexfiend/
+* Wireshark
+
+### Terminal Apps and Configuration
+
+**tmux**
+
+`brew install tmux`
+follow instructions to install plugins
     
 ### Data Science
 

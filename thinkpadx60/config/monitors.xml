@@ -1,0 +1,23 @@
+<monitors version="1">
+  <configuration>
+      <clone>yes</clone>
+      <output name="LVDS1">
+          <vendor>LEN</vendor>
+          <product>0x4000</product>
+          <serial>0x00000000</serial>
+          <width>1024</width>
+          <height>768</height>
+          <rate>60</rate>
+          <x>0</x>
+          <y>0</y>
+          <rotation>normal</rotation>
+          <reflect_x>no</reflect_x>
+          <reflect_y>no</reflect_y>
+          <primary>yes</primary>
+      </output>
+      <output name="VGA1">
+      </output>
+      <output name="VIRTUAL1">
+      </output>
+  </configuration>
+</monitors>

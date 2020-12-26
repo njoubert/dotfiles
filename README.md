@@ -16,7 +16,11 @@ ln -s /Users/njoubert/Code/dotfiles/swift/bashrc .bashrc
 
 ## Mac Terminal Settings
 
-I like:
+I like iTerm2, with:
+- Menlo for Powerline fonts, 14 pt
+- the `vscode-iterm.itermcolors` in the repo
+
+For the raw terminal, I like:
 
 - Novel theme
 - SF Mono 12pt

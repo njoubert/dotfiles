@@ -7,10 +7,13 @@
 #     - bash_profile is loaded on login interactive shells.
 #######################################################################
 
+WORKSTATIONALIAS="swift"
+
 # Don't 
 usage() {
   echo -n "$(tput bold)"
   echo "🌵🌴☠️  WELCOME NIELS ☕☕☕"
+  echo "SWIFT NAVIGATION MACBOOK PRO"
   echo "Useful Shortcuts:"
   echo "  ll             ls -lah"
   echo "  bg(1-6)        changes background color"
@@ -152,7 +155,7 @@ function proml {
   esac
 
 PS1="${TITLEBAR}\
-\u:\w$BLUE\$(parse_git_branch)$NORMAL\\$ "
+\u@${WORKSTATIONALIAS}:\w$BLUE\$(parse_git_branch)$NORMAL\\$ "
 PS2='> '
 PS4='+ '
 }
