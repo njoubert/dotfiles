@@ -1,5 +1,16 @@
 # Configuration of njoubert.com
 
+### 2020.12.26 
+
+configured tmux and added symlinks
+
+We gonna setup HTTPS!!! https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-apache-in-ubuntu-16-04
+
+This works but of course there's a whole bunch of error messages since it is self-signed. That's okay.
+
+
+
+
 ### 2020.12.26 Configuring Apache and MySQL for Small Server
 
 My DigitalOcean Droplet is only 512Mb RAM and 20 GB Disk. 
