@@ -10,8 +10,8 @@ set ruler
 highlight Comment ctermfg=green
 
 " Restrictions to help learn VIM
-noremap <Up> <Nop>
-noremap <Down> <Nop>
-noremap <Left> <Nop>
-noremap <Right> <Nop>
+" noremap <Up> <Nop>
+" noremap <Down> <Nop>
+" noremap <Left> <Nop>
+" noremap <Right> <Nop>
 
