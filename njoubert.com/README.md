@@ -1,5 +1,9 @@
 # Configuration of njoubert.com
 
+### 2020.12.31
+
+MySQL root password reset. MySQL plus sudo. 
+
 ### 2020.12.26 
 
 configured tmux and added symlinks
