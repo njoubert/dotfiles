@@ -20,6 +20,8 @@ uBlock Origin
 
 ## Dev Environment
 
+Also see https://github.com/njoubert/dotfiles-private/tree/master/uber-tower
+
 * Created and added new keypair to github
 ```
 ssh-keygen -t ed25519 -C "njoubert@gmail.com"
@@ -47,4 +49,6 @@ ln -s /home/njoubert/Code/dotfiles/precision7510/zshrc /home/njoubert/.zshrc
 
 Menlo for Powerline Fonts
 https://github.com/abertsch/Menlo-for-Powerline
+`sudo apt-get install powerline fonts-powerline`
 
+`git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm`
