@@ -33,6 +33,9 @@ sudo apt install net-tools git vim tmux mosh wget curl zsh
 * Make ZSH the default shell
 ```chsh -s $(which zsh)```
 
+Setup oh-my-zsh
+https://www.tecmint.com/install-oh-my-zsh-in-ubuntu/
+
 * Setup symlinks for dotfiles
 ```
 ln -s /home/njoubert/Code/dotfiles/precision7510/vimrc /home/njoubert/.vimrc
