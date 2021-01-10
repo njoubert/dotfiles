@@ -1,9 +1,22 @@
 # Precision 7510 Setup
 
-* Ubuntu 20.04.1 Install on a clean formatted drive
+## Laptop Details
 
-* Firefox Setup
-	* uBlock Origin
+```
+Dell Precision 7510
+Processor:
+Memory:
+Graphics:
+SDD:
+Serial Number:
+```
+
+## OS and Basics
+
+Ubuntu 20.04.1 Install on a clean formatted drive
+
+Firefox Setup
+uBlock Origin
 
 ## Dev Environment
 
@@ -14,15 +27,21 @@ ssh-keygen -t ed25519 -C "njoubert@gmail.com"
 
 * Install stuff:
 ```
-sudo apt install net-tools git vim tmux mosh
+sudo apt install net-tools git vim tmux mosh wget curl zsh
 ```	
+
+* Make ZSH the default shell
+```chsh -s $(which zsh)```
 
 * Setup symlinks for dotfiles
 ```
-
 ln -s /home/njoubert/Code/dotfiles/precision7510/vimrc /home/njoubert/.vimrc
 ln -s /home/njoubert/Code/dotfiles/precision7510/gitconfig /home/njoubert/.gitconfig
+ln -s /home/njoubert/Code/dotfiles/precision7510/bashrc /home/njoubert/.bashrc
+ln -s /home/njoubert/Code/dotfiles/precision7510/zshrc /home/njoubert/.zshrc
 
 ```
 
+Menlo for Powerline Fonts
+https://github.com/abertsch/Menlo-for-Powerline
 
