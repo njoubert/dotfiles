@@ -122,6 +122,8 @@ Configure no sleep:
         * Unclear how to separate personal and swiftnav. Going with swiftnav for now.
 * iState Menus 5
 * GrandPerspective
+* Rogue Amoeba Loopback
+    * License in email!
 
 ## Setup proper shell
 
