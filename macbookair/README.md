@@ -13,7 +13,10 @@
 
 Useful Website to find M1 apps: https://isapplesiliconready.com/
 
-Applications Installed
+Useful fonts: https://github.com/powerline/fonts
+
+### Applications Installed
+
 * Brave Browser
 * Google Chrome
 * Loopback Audio
@@ -32,6 +35,5 @@ Applications Installed
 * VLC
 * Setup SSH Keys for Github
 	* https://docs.github.com/en/enterprise-server@3.0/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
-	
-	
+		
 
