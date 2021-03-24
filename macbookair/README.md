@@ -21,7 +21,6 @@ Applications Installed
 	* `Name: Niels Joubert`
 	* `Code: VADS-RU2E-AQNY-3HFD-FGW8-YEMU-KWHP-VGE2-XBQJ`
 * Rectangle app
-* Signal app
 * iStatMenus 6
 	* `Email: njoubert@gmail.com`
 	* `Key: GAWAE-FCPBJ-JNK34-SA32X-G2K3Y-YZEXB-VT4G2-AM3QC-CRJX5-FHVPT-33DVC-HDQ6L-BAD3G-SKSZR-W2AA`
@@ -31,7 +30,6 @@ Applications Installed
 	* set colors to `vscode-iterm`
 	* Install Menlo for Powerline, set font pt 14
 * VLC
-* DaVinci Resolve FREE for video editing
 * Setup SSH Keys for Github
 	* https://docs.github.com/en/enterprise-server@3.0/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
 	
