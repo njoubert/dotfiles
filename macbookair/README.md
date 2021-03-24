@@ -28,6 +28,8 @@ Applications Installed
 * Apple Developer Tools (type `git` in the command line and it pops up the installer)
 * VSCode
 * iTerm2
+	* set colors to `vscode-iterm`
+	* Install Menlo for Powerline, set font pt 14
 * VLC
 * DaVinci Resolve FREE for video editing
 * Setup SSH Keys for Github
