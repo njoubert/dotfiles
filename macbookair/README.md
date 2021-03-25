@@ -8,6 +8,10 @@
 * 1 TB SSD
 ```
 
+## 2021.03.25
+
+* PrivateInternetAccess (rosetta)
+* Evernote (rosetta)
 
 ## 2021.03.23
 
