@@ -15,9 +15,13 @@
 
 ## 2021.03.23
 
-Useful Website to find M1 apps: https://isapplesiliconready.com/
+Useful Website to find M1 apps.
+* [isitapplesiliconready.com](https://isapplesiliconready.com/)
+* [doesitarm.com](https://doesitarm.com/)
 
-Useful fonts: https://github.com/powerline/fonts
+
+Useful fonts: 
+* https://github.com/powerline/fonts
 
 ### Applications Installed
 
