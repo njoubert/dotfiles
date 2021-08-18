@@ -8,6 +8,13 @@
 * 1 TB SSD
 ```
 
+## 2021.08.18
+
+* Homebrew is native on Mac M1
+	* https://code2care.org/howto/install-homebrew-brew-on-m1-mac
+	* `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+* youtube-dl the manual way
+
 ## 2021.05.20
 
 * Sublime Text 4 for M1 Mac!
