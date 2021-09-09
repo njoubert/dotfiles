@@ -2,4 +2,4 @@
 # Lines starting with # are comments
 
 # Modify the default saved filename
--o '%(uploader)s - %(upload_date)s - %(title)s - %(id)s.%(ext)s'
+-o '%(upload_date)s - %(uploader)s - %(title)s - %(id)s.%(ext)s'

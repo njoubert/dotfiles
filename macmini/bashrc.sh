@@ -109,9 +109,9 @@ set_bg_sequentially() {
 # Show usage if this is an interactive shell, and rotate background if also local
 if [[ $- == *i* ]]; then
   usage
-  if [ "$ORIGIN" == "local" ]; then
-    set_bg_sequentially
-  fi
+#  if [ "$ORIGIN" == "local" ]; then
+#    set_bg_sequentially
+#  fi
 fi
 
 # make less more friendly for non-text input files, see lesspipe(1)

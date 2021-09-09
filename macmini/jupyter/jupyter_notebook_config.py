@@ -100,7 +100,7 @@ c.FileContentsManager.post_save_hook = post_save
 #  
 #  Local IP addresses (such as 127.0.0.1 and ::1) are allowed as local, along
 #  with hostnames configured in local_hostnames.
-#c.NotebookApp.allow_remote_access = False
+c.NotebookApp.allow_remote_access = True
 
 ## Whether to allow the user to run the notebook as root.
 #c.NotebookApp.allow_root = False
@@ -222,7 +222,7 @@ c.FileContentsManager.post_save_hook = post_save
 #c.NotebookApp.iopub_msg_rate_limit = 1000
 
 ## The IP address the notebook server will listen on.
-#c.NotebookApp.ip = 'localhost'
+c.NotebookApp.ip = '*'
 
 ## Supply extra arguments that will be passed to Jinja environment.
 #c.NotebookApp.jinja_environment_options = {}
@@ -285,7 +285,7 @@ c.FileContentsManager.post_save_hook = post_save
 #  platform dependent and determined by the python standard library `webbrowser`
 #  module, unless it is overridden using the --browser (NotebookApp.browser)
 #  configuration option.
-#c.NotebookApp.open_browser = True
+c.NotebookApp.open_browser = True
 
 ## Hashed password to use for web authentication.
 #  
@@ -294,7 +294,7 @@ c.FileContentsManager.post_save_hook = post_save
 #    from notebook.auth import passwd; passwd()
 #  
 #  The string should be of the form type:salt:hashed-password.
-#c.NotebookApp.password = ''
+c.NotebookApp.password = ''
 
 ## Forces users to use a password for the Notebook server. This is useful in a
 #  multi user environment, for instance when everybody in the LAN can access each
@@ -358,7 +358,7 @@ c.FileContentsManager.post_save_hook = post_save
 #  
 #  Setting to an empty string disables authentication altogether, which is NOT
 #  RECOMMENDED.
-#c.NotebookApp.token = '<generated>'
+c.NotebookApp.token = ''
 
 ## Supply overrides for the tornado.web.Application that the Jupyter notebook
 #  uses.
