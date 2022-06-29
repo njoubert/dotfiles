@@ -25,6 +25,28 @@ For the raw terminal, I like:
 - Novel theme
 - SF Mono 12pt
 
+## My Mac Knowledge and Best Practices
+
+### LaunchDaemons and LaunchAgents
+
+[How to Catch and Remove Hidden LaunchDaemons and LaunchAgents on Mac](https://www.makeuseof.com/tag/hidden-launchdaemons-launchagents-mac/)
+
+LaunchDaemons typically run as root, meaning they work regardless of whether a user is logged in or not. They cannot display information using the graphical user interface and they affect the entire system.
+
+```
+/System/Library/LaunchDaemons for native macOS processes
+/Library/LaunchDaemons for installed third-party apps
+```
+
+Mac LaunchAgents start when a user logs in. Unlike daemons, they can access the user interface and display information. For example, a calendar app can monitor the user's calendar account for events and notify you when the event occurs. The lists of agents live in the following locations:
+
+
+```
+/Library/LaunchAgents for all user accounts
+~/Library/LaunchAgents for a specific user account
+/System/Library/LaunchAgents for macOS only
+```
+
 ## My Bash Knowledge and Best Practices
 
 ### Important Background Info
