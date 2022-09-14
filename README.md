@@ -1,5 +1,8 @@
 # Niels Joubert's dotfiles
 
+check out "Github does Dotfiles!" https://dotfiles.github.io/
+
+
 ## Non-dotfile-related utilities I use
 
 - Quicksilver
