@@ -2,6 +2,10 @@
 
 check out "Github does Dotfiles!" https://dotfiles.github.io/
 
+## Great command line tools to know:
+
+- [mtr](https://formulae.brew.sh/formula/mtr) Like traceroute and ping all in one
+
 
 ## Non-dotfile-related utilities I use
 
