@@ -63,6 +63,8 @@ Useful Website to find M1 apps.
 
 Useful fonts: 
 * https://github.com/powerline/fonts
+* MesloLG Nerd Font [preview](https://www.programmingfonts.org/#meslo) [download](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/Meslo.zip)
+
 
 ### Applications Installed
 
