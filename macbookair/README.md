@@ -52,32 +52,6 @@ For custom prompts, there's the venerable [powershell10k](https://github.com/rom
 ⏳ *As for plugins, I have yet to get into [oh-my-zsh](https://ohmyz.sh/) and enable all the [fancy](https://dev.to/abdfnx/oh-my-zsh-powerlevel10k-cool-terminal-1no0) [stuff](https://www.lorenzobettini.it/2024/01/oh-my-zsh-and-powerlevel10k-in-macos/).*
 
 
-### VIM Enhancements
-
-**See the [vimrc](vimrc) file.**
-
-Vim is a good quick-and-dirty text editor that I find myself using regularly on the command line.
-So a little bit of tweaking to make it nice is great.
-
-Install the latest VIM with python3 support:
-
-```
-brew install python3
-brew install vim
-```
-
-Confirm that vim indeed is now running from this new binary, and has python3. 
-If this looks wrong, check your `PATH`!
-```
-$ which vim
-/opt/homebrew/bin/vim
-
-$ vim --version | grep python3
-+cmdline_info      +libcall           +python3           +virtualedit
-```
-
-
-
 ### Sublime Text 4 Enhancements
 
 I do still use and love Sublime Text for how lightweight and great it is. 
