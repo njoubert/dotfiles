@@ -8,6 +8,8 @@ Then I use `git` to manage this repository.
 
 Manually copy files back to your homedirectory to install. 
 
+![Backup Dotfiles](images/backup-dotfiles.png)
+
 ## Computer Details
 ```
 * MacBook Air (M1, 2020)
@@ -34,6 +36,8 @@ In the end, I concluded that the simple fonts are the best ones, really.
 
 All above fonts are patched with all the nerd font glyphs and available in the [fonts](./fonts/) directory.
 
+![Meslo Nerdfont](images/meslo-nerdfont.png)
+
 ### ZSH in iTerm2
 
 **See [zshrc](zshrc) file**
@@ -45,7 +49,7 @@ MacOS default shell is `zsh` so I'm going with that.
 
 For custom prompts, there's the venerable [powershell10k](https://github.com/romkatv/powerlevel10k) and the new kid [starship.rs](https://starship.rs/). I tried both and Powerlevel10k is faster, while Starship is buggy and the documentation is often incorrect. So, P10K it is.
 
-As for plugins, I have yet to get into [oh-my-zsh](https://ohmyz.sh/) and enable all the [fancy](https://dev.to/abdfnx/oh-my-zsh-powerlevel10k-cool-terminal-1no0) [stuff](https://www.lorenzobettini.it/2024/01/oh-my-zsh-and-powerlevel10k-in-macos/).
+⏳ *As for plugins, I have yet to get into [oh-my-zsh](https://ohmyz.sh/) and enable all the [fancy](https://dev.to/abdfnx/oh-my-zsh-powerlevel10k-cool-terminal-1no0) [stuff](https://www.lorenzobettini.it/2024/01/oh-my-zsh-and-powerlevel10k-in-macos/).*
 
 
 ### VIM Enhancements
