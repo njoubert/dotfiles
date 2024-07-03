@@ -15,9 +15,26 @@ I spent time reconfiguring my terminal and vim.
 
 ### ZSH Enhancements
 
+MacOS default shell is `zsh` so I'm going with that.
 
+For custom prompts, there's the venerable [powershell10k](https://github.com/romkatv/powerlevel10k) and the new kid [starship.rs](https://starship.rs/). I tried both and Powerlevel10k is faster, while Starship is buggy and the documentation is often incorrect. So, P10K it is.
+
+As for plugins, I have yet to get into [oh-my-zsh](https://ohmyz.sh/) and enable all the [fancy](https://dev.to/abdfnx/oh-my-zsh-powerlevel10k-cool-terminal-1no0) [stuff](https://www.lorenzobettini.it/2024/01/oh-my-zsh-and-powerlevel10k-in-macos/).
+
+**See zshrc file**
 
 ### VIM Enhancements
+
+Vim is a good quick-and-dirty text editor that I find myself using regularly on the command line.
+So a little bit of tweaking to make it nice is great.
+
+**See the vimrc file.**
+
+### Sublime Text 4 Enhancements
+
+I do still use and love Sublime Text for how lightweight and great it is. 
+At my last 3 jobs, everyone is using Visual Studio Code and there's a lot of good stuff in there.
+
 
 ## 2021.08.18
 
