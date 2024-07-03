@@ -1,6 +1,8 @@
 # Macbook Air M1 Dotfiles
 
-## Installation
+## Managing Dotfiles
+
+![Backup Dotfiles](images/backup-dotfiles.png)
 
 I chose not to symlink paths.
 Instead, the [`backup-dotfiles.sh`](backup-dotfiles.sh) script copies dotfiles from `~/` to this repository.
@@ -8,15 +10,14 @@ Then I use `git` to manage this repository.
 
 Manually copy files back to your homedirectory to install. 
 
-![Backup Dotfiles](images/backup-dotfiles.png)
+To add more files to backup, modify the config in [`backup-dotfiles.sh`](backup-dotfiles.sh).
 
-## Computer Details
-```
-* MacBook Air (M1, 2020)
-* 8 core CPU, 8 core GPU
-* 16 GB Ram
-* 1 TB SSD
-```
+| Action           | Method |
+| ---------------- | ------ |
+| Backup Dotfiles  | `./backup-dotfiles.sh` then `git commit -am "<message>"` |
+| Restore Dotfiles | Manually copy from this directory |
+| Add Dotfiles     | Edit config in [`backup-dotfiles.sh`](backup-dotfiles.sh). |
+
 
 # Running Notes
 
