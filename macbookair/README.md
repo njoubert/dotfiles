@@ -8,6 +8,17 @@
 * 1 TB SSD
 ```
 
+## 2024.07.01  Big Update 👈
+
+After taking a new job at StackAV where I was asked to do more IC work, 
+I spent time reconfiguring my terminal and vim.
+
+### ZSH Enhancements
+
+
+
+### VIM Enhancements
+
 ## 2021.08.18
 
 * Homebrew is native on Mac M1
