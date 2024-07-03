@@ -1,4 +1,12 @@
-# Macbook Air Setup
+# Macbook Air M1 Dotfiles
+
+## Installation
+
+I chose not to symlink paths.
+Instead, the [`backup-dotfiles.sh`](backup-dotfiles.sh) script copies dotfiles from `~/` to this repository.
+Then I use `git` to manage this repository.
+
+Manually copy files back to your homedirectory to install. 
 
 ## Computer Details
 ```
@@ -7,6 +15,8 @@
 * 16 GB Ram
 * 1 TB SSD
 ```
+
+# Running Notes
 
 ## 2024.07.01  Big Update 👈
 
