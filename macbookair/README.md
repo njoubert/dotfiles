@@ -39,7 +39,15 @@ As for plugins, I have yet to get into [oh-my-zsh](https://ohmyz.sh/) and enable
 Vim is a good quick-and-dirty text editor that I find myself using regularly on the command line.
 So a little bit of tweaking to make it nice is great.
 
-**See the vimrc file.**
+Install the latest VIM with python3 support:
+
+```
+brew install python3
+brew install vim
+```
+
+**See the [vimrc](vimrc) file.**
+
 
 ### Sublime Text 4 Enhancements
 

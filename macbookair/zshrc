@@ -20,8 +20,8 @@ source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
 
 
 ## 2021.08.18 Installing Homebrew
-export PATH=/opt/homebrew/bin:$PATH
-export PATH="/opt/homebrew/sbin:$PATH"
+export PATH=$PATH:/opt/homebrew/bin:
+export PATH=$PATH:/opt/homebrew/sbin
 
 ## Aliases
 alias ll="ls -lahG"
