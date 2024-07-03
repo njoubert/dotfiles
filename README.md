@@ -83,3 +83,7 @@ Customize bash behavior with special variables.
 ### Special Bash Variables
 
 http://tldp.org/LDP/abs/html/internalvariables.html
+
+## Housekeeping
+
+This repository uses [pre-commit](https://pre-commit.com/) to housekeep. 
