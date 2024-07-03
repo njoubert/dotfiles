@@ -9,9 +9,11 @@
 
 # Files to Copy
 HOMEDIR="/Users/njoubert/"
+DESTDIT="/Users/njoubert/Code/dotfiles/macbookair/"
 
 declare -a DOTFILES=(".vimrc"
 	".zshrc"
+	".p10k.zsh"
 	)
 
 ###
@@ -106,7 +108,7 @@ print_fail() {
 for f in "${DOTFILES[@]}"
 do
 	FILEPATH="$HOMEDIR$f"
-	DESTPATH=${f#"."}
+	DESTPATH="$DESTDIT${f#"."}"
 	cp "$FILEPATH" "$DESTPATH"
 	retval=$?
 	if [ "$retval" -eq "0" ]; then
