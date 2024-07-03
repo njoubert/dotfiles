@@ -8,7 +8,9 @@
 ###
 
 # Files to Copy
-declare -a filelist=(".vimrc"
+HOMEDIR="/Users/njoubert/"
+
+declare -a DOTFILES=(".vimrc"
 	".zshrc"
 	)
 
@@ -101,16 +103,16 @@ print_fail() {
 ### Now the actual copying
 ###
 
-for f in "${filelist[@]}"
+for f in "${DOTFILES[@]}"
 do
-	homepath="~/$f"
-	nodot=${f#"."}
-	cp -v "$homepath" "$nodot"
+	FILEPATH="$HOMEDIR$f"
+	DESTPATH=${f#"."}
+	cp "$FILEPATH" "$DESTPATH"
 	retval=$?
 	if [ "$retval" -eq "0" ]; then
-		print_success "Copied $homepath to $nodot";
+		print_success "Copied $FILEPATH to $DESTPATH";
 	else
-		print_fail "Failed to copy $homepath to $nodot"
+		print_fail "Failed to copy $FILEPATH to $DESTPATH"
 	fi;
 done
 
