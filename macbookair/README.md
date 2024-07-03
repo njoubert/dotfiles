@@ -34,7 +34,12 @@ In the end, I concluded that the simple fonts are the best ones, really.
 
 All above fonts are patched with all the nerd font glyphs and available in the [fonts](./fonts/) directory.
 
-### ZSH Enhancements
+### ZSH in iTerm2
+
+**See [zshrc](zshrc) file**
+
+![My Terminal](images/macbookair-terminal.png)
+
 
 MacOS default shell is `zsh` so I'm going with that.
 
@@ -42,9 +47,10 @@ For custom prompts, there's the venerable [powershell10k](https://github.com/rom
 
 As for plugins, I have yet to get into [oh-my-zsh](https://ohmyz.sh/) and enable all the [fancy](https://dev.to/abdfnx/oh-my-zsh-powerlevel10k-cool-terminal-1no0) [stuff](https://www.lorenzobettini.it/2024/01/oh-my-zsh-and-powerlevel10k-in-macos/).
 
-**See zshrc file**
 
 ### VIM Enhancements
+
+**See the [vimrc](vimrc) file.**
 
 Vim is a good quick-and-dirty text editor that I find myself using regularly on the command line.
 So a little bit of tweaking to make it nice is great.
@@ -56,7 +62,16 @@ brew install python3
 brew install vim
 ```
 
-**See the [vimrc](vimrc) file.**
+Confirm that vim indeed is now running from this new binary, and has python3. 
+If this looks wrong, check your `PATH`!
+```
+$ which vim
+/opt/homebrew/bin/vim
+
+$ vim --version | grep python3
++cmdline_info      +libcall           +python3           +virtualedit
+```
+
 
 
 ### Sublime Text 4 Enhancements
