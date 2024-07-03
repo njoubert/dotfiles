@@ -20,3 +20,9 @@ repos:
     hooks:
     -   id: detect-secrets
         name: detect secrets
+
+
+-   repo: https://github.com/mxr/sync-pre-commit-deps
+    rev: v0.0.1
+    hooks:
+    -   id: sync-pre-commit-deps
