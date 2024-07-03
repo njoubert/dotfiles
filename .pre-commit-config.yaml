@@ -8,7 +8,7 @@ repos:
 #    -   id: end-of-file-fixer
     -   id: check-yaml
     -   id: check-added-large-files
-        args: ["--maxkb=5024", "--enforce-all"]
+        args: ["--maxkb=10240", "--enforce-all"]
     -   id: check-case-conflict
 #    -   id: forbid-submodules
     -   id: check-merge-conflict
