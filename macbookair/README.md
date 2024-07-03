@@ -13,6 +13,17 @@
 After taking a new job at StackAV where I was asked to do more IC work, 
 I spent time reconfiguring my terminal and vim.
 
+### Fonts
+
+I went down a rabbithole on [nerd fonts](https://www.nerdfonts.com/).
+In the end, I concluded that the simple fonts are the best ones, really.
+
+- Text Editor: Monaco, the build-in Mac font, for text editing.
+- Terminal: Meslo, the previous Mac font patched for programming.
+- Alternative: Menlo, the previous Mac font.
+
+All above fonts are patched with all the nerd font glyphs and available in the [fonts](./fonts/) directory.
+
 ### ZSH Enhancements
 
 MacOS default shell is `zsh` so I'm going with that.
@@ -34,6 +45,12 @@ So a little bit of tweaking to make it nice is great.
 
 I do still use and love Sublime Text for how lightweight and great it is. 
 At my last 3 jobs, everyone is using Visual Studio Code and there's a lot of good stuff in there.
+
+Plugins:
+
+- Markdown Extended
+- MarkdownPreview
+- MarkdownLivePreview
 
 
 ## 2021.08.18
