@@ -39,4 +39,18 @@ done
 
 
 git -C $WORKTREE commit -am "$(date) Additions from ./backup-dotfiles.sh"
-git push
+if [ "$retval" -eq "0" ]; then
+	print_success "Committed additions to Git";
+	git push
+	retvall=$?
+	if [ "$retvall" -eq "0" ]; then
+		print_success "Pushed to GitHub";
+	else
+		print_fail "Failed to push to GitHub"
+	fi;
+
+else
+	print_fail "Failed to commir"
+fi;
+
+
