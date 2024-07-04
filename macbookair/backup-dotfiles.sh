@@ -3,7 +3,7 @@
 # Silly little script to copy over dotfiles into this directory.
 #
 
-. color.sh  # Importing color printing
+. /Users/njoubert/Code/dotfiles/macbookair/color.sh  # Importing color printing
 
 ###
 ### Config
