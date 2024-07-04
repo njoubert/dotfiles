@@ -121,4 +121,4 @@ do
 done
 
 
-git -C $WORKTREE commit -am "$(date) Additions"
+git -C $WORKTREE commit -am "$(date) Additions from ./backup-dotfiles.sh"
