@@ -44,6 +44,8 @@ export PATH=/opt/homebrew/bin:$PATH
 export PATH=/opt/homebrew/sbin:$PATH
 # 2024.07.03 Installing Rust
 export PATH=/Users/njoubert/.cargo/bin:$PATH
+# 2024.07.03 Making my own bin directory
+export PATH=/Users/njoubert/bin:$PATH
 
 ###
 ### Aliases

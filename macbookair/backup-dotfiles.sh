@@ -9,7 +9,9 @@
 
 # Files to Copy
 HOMEDIR="/Users/njoubert/"
-DESTDIT="/Users/njoubert/Code/dotfiles/macbookair/"
+DESTDIR="/Users/njoubert/Code/dotfiles/macbookair/"
+WORKTREE="/Users/njoubert/Code/dotfiles/"
+GITDIR="/Users/njoubert/Code/dotfiles/.git/"
 
 declare -a DOTFILES=(".vimrc"
 	".zshrc"
@@ -108,7 +110,7 @@ print_fail() {
 for f in "${DOTFILES[@]}"
 do
 	FILEPATH="$HOMEDIR$f"
-	DESTPATH="$DESTDIT${f#"."}"
+	DESTPATH="$DESTDIR${f#"."}"
 	cp "$FILEPATH" "$DESTPATH"
 	retval=$?
 	if [ "$retval" -eq "0" ]; then
@@ -119,3 +121,4 @@ do
 done
 
 
+git -C $WORKTREE commit -am "$(date) Additions"
