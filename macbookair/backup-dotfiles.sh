@@ -37,20 +37,31 @@ do
 	fi;
 done
 
+
 git add -A
+retval=$?
+if [ "$retval" -eq "0" ]; then
+	print_success "Added all files to git";
+else
+	print_fail "Failed to add files to git. Aborting!"
+	exit 1
+fi;
+
 git -C $WORKTREE commit -m "$(date) Additions from ./backup-dotfiles.sh"
 if [ "$retval" -eq "0" ]; then
 	print_success "Committed additions to Git";
-	git push
-	retvall=$?
-	if [ "$retvall" -eq "0" ]; then
-		print_success "Pushed to GitHub";
-	else
-		print_fail "Failed to push to GitHub"
-	fi;
-
 else
-	print_fail "Failed to commir"
+	print_fail "Failed to commit to git. Aborting!"
+	exit 1
+fi;
+
+git push
+retval=$?
+if [ "$retval" -eq "0" ]; then
+	print_success "Pushed to GitHub";
+else
+	print_fail "Failed to push to GitHub. Aborting!"
+	exit 1
 fi;
 
 
