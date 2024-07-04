@@ -58,7 +58,7 @@ fi;
 git push
 retval=$?
 if [ "$retval" -eq "0" ]; then
-	print_success "Pushed to GitHub";
+	print_success "Pushed to GitHub: https://github.com/njoubert/dotfiles/tree/master/macbookair";
 else
 	print_fail "Failed to push to GitHub. Aborting!"
 	exit 1
