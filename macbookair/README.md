@@ -31,7 +31,7 @@ I spent time reconfiguring my terminal and vim.
 
 ### Password, Secrets, and SSH Keys Management
 
-I transitioned off of LastPass and onto 1Password.
+🚨 **I migrated off LastPass and onto 1Password.** 🚨
 
 One of the cool things is that 1Password installed an `ssh-agent` and lets you manage your SSH Keys!
 
