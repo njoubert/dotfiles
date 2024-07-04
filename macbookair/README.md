@@ -28,6 +28,21 @@ To add more files to backup, modify the config in [`backup-dotfiles.sh`](backup-
 After taking a new job at StackAV where I was asked to do more IC work, 
 I spent time reconfiguring my terminal and vim.
 
+### Password, Secrets, and SSH Keys Management
+
+I transitioned off of LastPass and onto 1Password.
+
+One of the cool things is that 1Password installed an `ssh-agent` and lets you manage your SSH Keys!
+
+#### 2FA App
+
+I actively use a *different* app for 2FA than my Password Manager. 
+I use Authy from Twilio for 2FA on my phone.
+
+I believe it is **less secure** is the same app stores your password and your 2FA code. 
+That is no longer two factor authentication, if you compromise 1Pass then you're in everywhere!
+With my setup, an attacked would have to compromise both LastPass and Authy to gain access.
+
 ### Fonts
 
 I went down a rabbithole on [nerd fonts](https://www.nerdfonts.com/).
