@@ -24,45 +24,30 @@ declare -a DOTFILES=(".vimrc"
 ### Now the actual copying
 ###
 
+assert_with_msg() {
+	if [ "$1" -eq "0" ]; then
+		print_success "$2";
+	else
+		print_fail "$3..Aborting!";
+		exit;
+	fi;
+}
+
 for f in "${DOTFILES[@]}"
 do
 	FILEPATH="$HOMEDIR$f"
 	DESTPATH="$DESTDIR${f#"."}"
 	cp "$FILEPATH" "$DESTPATH"
-	retval=$?
-	if [ "$retval" -eq "0" ]; then
-		print_success "Copied $FILEPATH";
-	else
-		print_fail "Failed to copy $FILEPATH to $DESTPATH"
-	fi;
+	assert_with_msg $? "Copied $FILEPATH" "Failed to copy $FILEPATH to $DESTPATH"
 done
 
-
 git add -A
-retval=$?
-if [ "$retval" -eq "0" ]; then
-	print_success "Added all files to git";
-else
-	print_fail "Failed to add files to git. Aborting!"
-	exit 1
-fi;
+assert_with_msg $? "Added all files to git." "Failed to add files to git."
 
 git -C $WORKTREE commit -m "$(date) Additions from ./backup-dotfiles.sh"
-retval=$?
-if [ "$retval" -eq "0" ]; then
-	print_success "Committed additions to git";
-else
-	print_fail "Failed to commit to git. Aborting!"
-	exit 1
-fi;
+assert_with_msg $? "Committed additions to git." "Failed to commit to git."
 
 git push
-retval=$?
-if [ "$retval" -eq "0" ]; then
-	print_success "Pushed to GitHub: https://github.com/njoubert/dotfiles/tree/master/macbookair";
-else
-	print_fail "Failed to push to GitHub. Aborting!"
-	exit 1
-fi;
+assert_with_msg $? "Pushed to GitHub: https://github.com/njoubert/dotfiles/tree/master/macbookair" "Failed to push to GitHub."
 
 
