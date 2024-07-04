@@ -20,6 +20,18 @@ declare -a DOTFILES=(".vimrc"
 	".p10k.zsh"
 	)
 
+check_return_value() {
+	local retval=${1}
+	local yesmsg=${2}
+	local nomsg=${3}
+
+	if [ "$retval" -eq "0" ]; then
+		print_success $yesmsg;
+	else
+		print_fail $nomsg
+		exit 1
+	fi;
+}
 ###
 ### Now the actual copying
 ###
@@ -40,12 +52,7 @@ done
 
 git add -A
 retval=$?
-if [ "$retval" -eq "0" ]; then
-	print_success "Added all files to git";
-else
-	print_fail "Failed to add files to git. Aborting!"
-	exit 1
-fi;
+check_return_value $? "Added all files to git" "Failed to add files to git. Aborting!"
 
 git -C $WORKTREE commit -m "$(date) Additions from ./backup-dotfiles.sh"
 if [ "$retval" -eq "0" ]; then
