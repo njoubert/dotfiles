@@ -47,7 +47,7 @@ assert_with_msg $? "Added all files to git." "Failed to add files to git."
 git -C $WORKTREE commit -m "$(date) Additions from ./backup-dotfiles.sh"
 assert_with_msg $? "Committed additions to git." "Failed to commit to git."
 
-git push
+git -C $WORKTREE push
 assert_with_msg $? "Pushed to GitHub: https://github.com/njoubert/dotfiles/tree/master/macbookair" "Failed to push to GitHub."
 
 
