@@ -39,8 +39,11 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 ###
 ### 2021.08.18 Installing Homebrew
 ###
+# 2021.08.18 Installing Homebrew
 export PATH=/opt/homebrew/bin:$PATH
 export PATH=/opt/homebrew/sbin:$PATH
+# 2024.07.03 Installing Rust
+export PATH=/Users/njoubert/.cargo/bin:$PATH
 
 ###
 ### Aliases
