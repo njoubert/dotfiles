@@ -38,7 +38,7 @@ do
 done
 
 git add -A
-git -C $WORKTREE commit -am "$(date) Additions from ./backup-dotfiles.sh"
+git -C $WORKTREE commit -m "$(date) Additions from ./backup-dotfiles.sh"
 if [ "$retval" -eq "0" ]; then
 	print_success "Committed additions to Git";
 	git push
