@@ -5,7 +5,7 @@
 
 ## Managing Dotfiles
 
-![Backup Dotfiles](images/backup-dotfiles.png)
+![Backup Dotfiles](images/backup-dotfiles.gif)
 
 I chose not to symlink paths.
 Instead, the [`backup-dotfiles.sh`](backup-dotfiles.sh) script copies dotfiles from `~/` to this repository.
