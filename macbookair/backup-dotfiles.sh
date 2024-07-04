@@ -41,7 +41,7 @@ do
 	assert_with_msg $? "Copied $FILEPATH" "Failed to copy $FILEPATH to $DESTPATH"
 done
 
-git add -A
+git -C $WORKTREE add -A
 assert_with_msg $? "Added all files to git." "Failed to add files to git."
 
 git -C $WORKTREE commit -m "$(date) Additions from ./backup-dotfiles.sh"

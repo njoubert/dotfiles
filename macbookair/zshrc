@@ -37,7 +37,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 
 
 ###
-### 2021.08.18 Installing Homebrew
+### Setting up Paths
 ###
 # 2021.08.18 Installing Homebrew
 export PATH=/opt/homebrew/bin:$PATH
@@ -46,6 +46,12 @@ export PATH=/opt/homebrew/sbin:$PATH
 export PATH=/Users/njoubert/.cargo/bin:$PATH
 # 2024.07.03 Making my own bin directory
 export PATH=/Users/njoubert/bin:$PATH
+
+###
+### Setting up SSH
+###
+# 2024.07.04 https://developer.1password.com/docs/ssh/get-started/
+export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
 
 ###
 ### Aliases
