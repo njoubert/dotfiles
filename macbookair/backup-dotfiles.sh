@@ -31,7 +31,7 @@ do
 	cp "$FILEPATH" "$DESTPATH"
 	retval=$?
 	if [ "$retval" -eq "0" ]; then
-		print_success "Copied $FILEPATH to $DESTPATH";
+		print_success "Copied $FILEPATH";
 	else
 		print_fail "Failed to copy $FILEPATH to $DESTPATH"
 	fi;
