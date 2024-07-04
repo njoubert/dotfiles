@@ -39,3 +39,4 @@ done
 
 
 git -C $WORKTREE commit -am "$(date) Additions from ./backup-dotfiles.sh"
+git push
