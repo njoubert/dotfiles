@@ -49,12 +49,20 @@ With my setup, an attacked would have to compromise both LastPass and Authy to g
 I went down a rabbithole on [nerd fonts](https://www.nerdfonts.com/).
 In the end, I concluded that the simple fonts are the best ones, really.
 
-- Text Editor: Monaco, the build-in Mac font, for text editing.
-- Terminal: Meslo, the previous Mac font patched for programming.
-- Alternative: Menlo, the previous Mac font.
+Visual Studio Code does a really fancy auto-line-spacing algorithm that provides nice spacing for long coding runs. 
+Everywhere else, you get the default line spacing. 
+Menlo is a tightly line-spaced font which is nice for terminal. 
+MesloLGM is a Menlo variable with Medium line spacing (the "M" at the end of the name).
 
-All above fonts are patched with all the nerd font glyphs and available in the [fonts](./fonts/) directory.
+My preferred fonts are:
 
+- Terminal and Text Editor: [Menlo for Powerline](https://github.com/lxbrtsch/Menlo-for-Powerline)
+- Alternative for Text Editor: Monaco, the build-in Mac font. Softer and more organic than Menlo.
+- Alternative for Terminal: MesloLGS Nerd Font, same as Menlo with bigger line spacing and all the glyphs.
+
+Fonts are vailable in the [fonts](./fonts/) directory.
+
+This is the Meslo nerdfont:
 ![Meslo Nerdfont](images/meslo-nerdfont.png)
 
 ### iTerm2
