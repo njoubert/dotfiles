@@ -2,3 +2,5 @@
 [user]
 	name = Niels Joubert
 	email = njoubert@gmail.com
+[pull]
+	rebase = true
