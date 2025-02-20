@@ -11,7 +11,7 @@
 
 # Files to Copy
 HOMEDIR="/Users/njoubert/"
-DESTDIR="/Users/njoubert/Code/dotfiles/macbookair/"
+DESTDIR="/Users/njoubert/Code/dotfiles/macbookair/dotfiles/"
 WORKTREE="/Users/njoubert/Code/dotfiles/"
 GITDIR="/Users/njoubert/Code/dotfiles/.git/"
 
