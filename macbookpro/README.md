@@ -35,6 +35,8 @@ Now we can ssh to my servers and github using 1password.
 
 ### iTerm2 with my profile and colors.
 
+![iterm2](images/iterm2.png)
+
 I love iTerm2, but it needs some better colors and profiles.
 
 * [Download](https://iterm2.com/downloads.html) and install as usual.
