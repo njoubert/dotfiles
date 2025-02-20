@@ -4,7 +4,10 @@ This work is based on my [Macbook Air dotfiles.](../macbookair/README.md)
 
 ## Managing Dotfiles
 
-🚨**Run backup-dotfiles.sh every now and then!**🚨
+**🚨 Run backup-dotfiles.sh every now and then! 🚨**
+
+
+![Backup Dotfiles](../macbookair/images/backup-dotfiles.gif)
 
 Just like the Macbook Air M1, I chose not to symlink paths. Instead, the backup-dotfiles.sh script copies dotfiles from ~/ to this repository. Then I use git to manage this repository.
 
