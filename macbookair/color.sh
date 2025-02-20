@@ -88,3 +88,6 @@ print_success() {
 print_fail() {
   echo -e "⛔️ ${White}${On_Red}$1${Color_Off}"
 }
+print_pass() {
+  echo -e "👉 ${Black}${On_Yellow}$1${Color_Off}"
+}
