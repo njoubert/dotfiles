@@ -20,4 +20,17 @@ Then load the profile from [njoubert-iterm2-profile.json](../macbookair/njoubert
 
 I'm duplicating the ZSH setup from my macbook air by following [these instructions]((../macbookair/README.md)
 
+### Sublime Text 4
 
+First we install [sublime text 4](https://www.sublimetext.com/download)
+
+I want the handy `subl` cli shortcut described here.
+To install `subl` we update `.zshrc` with this snippet:
+
+```bash
+############## START SUBLIME TEXT #################
+# 2025.02.19 NIELS
+#
+export PATH="/Applications/Sublime Text.app/Contents/SharedSupport/bin:$PATH"
+############## END SUBLIME TEXT #################
+```
