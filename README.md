@@ -1,6 +1,6 @@
 # Niels Joubert's dotfiles
 
-check out "Github does Dotfiles!" https://dotfiles.github.io/
+Check out "Github does Dotfiles!" https://dotfiles.github.io/
 
 ## Great command line tools to know:
 
