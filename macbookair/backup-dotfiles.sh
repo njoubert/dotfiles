@@ -18,6 +18,7 @@ GITDIR="/Users/njoubert/Code/dotfiles/.git/"
 declare -a DOTFILES=(".vimrc"
 	".zshrc"
 	".p10k.zsh"
+	".gitconfig"
 	)
 
 ###
