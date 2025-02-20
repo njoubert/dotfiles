@@ -1,6 +1,18 @@
 # Macbook Pro M4 Max Dotfiles
 
-Much of the work here is based on the [Macbook Air dotfiles in this repo.](../macbookair/README.md)
+This work is based on my [Macbook Air dotfiles.](../macbookair/README.md)
+
+## Managing Dotfiles
+
+🚨**Run backup-dotfiles.sh every now and then!**🚨
+
+Just like the Macbook Air M1, I chose not to symlink paths. Instead, the backup-dotfiles.sh script copies dotfiles from ~/ to this repository. Then I use git to manage this repository.
+
+**To Install**: Manually copy files back to your home directory.
+
+**Adding more files:** Edit the [`backup-dotfiles.sh`](backup-dotfiles.sh) script.
+
+
 
 # Running Notes
 
