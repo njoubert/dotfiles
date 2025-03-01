@@ -19,6 +19,11 @@ Just like the Macbook Air M1, I chose not to symlink paths. Instead, the backup-
 
 # Running Notes
 
+## 2025-02-28
+
+3D Modeling and Printing Software:
+* Autodesk Fusion for Personal Use, on recommendation from Fergus.
+
 ## 2025-02-16 
 
 General Apps Installed:
