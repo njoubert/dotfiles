@@ -122,3 +122,8 @@ source $ZSH/oh-my-zsh.sh
 export PATH="/Applications/Sublime Text.app/Contents/SharedSupport/bin:$PATH"
 ############## END SUBLIME TEXT #################
 
+############## START FILMFLOW ##################
+# 2025.02.22 NIELS
+
+export PATH="/Users/njoubert/Code/FilmFlow/ff/scripts:$PATH"
+################################################
