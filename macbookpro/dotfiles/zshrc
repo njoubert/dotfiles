@@ -116,14 +116,37 @@ source $ZSH/oh-my-zsh.sh
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 
-############## START SUBLIME TEXT #################
+###
+### SUBLIME TEXT 
+###
+
 # 2025.02.19 NIELS
-#
 export PATH="/Applications/Sublime Text.app/Contents/SharedSupport/bin:$PATH"
-############## END SUBLIME TEXT #################
 
-############## START FILMFLOW ##################
+
+###
+### FILMFLOW 
+###
+
 # 2025.02.22 NIELS
-
 export PATH="/Users/njoubert/Code/FilmFlow/ff/scripts:$PATH"
-################################################
+
+###
+### HOMEBREW
+###
+
+# 2025.07.13 NIELS
+# Source the Brew environment
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# 2025.07.13 NIELS
+# Have brew installs take precedence over preinstalled binaries
+export PATH="$PATH:/opt/homebrew/bin:/opt/homebrew/sbin"
+
+# 2025.07.13 NIELS
+# Fuzzy Finder
+source <(fzf --zsh)
+
+
+
+############## END HOMEBREW ##################
