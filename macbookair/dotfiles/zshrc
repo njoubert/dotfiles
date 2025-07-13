@@ -25,38 +25,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 ############## END POWERLEVEL10K #################
 
 
-############## START STARSHIP.RS ###########
-# 2024.06.30
-#
-# https://starship.rs/
-# At this point we have run `brew install starship`
 
-# eval "$(starship init zsh)"
-############## END STARSHIP.RS ##############
-
-
-
-###
-### Setting up Paths
-###
-# 2021.08.18 Installing Homebrew
-export PATH=/opt/homebrew/bin:$PATH
-export PATH=/opt/homebrew/sbin:$PATH
-# 2024.07.03 Installing Rust
-export PATH=/Users/njoubert/.cargo/bin:$PATH
-# 2024.07.03 Making my own bin directory
-export PATH=/Users/njoubert/bin:$PATH
-
-###
-### Setting up SSH
-###
-# 2024.07.04 https://developer.1password.com/docs/ssh/get-started/
-export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
-
-###
-### Aliases
-###
-alias ll="ls -lahG"
 
 
 ###############################################################################
@@ -167,3 +136,47 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+
+
+############## START STARSHIP.RS ###########
+# 2024.06.30
+#
+# https://starship.rs/
+# At this point we have run `brew install starship`
+
+# eval "$(starship init zsh)"
+############## END STARSHIP.RS ##############
+
+
+
+###
+### Setting up Paths
+###
+# 2021.08.18 Installing Homebrew
+export PATH=/opt/homebrew/bin:$PATH
+export PATH=/opt/homebrew/sbin:$PATH
+# 2024.07.03 Installing Rust
+export PATH=/Users/njoubert/.cargo/bin:$PATH
+# 2024.07.03 Making my own bin directory
+export PATH=/Users/njoubert/bin:$PATH
+# 2025.06.06 Set up the filmflow paths
+export PATH=/Users/njoubert/Code/FilmFlow/ff/scripts:$PATH
+
+
+# 2025.07.13 NIELS
+# Fuzzy Finder
+source <(fzf --zsh)
+
+
+###
+### Setting up SSH
+###
+# 2024.07.04 https://developer.1password.com/docs/ssh/get-started/
+export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+
+###
+### Aliases
+###
+alias ll="ls -lahG"
+
