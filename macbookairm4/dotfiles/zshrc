@@ -1,0 +1,39 @@
+# Go
+export PATH="/opt/homebrew/opt/go@1.22/bin:$PATH"
+export PATH="$HOME/go/bin:$PATH"
+
+# Sublime
+export PATH="/Applications/Sublime Text.app/Contents/SharedSupport/bin/:$PATH"
+
+# Fuzzy Finder
+source <(fzf --zsh)
+
+#######################################################################
+# NIELS CUSTOM PROMPT FOR GIT STARTS HERE
+#######################################################################
+
+# Prompt
+# Setup basic prompt with git info
+autoload -Uz compinit && compinit -C
+fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
+
+# Source git prompt helper if available
+[[ -r /opt/homebrew/etc/bash_completion.d/git-prompt.sh ]] && \
+source /opt/homebrew/etc/bash_completion.d/git-prompt.sh
+[[ -z ${__GIT_PROMPT_SH_SOURCED+x} && -r /opt/homebrew/etc/profile.d/bash_completion.sh ]] && \
+source /opt/homebrew/etc/profile.d/bash_completion.sh
+
+# Configure git prompt
+setopt PROMPT_SUBST
+export GIT_PS1_SHOWDIRTYSTATE=1
+export GIT_PS1_SHOWSTASHSTATE=1
+export GIT_PS1_STATESEPARATOR='|'
+export GIT_PS1_SHOWCOLORHINTS=0
+
+# Set custom prompt: user@host dir (git-branch) %
+PROMPT="%F{76}%n@%m %F{39}%~%F{226}\$(__git_ps1 '(%s)')%F{81}%# %f"
+RPROMPT=
+
+#######################################################################
+# NIELS CUSTOM PROMPT FOR GIT ENDS HERE
+#######################################################################

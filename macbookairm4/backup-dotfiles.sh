@@ -45,6 +45,8 @@ info_with_msg() {
 
 changed_files=0  # Flag to track if any files have changes
 
+mkdir -p $DESTDIR
+
 for f in "${DOTFILES[@]}"
 do
 	FILEPATH="$HOMEDIR$f"
