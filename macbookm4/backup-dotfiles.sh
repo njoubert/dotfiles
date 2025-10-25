@@ -11,7 +11,7 @@
 
 # Files to Copy
 HOMEDIR="/Users/njoubert/"
-DESTDIR="/Users/njoubert/Code/dotfiles/macbookpro/dotfiles/"
+DESTDIR="/Users/njoubert/Code/dotfiles/macbookm4/dotfiles/"
 WORKTREE="/Users/njoubert/Code/dotfiles/"
 GITDIR="/Users/njoubert/Code/dotfiles/.git/"
 
@@ -69,7 +69,7 @@ if [ "$changed_files" -eq 1 ]; then
 	assert_with_msg $? "Committed additions to git." "Failed to commit to git."
 
 	git -C "$WORKTREE" push
-	assert_with_msg $? "Pushed to GitHub: https://github.com/njoubert/dotfiles/tree/master/macbookair" "Failed to push to GitHub."
+	assert_with_msg $? "Pushed to GitHub: https://github.com/njoubert/dotfiles/tree/master/macbookm4" "Failed to push to GitHub."
 else
 	info_with_msg "No changes detected. Skipping Git operations."
 fi

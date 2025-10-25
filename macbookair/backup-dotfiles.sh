@@ -3,7 +3,7 @@
 # Silly little script to copy over dotfiles into this directory.
 #
 
-. /Users/njoubert/Code/dotfiles/macbookair/color.sh  # Importing color printing
+. /Users/njoubert/Code/dotfiles/color.sh  # Importing color printing
 
 ###
 ### Config
@@ -19,7 +19,9 @@ declare -a DOTFILES=(".vimrc"
 	".zshrc"
 	".p10k.zsh"
 	".gitconfig"
+	".vimrc"
 	)
+
 
 ###
 ### Functions
