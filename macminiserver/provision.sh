@@ -53,6 +53,41 @@ install_homebrew() {
 }
 
 ################################################################################
+# Install Xcode Command Line Tools
+################################################################################
+install_xcode_tools() {
+    log_info "Checking for Xcode Command Line Tools..."
+    
+    # Check if command line tools are already installed
+    if xcode-select -p &> /dev/null; then
+        log_info "Xcode Command Line Tools already installed at $(xcode-select -p)"
+    else
+        log_info "Installing Xcode Command Line Tools..."
+        # This will prompt the user with a GUI dialog
+        xcode-select --install
+        log_info "Xcode Command Line Tools installation initiated"
+        log_warn "Please complete the installation in the dialog box"
+        log_warn "The script will continue once installation is complete..."
+        
+        # Wait for installation to complete
+        until xcode-select -p &> /dev/null; do
+            sleep 5
+        done
+        
+        log_info "Xcode Command Line Tools installed successfully"
+    fi
+    
+    # Accept the license if needed
+    if ! sudo xcodebuild -license check &> /dev/null; then
+        log_info "Accepting Xcode license..."
+        sudo xcodebuild -license accept 2>/dev/null || {
+            log_warn "Could not auto-accept Xcode license"
+            log_warn "You may need to run: sudo xcodebuild -license accept"
+        }
+    fi
+}
+
+################################################################################
 # Install Docker
 ################################################################################
 install_docker() {
@@ -96,6 +131,7 @@ install_tools() {
         "iperf3"
         "vim"
         "fail2ban"
+        "fzf"
     )
     
     for tool in "${tools[@]}"; do
@@ -118,6 +154,7 @@ install_gui_apps() {
         "rectangle"
         "sublime-text"
         "iterm2"
+        "visual-studio-code"
     )
     
     for cask in "${casks[@]}"; do
@@ -154,16 +191,6 @@ install_oh_my_zsh() {
         log_info "Powerlevel10k installed successfully"
     fi
     
-    # Update .zshrc to use powerlevel10k theme
-    if grep -q "ZSH_THEME=\"powerlevel10k/powerlevel10k\"" "$HOME/.zshrc" 2>/dev/null; then
-        log_info "Powerlevel10k theme already set in .zshrc"
-    else
-        log_info "Configuring Powerlevel10k theme in .zshrc..."
-        if [ -f "$HOME/.zshrc" ]; then
-            sed -i.bak 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' "$HOME/.zshrc"
-        fi
-    fi
-    
     # Set zsh as default shell if it isn't already
     if [ "$SHELL" != "$(which zsh)" ]; then
         log_info "Setting zsh as default shell..."
@@ -171,6 +198,33 @@ install_oh_my_zsh() {
         log_info "Default shell changed to zsh (will take effect on next login)"
     else
         log_info "zsh is already the default shell"
+    fi
+}
+
+################################################################################
+# Configure Zsh
+################################################################################
+configure_zsh() {
+    log_info "Configuring Zsh..."
+    
+    # Get the directory where this script is located
+    SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    ZSHRC_SOURCE="$SCRIPT_DIR/dotfiles/zshrc"
+    
+    if [ -f "$ZSHRC_SOURCE" ]; then
+        # Backup existing .zshrc if it exists and is different
+        if [ -f "$HOME/.zshrc" ]; then
+            if ! cmp -s "$ZSHRC_SOURCE" "$HOME/.zshrc"; then
+                cp "$HOME/.zshrc" "$HOME/.zshrc.backup.$(date +%Y%m%d_%H%M%S)"
+                log_info "Backed up existing .zshrc"
+            fi
+        fi
+        
+        # Copy zshrc to home directory
+        cp "$ZSHRC_SOURCE" "$HOME/.zshrc"
+        log_info "Zsh configuration installed to ~/.zshrc"
+    else
+        log_warn "zshrc not found at $ZSHRC_SOURCE"
     fi
 }
 
@@ -196,10 +250,115 @@ configure_git() {
         log_info "Git user.email already configured"
     fi
     
+    # Set vim as the default editor
+    git config --global core.editor "vim"
+    log_info "Git editor set to vim"
+    
     # Set some useful defaults
     git config --global init.defaultBranch main
     git config --global pull.rebase false
     log_info "Git configuration complete"
+}
+
+################################################################################
+# Setup SSH keys
+################################################################################
+setup_ssh_keys() {
+    log_info "Setting up SSH keys..."
+    
+    SSH_DIR="$HOME/.ssh"
+    SSH_KEY="$SSH_DIR/id_ed25519"
+    
+    # Create .ssh directory if it doesn't exist
+    mkdir -p "$SSH_DIR"
+    chmod 700 "$SSH_DIR"
+    
+    # Generate SSH key if it doesn't exist
+    if [ ! -f "$SSH_KEY" ]; then
+        log_info "Generating new SSH key..."
+        ssh-keygen -t ed25519 -C "njoubert@macminiserver" -f "$SSH_KEY" -N ""
+        log_info "SSH key generated at $SSH_KEY"
+    else
+        log_info "SSH key already exists at $SSH_KEY"
+    fi
+    
+    # Ensure proper permissions
+    chmod 600 "$SSH_KEY"
+    chmod 644 "$SSH_KEY.pub"
+    
+    # Display the public key
+    log_info ""
+    log_info "=========================================="
+    log_info "Your SSH Public Key:"
+    log_info "=========================================="
+    cat "$SSH_KEY.pub"
+    log_info "=========================================="
+    log_info ""
+    log_info "To use this key on other servers:"
+    log_info "1. Copy the public key above"
+    log_info "2. On the remote server, add it to ~/.ssh/authorized_keys"
+    log_info "3. Or use: ssh-copy-id -i $SSH_KEY.pub user@remote-host"
+    log_info ""
+    log_info "If you get 'Too many authentication failures' when connecting:"
+    log_info "  ssh -o IdentitiesOnly=yes -i $SSH_KEY user@host"
+    log_info "  or add to ~/.ssh/config on your client:"
+    log_info "    Host macminiserver.local"
+    log_info "      IdentitiesOnly yes"
+    log_info "      IdentityFile ~/.ssh/id_ed25519"
+    log_info ""
+    
+    # Prompt user to add their own key for logging into this server
+    log_info "=========================================="
+    log_warn "IMPORTANT: Add your own SSH key to login to this server"
+    log_info "=========================================="
+    log_info ""
+    log_info "To allow SSH login from your other machines:"
+    log_info "1. On your LOCAL machine, display your public key:"
+    log_info "   cat ~/.ssh/id_ed25519.pub  (or id_rsa.pub)"
+    log_info "2. Copy that public key"
+    log_info "3. Paste it here when prompted (or press Enter to skip)"
+    log_info ""
+    
+    read -p "Paste your SSH public key (or press Enter to skip): " user_pubkey
+    
+    if [ -n "$user_pubkey" ]; then
+        AUTHORIZED_KEYS="$SSH_DIR/authorized_keys"
+        
+        # Check if key already exists
+        if grep -Fxq "$user_pubkey" "$AUTHORIZED_KEYS" 2>/dev/null; then
+            log_info "Key already exists in authorized_keys"
+        else
+            echo "$user_pubkey" >> "$AUTHORIZED_KEYS"
+            chmod 600 "$AUTHORIZED_KEYS"
+            log_info "SSH key added to $AUTHORIZED_KEYS"
+            log_info "You should now be able to SSH into this server!"
+        fi
+    else
+        log_warn "No key provided. You can add it later with:"
+        log_warn "  echo 'YOUR_PUBLIC_KEY' >> ~/.ssh/authorized_keys"
+        log_warn "  chmod 600 ~/.ssh/authorized_keys"
+    fi
+    
+    log_info ""
+}
+
+################################################################################
+# Configure Vim
+################################################################################
+configure_vim() {
+    log_info "Configuring Vim..."
+    
+    # Get the directory where this script is located
+    SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    VIMRC_SOURCE="$SCRIPT_DIR/dotfiles/vimrc"
+    
+    if [ -f "$VIMRC_SOURCE" ]; then
+        # Copy vimrc to home directory
+        cp "$VIMRC_SOURCE" "$HOME/.vimrc"
+        log_info "Vim configuration installed to ~/.vimrc"
+    else
+        log_warn "vimrc not found at $VIMRC_SOURCE"
+    fi
 }
 
 ################################################################################
@@ -217,11 +376,17 @@ install_fonts() {
         FONT_DEST="$HOME/Library/Fonts"
         mkdir -p "$FONT_DEST"
         
-        # Copy .ttf and .otf files
-        if ls "$FONT_SOURCE"/*.{ttf,otf} 1> /dev/null 2>&1; then
-            cp -f "$FONT_SOURCE"/*.ttf "$FONT_DEST/" 2>/dev/null || true
-            cp -f "$FONT_SOURCE"/*.otf "$FONT_DEST/" 2>/dev/null || true
-            log_info "Menlo for Powerline Font installed"
+        # Copy font files
+        local font_count=0
+        if ls "$FONT_SOURCE"/*.ttf 1> /dev/null 2>&1; then
+            cp -f "$FONT_SOURCE"/*.ttf "$FONT_DEST/" 2>/dev/null && ((font_count++)) || true
+        fi
+        if ls "$FONT_SOURCE"/*.otf 1> /dev/null 2>&1; then
+            cp -f "$FONT_SOURCE"/*.otf "$FONT_DEST/" 2>/dev/null && ((font_count++)) || true
+        fi
+        
+        if [ $font_count -gt 0 ]; then
+            log_info "Menlo for Powerline Font installed to $FONT_DEST"
         else
             log_warn "No font files found in $FONT_SOURCE"
         fi
@@ -240,19 +405,16 @@ configure_iterm2() {
     SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
     ITERM_PROFILE="$SCRIPT_DIR/njoubert-iterm2-profile.json"
     
-    # Create iTerm2 preferences directory
-    ITERM_PREFS_DIR="$HOME/.config/iterm2"
-    mkdir -p "$ITERM_PREFS_DIR"
-    
     if [ -f "$ITERM_PROFILE" ]; then
-        # Copy the profile to the config directory
-        cp "$ITERM_PROFILE" "$ITERM_PREFS_DIR/"
-        log_info "Copied iTerm2 profile to $ITERM_PREFS_DIR"
-        
-        # Set iTerm2 to load preferences from the config directory
-        defaults write com.googlecode.iterm2 PrefsCustomFolder "$ITERM_PREFS_DIR"
-        defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
-        log_info "iTerm2 configured to use custom profile from $ITERM_PREFS_DIR"
+        # iTerm2 stores preferences as plist in ~/Library/Preferences
+        # We need to import the JSON profile manually or convert it
+        log_info "iTerm2 profile found at $ITERM_PROFILE"
+        log_info "To import the profile:"
+        log_info "  1. Open iTerm2"
+        log_info "  2. Go to Settings > Profiles"
+        log_info "  3. Click 'Other Actions...' > 'Import JSON Profiles...'"
+        log_info "  4. Select: $ITERM_PROFILE"
+        log_info ""
     else
         log_warn "iTerm2 profile not found at $ITERM_PROFILE"
     fi
@@ -326,10 +488,38 @@ configure_system_preferences() {
         log_info "Remote login (SSH) already enabled"
     fi
     
+    # Configure SSH to allow more authentication attempts
+    # This prevents "Too many authentication failures" when you have multiple SSH keys
+    SSHD_CONFIG="/etc/ssh/sshd_config"
+    if ! sudo grep -q "^MaxAuthTries" "$SSHD_CONFIG"; then
+        log_info "Configuring SSH MaxAuthTries..."
+        echo "MaxAuthTries 20" | sudo tee -a "$SSHD_CONFIG" > /dev/null
+        log_info "SSH MaxAuthTries set to 20 (prevents 'Too many authentication failures' error)"
+        log_warn "Note: SSH configuration will take effect after restart or: sudo launchctl kickstart -k system/com.openssh.sshd"
+    else
+        log_info "SSH MaxAuthTries already configured"
+    fi
+    
     # Make the dock only show active apps
     defaults write com.apple.dock static-only -bool true
     killall Dock 2>/dev/null || true
     log_info "Dock configured to show only active apps"
+    
+    # Set keyboard repeat rate to maximum (fastest)
+    # KeyRepeat: 2 is the fastest (15ms between repeats)
+    # InitialKeyRepeat: 15 is the shortest delay before repeat starts (225ms)
+    defaults write -g KeyRepeat -int 2
+    defaults write -g InitialKeyRepeat -int 15
+    
+    # Also set in NSGlobalDomain to be sure
+    defaults write NSGlobalDomain KeyRepeat -int 2
+    defaults write NSGlobalDomain InitialKeyRepeat -int 15
+    
+    # Try to restart the relevant system service
+    killall -u "$USER" cfprefsd 2>/dev/null || true
+    
+    log_info "Keyboard repeat rate set to maximum speed"
+    log_warn "Note: Keyboard settings will fully apply after logout/login or restart"
 }
 
 ################################################################################
@@ -352,9 +542,9 @@ configure_fail2ban() {
         log_info "Creating Fail2ban configuration..."
         sudo tee /usr/local/etc/fail2ban/jail.local > /dev/null << 'EOF'
 [DEFAULT]
-bantime = 3600
+bantime = 1800
 findtime = 600
-maxretry = 10
+maxretry = 20
 
 [sshd]
 enabled = true
@@ -362,18 +552,26 @@ port = ssh
 logpath = /var/log/system.log
 EOF
         log_info "Fail2ban configuration created"
+        log_info "Fail2ban: 20 failed attempts in 10 minutes = 30 minute ban"
     else
         log_info "Fail2ban configuration already exists"
     fi
     
-    # Start fail2ban service
-    brew services list | grep -q "fail2ban.*started" && {
-        log_info "Fail2ban service already running"
-    } || {
-        log_info "Starting Fail2ban service..."
-        brew services start fail2ban
-        log_info "Fail2ban service started"
-    }
+    # Try to start fail2ban service if brew services is available
+    if brew services list &> /dev/null; then
+        brew services list | grep -q "fail2ban.*started" && {
+            log_info "Fail2ban service already running"
+        } || {
+            log_info "Starting Fail2ban service (requires root)..."
+            sudo brew services start fail2ban 2>/dev/null || {
+                log_warn "Could not start fail2ban as a service"
+                log_warn "You can start it manually with: sudo fail2ban-client start"
+            }
+        }
+    else
+        log_warn "brew services not available"
+        log_info "To start fail2ban manually: sudo fail2ban-client start"
+    fi
 }
 
 ################################################################################
@@ -487,13 +685,9 @@ configure_firewall() {
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setblockall off
     log_info "Firewall set to allow signed applications"
     
-    # Enable stealth mode (don't respond to ping)
-    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
-    log_info "Stealth mode enabled"
-    
-    # Enable logging
-    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setloggingmode on
-    log_info "Firewall logging enabled"
+    # disable stealth mode (respond to ping)
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode off
+    log_info "Stealth mode disabled - respond to ping please"
     
     # Note: HTTP (80) and HTTPS (443) are typically handled by allowing specific apps
     # For Docker/nginx, the firewall will prompt or you can add rules for specific apps
@@ -674,6 +868,9 @@ main() {
         exit 1
     fi
     
+    # Install Xcode Command Line Tools
+    install_xcode_tools
+    
     # Install Homebrew
     install_homebrew
     
@@ -692,8 +889,17 @@ main() {
     # Install and configure Oh My Zsh and Powerlevel10k
     install_oh_my_zsh
     
+    # Configure Zsh
+    configure_zsh
+    
     # Configure Git
     configure_git
+    
+    # Setup SSH keys
+    setup_ssh_keys
+    
+    # Configure Vim
+    configure_vim
     
     # Configure iTerm2
     configure_iterm2
