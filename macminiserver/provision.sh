@@ -69,9 +69,16 @@ install_docker() {
     # Check if Docker is running
     if pgrep -x "Docker" > /dev/null; then
         log_info "Docker is running"
+        
+        # Pre-pull common Docker images
+        log_info "Pre-pulling common Docker images..."
+        docker pull nginx:latest 2>/dev/null || log_warn "Failed to pull nginx image"
+        docker pull hello-world:latest 2>/dev/null || log_warn "Failed to pull hello-world image"
+        log_info "Docker images pre-pulled"
     else
         log_warn "Docker is installed but not running. Please start Docker Desktop from Applications."
         log_warn "You can start it with: open -a Docker"
+        log_warn "After starting Docker, run: docker pull nginx && docker pull hello-world"
     fi
 }
 
@@ -88,6 +95,8 @@ install_tools() {
         "htop"
         "iperf3"
         "vim"
+        "docker-compose"
+        "fail2ban"
     )
     
     for tool in "${tools[@]}"; do
@@ -164,6 +173,34 @@ install_oh_my_zsh() {
     else
         log_info "zsh is already the default shell"
     fi
+}
+
+################################################################################
+# Configure Git
+################################################################################
+configure_git() {
+    log_info "Configuring Git..."
+    
+    # Set git user name
+    if [ "$(git config --global user.name)" != "Niels Joubert" ]; then
+        git config --global user.name "Niels Joubert"
+        log_info "Git user.name set to 'Niels Joubert'"
+    else
+        log_info "Git user.name already configured"
+    fi
+    
+    # Set git user email
+    if [ "$(git config --global user.email)" != "njoubert@gmail.com" ]; then
+        git config --global user.email "njoubert@gmail.com"
+        log_info "Git user.email set to 'njoubert@gmail.com'"
+    else
+        log_info "Git user.email already configured"
+    fi
+    
+    # Set some useful defaults
+    git config --global init.defaultBranch main
+    git config --global pull.rebase false
+    log_info "Git configuration complete"
 }
 
 ################################################################################
@@ -259,6 +296,18 @@ configure_sleep_settings() {
 configure_system_preferences() {
     log_info "Configuring system preferences..."
     
+    # Set computer name
+    CURRENT_HOSTNAME=$(scutil --get ComputerName 2>/dev/null || echo "")
+    if [ "$CURRENT_HOSTNAME" != "macminiserver" ]; then
+        log_info "Setting computer name to 'macminiserver'..."
+        sudo scutil --set ComputerName "macminiserver"
+        sudo scutil --set LocalHostName "macminiserver"
+        sudo scutil --set HostName "macminiserver"
+        log_info "Computer name set to 'macminiserver'"
+    else
+        log_info "Computer name already set to 'macminiserver'"
+    fi
+    
     # Disable screen saver
     defaults -currentHost write com.apple.screensaver idleTime 0
     log_info "Screen saver disabled"
@@ -282,6 +331,147 @@ configure_system_preferences() {
     defaults write com.apple.dock static-only -bool true
     killall Dock 2>/dev/null || true
     log_info "Dock configured to show only active apps"
+}
+
+################################################################################
+# Configure Fail2ban
+################################################################################
+configure_fail2ban() {
+    log_info "Configuring Fail2ban..."
+    
+    # Check if fail2ban is installed
+    if ! command -v fail2ban-client &> /dev/null; then
+        log_warn "Fail2ban not installed, skipping configuration"
+        return
+    fi
+    
+    # Create fail2ban config directory
+    sudo mkdir -p /usr/local/etc/fail2ban
+    
+    # Create basic jail.local configuration for SSH protection
+    if [ ! -f /usr/local/etc/fail2ban/jail.local ]; then
+        log_info "Creating Fail2ban configuration..."
+        sudo tee /usr/local/etc/fail2ban/jail.local > /dev/null << 'EOF'
+[DEFAULT]
+bantime = 3600
+findtime = 600
+maxretry = 10
+
+[sshd]
+enabled = true
+port = ssh
+logpath = /var/log/system.log
+EOF
+        log_info "Fail2ban configuration created"
+    else
+        log_info "Fail2ban configuration already exists"
+    fi
+    
+    # Start fail2ban service
+    brew services list | grep -q "fail2ban.*started" && {
+        log_info "Fail2ban service already running"
+    } || {
+        log_info "Starting Fail2ban service..."
+        brew services start fail2ban
+        log_info "Fail2ban service started"
+    }
+}
+
+################################################################################
+# Configure log rotation
+################################################################################
+configure_log_rotation() {
+    log_info "Configuring log rotation..."
+    
+    # Create newsyslog.d directory if it doesn't exist
+    sudo mkdir -p /etc/newsyslog.d
+    
+    # Configure log rotation for common server logs
+    if [ ! -f /etc/newsyslog.d/server.conf ]; then
+        log_info "Creating log rotation configuration..."
+        sudo tee /etc/newsyslog.d/server.conf > /dev/null << 'EOF'
+# Docker container logs (if logging to file)
+/var/log/docker/*.log    644  7     100  *     GZ
+
+# Custom application logs
+/var/log/server/*.log    644  7     100  *     GZ
+EOF
+        log_info "Log rotation configured"
+    else
+        log_info "Log rotation already configured"
+    fi
+    
+    # macOS uses newsyslog by default, which runs daily
+    log_info "System logs will be rotated daily by newsyslog"
+}
+
+################################################################################
+# Setup Homebrew auto-update
+################################################################################
+setup_brew_autoupdate() {
+    log_info "Setting up Homebrew auto-update..."
+    
+    # Create launchd plist for homebrew auto-update
+    PLIST_FILE="$HOME/Library/LaunchAgents/com.homebrew.autoupdate.plist"
+    
+    if [ ! -f "$PLIST_FILE" ]; then
+        log_info "Creating Homebrew auto-update LaunchAgent..."
+        mkdir -p "$HOME/Library/LaunchAgents"
+        
+        cat > "$PLIST_FILE" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.homebrew.autoupdate</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-c</string>
+        <string>$(which brew) update && $(which brew) upgrade && $(which brew) cleanup</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>3</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>$HOME/Library/Logs/homebrew-autoupdate.log</string>
+    <key>StandardErrorPath</key>
+    <string>$HOME/Library/Logs/homebrew-autoupdate.error.log</string>
+</dict>
+</plist>
+EOF
+        
+        # Load the LaunchAgent
+        launchctl load "$PLIST_FILE" 2>/dev/null || true
+        log_info "Homebrew auto-update scheduled daily at 3:00 AM"
+    else
+        log_info "Homebrew auto-update already configured"
+    fi
+}
+
+################################################################################
+# Enable SMB file sharing
+################################################################################
+enable_smb_sharing() {
+    log_info "Configuring SMB file sharing..."
+    
+    # Enable SMB file sharing
+    if sudo launchctl list | grep -q "com.apple.smbd"; then
+        log_info "SMB file sharing already enabled"
+    else
+        log_info "Enabling SMB file sharing..."
+        sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.smbd.plist 2>/dev/null || true
+        log_info "SMB file sharing enabled"
+    fi
+    
+    # Note about sharing folders
+    log_info "To share folders, use System Settings > General > Sharing > File Sharing"
+    log_info "Or use: sudo sharing -a /path/to/folder -S 'Share Name' -s 001"
 }
 
 ################################################################################
@@ -503,6 +693,9 @@ main() {
     # Install and configure Oh My Zsh and Powerlevel10k
     install_oh_my_zsh
     
+    # Configure Git
+    configure_git
+    
     # Configure iTerm2
     configure_iterm2
     
@@ -511,6 +704,18 @@ main() {
     
     # Configure system preferences
     configure_system_preferences
+    
+    # Configure Fail2ban
+    configure_fail2ban
+    
+    # Configure log rotation
+    configure_log_rotation
+    
+    # Setup Homebrew auto-update
+    setup_brew_autoupdate
+    
+    # Enable SMB file sharing
+    enable_smb_sharing
     
     # Configure firewall
     configure_firewall
