@@ -155,6 +155,7 @@ install_gui_apps() {
         "sublime-text"
         "iterm2"
         "visual-studio-code"
+        "betterdisplay"
     )
     
     for cask in "${casks[@]}"; do

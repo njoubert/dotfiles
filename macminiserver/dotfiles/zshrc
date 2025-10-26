@@ -78,3 +78,6 @@ fi
 typeset -U path
 path=("/usr/local/bin" "/usr/local/sbin" "$GOBIN" $path)
 
+# My dotfiles bin path
+export PATH="~/Code/dotfiles/macminiserver/bin/:$PATH"
+

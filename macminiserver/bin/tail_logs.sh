@@ -35,9 +35,9 @@ read -p "Enter your choice [0-12]: " choice
 
 case $choice in
     1)
-        echo -e "${GREEN}Tailing system log...${NC}"
+        echo -e "${GREEN}Streaming system log (errors and failures)...${NC}"
         echo "Press Ctrl+C to exit"
-        log show --predicate 'eventMessage contains "error" OR eventMessage contains "fail"' --style syslog --last 1h | tail -f
+        log stream --predicate 'eventMessage contains "error" OR eventMessage contains "fail"' --style syslog
         ;;
     2)
         echo -e "${GREEN}Tailing Docker logs...${NC}"
@@ -70,18 +70,18 @@ case $choice in
         fi
         ;;
     5)
-        echo -e "${GREEN}Showing system diagnostics...${NC}"
+        echo -e "${GREEN}Streaming system diagnostics (kernel messages)...${NC}"
         echo "Press Ctrl+C to exit"
-        log show --predicate 'processImagePath contains "kernel"' --style syslog --last 30m | tail -f
+        log stream --predicate 'processImagePath contains "kernel"' --style syslog
         ;;
     6)
         echo -e "${GREEN}Showing installation logs...${NC}"
         tail -f /var/log/install.log
         ;;
     7)
-        echo -e "${GREEN}Showing security logs...${NC}"
+        echo -e "${GREEN}Streaming security logs...${NC}"
         echo "Press Ctrl+C to exit"
-        log show --predicate 'process == "authd" OR process == "SecurityAgent"' --style syslog --last 1h | tail -f
+        log stream --predicate 'process == "authd" OR process == "SecurityAgent"' --style syslog
         ;;
     8)
         echo -e "${GREEN}Showing all Docker container logs...${NC}"
@@ -129,9 +129,9 @@ case $choice in
         top -o cpu
         ;;
     12)
-        echo -e "${GREEN}Showing firewall logs...${NC}"
+        echo -e "${GREEN}Streaming firewall logs...${NC}"
         echo "Press Ctrl+C to exit"
-        log show --predicate 'process == "socketfilterfw"' --style syslog --last 1h | tail -f
+        log stream --predicate 'process == "socketfilterfw"' --style syslog
         ;;
     0)
         echo "Exiting..."
