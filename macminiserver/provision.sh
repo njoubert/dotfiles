@@ -95,7 +95,6 @@ install_tools() {
         "htop"
         "iperf3"
         "vim"
-        "docker-compose"
         "fail2ban"
     )
     
