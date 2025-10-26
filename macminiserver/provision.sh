@@ -702,6 +702,31 @@ enable_smb_sharing() {
 }
 
 ################################################################################
+# Configure DNS resolver for local domain
+################################################################################
+configure_dns_resolver() {
+    log_info "Configuring DNS resolver for cloudsrest domain..."
+    
+    # Create resolver directory if it doesn't exist
+    sudo mkdir -p /etc/resolver
+    
+    # Configure resolver for cloudsrest domain
+    if [ ! -f /etc/resolver/cloudsrest ]; then
+        log_info "Creating DNS resolver configuration for cloudsrest..."
+        echo "nameserver 10.0.0.1" | sudo tee /etc/resolver/cloudsrest > /dev/null
+        log_info "DNS resolver configured to use 10.0.0.1 for *.cloudsrest"
+    else
+        log_info "DNS resolver for cloudsrest already configured"
+    fi
+    
+    # Flush DNS cache
+    log_info "Flushing DNS cache..."
+    sudo dscacheutil -flushcache
+    sudo killall -HUP mDNSResponder 2>/dev/null || true
+    log_info "DNS cache flushed"
+}
+
+################################################################################
 # Configure firewall
 ################################################################################
 configure_firewall() {
@@ -951,6 +976,9 @@ main() {
     
     # Enable SMB file sharing
     enable_smb_sharing
+    
+    # Configure DNS resolver
+    configure_dns_resolver
     
     # Configure firewall
     configure_firewall

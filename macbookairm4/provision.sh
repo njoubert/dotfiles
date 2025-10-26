@@ -5,6 +5,14 @@
 defaults write com.apple.dock static-only -bool true
 killall Dock
 
+# Configure DNS resolver for local domain
+echo "Configuring DNS resolver for cloudsrest domain..."
+sudo mkdir -p /etc/resolver
+echo "nameserver 10.0.0.1" | sudo tee /etc/resolver/cloudsrest
+sudo dscacheutil -flushcache
+sudo killall -HUP mDNSResponder
+echo "DNS resolver configured"
+
 # Brew source installs
 PACKAGES=(
  shellcheck
