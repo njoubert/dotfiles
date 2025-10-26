@@ -13,13 +13,13 @@ if [[ ${TERM_PROGRAM:-} == "vscode" ]]; then
 	# Prompt
 	# Setup basic prompt with git info
 	autoload -Uz compinit && compinit -C
-	fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
+	fpath=(/usr/local/share/zsh/site-functions $fpath)
 
 	# Source git prompt helper if available
-	[[ -r /opt/homebrew/etc/bash_completion.d/git-prompt.sh ]] && \
-	source /opt/homebrew/etc/bash_completion.d/git-prompt.sh
-	[[ -z ${__GIT_PROMPT_SH_SOURCED+x} && -r /opt/homebrew/etc/profile.d/bash_completion.sh ]] && \
-	source /opt/homebrew/etc/profile.d/bash_completion.sh
+	[[ -r /usr/local/etc/bash_completion.d/git-prompt.sh ]] && \
+	source /usr/local/etc/bash_completion.d/git-prompt.sh
+	[[ -z ${__GIT_PROMPT_SH_SOURCED+x} && -r /usr/local/etc/profile.d/bash_completion.sh ]] && \
+	source /usr/local/etc/profile.d/bash_completion.sh
 
 	# Configure git prompt
 	setopt PROMPT_SUBST
@@ -68,12 +68,13 @@ source <(fzf --zsh)
 # Sublime
 export PATH="/Applications/Sublime Text.app/Contents/SharedSupport/bin/:$PATH"
 
+# For Intel Macs this lives at /usr/local/bin/brew
 # Homebrew environment (adds PATH, MANPATH, etc.)
-if [[ -x /opt/homebrew/bin/brew ]]; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
+if [[ -x /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv)"
 fi
 
 # Ensure preferred bins at the front using zsh's path array
 typeset -U path
-path=("/opt/homebrew/bin" "/opt/homebrew/sbin" "$GOBIN" $path)
+path=("/usr/local/bin" "/usr/local/sbin" "$GOBIN" $path)
 
