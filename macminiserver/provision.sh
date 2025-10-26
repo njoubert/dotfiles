@@ -491,13 +491,43 @@ configure_system_preferences() {
     # Configure SSH to allow more authentication attempts
     # This prevents "Too many authentication failures" when you have multiple SSH keys
     SSHD_CONFIG="/etc/ssh/sshd_config"
+    SSH_NEEDS_RESTART=false
+    
     if ! sudo grep -q "^MaxAuthTries" "$SSHD_CONFIG"; then
         log_info "Configuring SSH MaxAuthTries..."
         echo "MaxAuthTries 20" | sudo tee -a "$SSHD_CONFIG" > /dev/null
         log_info "SSH MaxAuthTries set to 20 (prevents 'Too many authentication failures' error)"
-        log_warn "Note: SSH configuration will take effect after restart or: sudo launchctl kickstart -k system/com.openssh.sshd"
+        SSH_NEEDS_RESTART=true
     else
         log_info "SSH MaxAuthTries already configured"
+    fi
+    
+    # Disable password authentication (require SSH keys only)
+    if ! sudo grep -q "^PasswordAuthentication no" "$SSHD_CONFIG"; then
+        log_info "Disabling SSH password authentication..."
+        # Remove any existing PasswordAuthentication lines (commented or not)
+        sudo sed -i '' '/^#*PasswordAuthentication/d' "$SSHD_CONFIG"
+        echo "PasswordAuthentication no" | sudo tee -a "$SSHD_CONFIG" > /dev/null
+        log_info "SSH password authentication disabled - key-based auth only"
+        log_warn "IMPORTANT: Make sure you've added your SSH key to ~/.ssh/authorized_keys!"
+        SSH_NEEDS_RESTART=true
+    else
+        log_info "SSH password authentication already disabled"
+    fi
+    
+    # Also disable challenge-response authentication
+    if ! sudo grep -q "^ChallengeResponseAuthentication no" "$SSHD_CONFIG"; then
+        sudo sed -i '' '/^#*ChallengeResponseAuthentication/d' "$SSHD_CONFIG"
+        echo "ChallengeResponseAuthentication no" | sudo tee -a "$SSHD_CONFIG" > /dev/null
+        log_info "SSH challenge-response authentication disabled"
+        SSH_NEEDS_RESTART=true
+    fi
+    
+    # Restart SSH daemon if configuration changed
+    if [ "$SSH_NEEDS_RESTART" = true ]; then
+        log_info "Restarting SSH daemon to apply changes..."
+        sudo launchctl kickstart -k system/com.openssh.sshd
+        log_info "SSH daemon restarted"
     fi
     
     # Make the dock only show active apps
