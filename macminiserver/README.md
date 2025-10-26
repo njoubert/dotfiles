@@ -10,6 +10,19 @@ This is the dotfiles folder for my old Intel Mac Mini.
 C07XKPEAJYVW
 ```
 
+## Dynamic DNS Configuration
+
+Here is the configuration:
+
+- Porkbun is the domain name registrar.
+  - Set the nameservers to Cloudflare
+- Cloudflare is the DNS service.
+  - Cloudflare has near-instant dynamic DNS updates via an API.
+- Unifi OS runs the dynamic DNS updates (it supports cloudflare out of the box)
+  - When the WAN IP changes, it hits the Cloudflare DNS.
+- Unifi OS port forwarding exposes macminiserver to the internet - ssh (22), http (80), https (443)
+
+
 ## Mac Mini Server Provisioning
 
 A self-contained, idempotent provisioning script for setting up a Mac mini as a server running macOS Sequoia 15.7.
