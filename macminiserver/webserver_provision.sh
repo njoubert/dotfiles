@@ -893,11 +893,11 @@ phase_1_6_5_configure_firewall() {
 }
 
 #==============================================================================
-# Phase 1.7: Create Convenient Symlinks
+# Phase 1.6.7: Create Convenient Symlinks
 #==============================================================================
 
-phase_1_7_create_symlinks() {
-    log "Phase 1.7: Create Convenient Symlinks"
+phase_1_6_7_create_symlinks() {
+    log "Phase 1.6.7: Create Convenient Symlinks"
     echo ""
     
     SYMLINK_DIR="$HOME/webserver/symlinks"
@@ -958,7 +958,7 @@ phase_1_7_create_symlinks() {
     done
     
     echo ""
-    success "Phase 1.7 complete!"
+    success "Phase 1.6.7 complete!"
     log "Convenient symlinks available at: $SYMLINK_DIR"
     echo ""
 }
@@ -975,13 +975,13 @@ main() {
     phase_1_5_test_caddy
     phase_1_6_launchdaemon
     phase_1_6_5_configure_firewall
-    phase_1_7_create_symlinks
+    phase_1_6_7_create_symlinks
     
     log "========================================="
     log "Provisioning complete!"
     log "========================================="
     echo ""
-    log "✅ Phase 1.1-1.7 Complete!"
+    log "✅ Phase 1.1-1.6.7 Complete!"
     log ""
     log "Caddy webserver is now:"
     log "  - Installed and configured"
