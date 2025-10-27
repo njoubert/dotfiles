@@ -192,19 +192,76 @@ EOF
 }
 
 #==============================================================================
+# Phase 1.3: Create Basic Caddyfile
+#==============================================================================
+
+phase_1_3_create_caddyfile() {
+    log "Phase 1.3: Create Basic Caddyfile"
+    echo ""
+    
+    CADDYFILE="/usr/local/etc/Caddyfile"
+    
+    # Backup existing Caddyfile if present
+    if [[ -f "$CADDYFILE" ]]; then
+        warning "Caddyfile already exists at $CADDYFILE"
+        log "Backing up existing file..."
+        sudo cp "$CADDYFILE" "$CADDYFILE.backup.$(date +%Y%m%d_%H%M%S)"
+        success "Backup created"
+    fi
+    
+    # Create basic Caddyfile (HTTP only for testing)
+    log "Creating basic Caddyfile..."
+    
+    sudo tee "$CADDYFILE" > /dev/null << 'EOF'
+{
+    # Global options
+    admin off
+}
+
+# Catch-all for testing - responds to any domain/IP
+:80 {
+    root * /usr/local/var/www/hello
+    file_server
+    
+    log {
+        output file /usr/local/var/log/caddy/access.log
+    }
+}
+EOF
+    
+    success "Created Caddyfile at $CADDYFILE"
+    
+    # Validate Caddyfile syntax
+    log "Validating Caddyfile syntax..."
+    if caddy validate --config "$CADDYFILE" > /dev/null 2>&1; then
+        success "Caddyfile syntax is valid"
+    else
+        error "Caddyfile syntax validation failed"
+        log "Running validation with output:"
+        caddy validate --config "$CADDYFILE"
+        exit 1
+    fi
+    
+    echo ""
+    success "Phase 1.3 complete!"
+    echo ""
+}
+
+#==============================================================================
 # Main execution
 #==============================================================================
 
 main() {
     phase_1_1_install_caddy
     phase_1_2_hello_world
+    phase_1_3_create_caddyfile
     
     log "========================================="
     log "Provisioning complete!"
     log "========================================="
     echo ""
     log "Next steps:"
-    log "  - Continue with Phase 1.2 in the implementation guide"
+    log "  - Continue with Phase 1.4 in the implementation guide"
     log "  - Add additional phases to this script as you progress"
     echo ""
 }

@@ -106,7 +106,7 @@ At each phase, add the commands to your provisioning script, then review and run
 
 ### 1.3 Create Basic Caddyfile
 
-- [ ] Create initial Caddyfile (HTTP only for testing)
+- [x] Create initial Caddyfile (HTTP only for testing)
   ```bash
   cat > /usr/local/etc/Caddyfile << 'EOF'
   {
@@ -126,7 +126,7 @@ At each phase, add the commands to your provisioning script, then review and run
   EOF
   ```
 
-- [ ] Test Caddyfile syntax
+- [x] Test Caddyfile syntax
   ```bash
   caddy validate --config /usr/local/etc/Caddyfile
   # Should show: Valid configuration
