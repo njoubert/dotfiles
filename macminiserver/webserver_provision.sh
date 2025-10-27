@@ -248,6 +248,157 @@ EOF
 }
 
 #==============================================================================
+# Phase 1.4: Create Management Script
+#==============================================================================
+
+phase_1_4_management_script() {
+    log "Phase 1.4: Create Management Script"
+    echo ""
+    
+    # Create scripts directory
+    log "Creating scripts directory..."
+    SCRIPTS_DIR="$HOME/webserver/scripts"
+    
+    if [[ ! -d "$SCRIPTS_DIR" ]]; then
+        mkdir -p "$SCRIPTS_DIR"
+        success "Created $SCRIPTS_DIR"
+    else
+        success "Directory $SCRIPTS_DIR already exists"
+    fi
+    
+    # Create management script
+    MANAGE_SCRIPT="$SCRIPTS_DIR/manage-caddy.sh"
+    
+    if [[ -f "$MANAGE_SCRIPT" ]]; then
+        warning "Management script already exists at $MANAGE_SCRIPT"
+        log "Backing up existing script..."
+        cp "$MANAGE_SCRIPT" "$MANAGE_SCRIPT.backup.$(date +%Y%m%d_%H%M%S)"
+        success "Backup created"
+    fi
+    
+    log "Creating Caddy management script..."
+    
+    cat > "$MANAGE_SCRIPT" << 'EOF'
+#!/bin/bash
+# Caddy Webserver Management Script
+
+CADDYFILE="/usr/local/etc/Caddyfile"
+LOG_DIR="/usr/local/var/log/caddy"
+ERROR_LOG="$LOG_DIR/caddy-error.log"
+ACCESS_LOG="$LOG_DIR/access.log"
+PLIST_PATH="/Library/LaunchDaemons/com.caddyserver.caddy.plist"
+
+case "$1" in
+  start)
+    echo "Starting Caddy..."
+    sudo launchctl load -w "$PLIST_PATH"
+    sleep 2
+    sudo launchctl list | grep caddy
+    ;;
+    
+  stop)
+    echo "Stopping Caddy..."
+    sudo launchctl unload -w "$PLIST_PATH"
+    ;;
+    
+  restart)
+    echo "Restarting Caddy..."
+    sudo launchctl unload "$PLIST_PATH"
+    sleep 2
+    sudo launchctl load "$PLIST_PATH"
+    sleep 2
+    sudo launchctl list | grep caddy
+    ;;
+    
+  reload)
+    echo "Reloading Caddy configuration (zero downtime)..."
+    caddy reload --config $CADDYFILE
+    ;;
+    
+  status)
+    echo "=== Caddy Service Status ==="
+    if sudo launchctl list | grep -q caddy; then
+      echo "✅ Caddy LaunchDaemon is loaded"
+      sudo launchctl list | grep caddy
+    else
+      echo "❌ Caddy LaunchDaemon is not loaded"
+    fi
+    echo ""
+    echo "=== Caddy Process ==="
+    ps aux | grep -v grep | grep caddy || echo "No Caddy process found"
+    echo ""
+    echo "=== Recent Error Log ==="
+    if [ -f "$ERROR_LOG" ]; then
+      tail -5 "$ERROR_LOG"
+    else
+      echo "No error log found"
+    fi
+    ;;
+    
+  logs)
+    if [ "$2" = "error" ]; then
+      echo "Tailing Caddy error log (Ctrl+C to exit)..."
+      tail -f "$ERROR_LOG"
+    elif [ "$2" = "access" ]; then
+      echo "Tailing Caddy access log (Ctrl+C to exit)..."
+      tail -f "$ACCESS_LOG"
+    else
+      echo "Usage: $0 logs {error|access}"
+      exit 1
+    fi
+    ;;
+    
+  validate)
+    echo "Validating Caddyfile..."
+    caddy validate --config $CADDYFILE
+    ;;
+    
+  *)
+    echo "Caddy Webserver Management"
+    echo ""
+    echo "Usage: $0 {start|stop|restart|reload|status|logs|validate}"
+    echo ""
+    echo "  start    - Start Caddy service"
+    echo "  stop     - Stop Caddy service"
+    echo "  restart  - Restart Caddy service (brief downtime)"
+    echo "  reload   - Reload config (zero downtime)"
+    echo "  status   - Show service status and recent errors"
+    echo "  logs     - Tail logs (error|access)"
+    echo "  validate - Validate Caddyfile syntax"
+    exit 1
+    ;;
+esac
+EOF
+    
+    success "Created management script at $MANAGE_SCRIPT"
+    
+    # Make script executable
+    log "Making script executable..."
+    chmod +x "$MANAGE_SCRIPT"
+    success "Script is now executable"
+    
+    # Add alias to .zshrc if not already present
+    log "Adding alias to .zshrc..."
+    ALIAS_LINE='alias caddy-manage="~/webserver/scripts/manage-caddy.sh"'
+    
+    if grep -q "caddy-manage" "$HOME/.zshrc" 2>/dev/null; then
+        success "Alias already exists in .zshrc"
+    else
+        echo "" >> "$HOME/.zshrc"
+        echo "# Caddy management alias" >> "$HOME/.zshrc"
+        echo "$ALIAS_LINE" >> "$HOME/.zshrc"
+        success "Added alias to .zshrc"
+        log "Run 'source ~/.zshrc' to load the alias in current shell"
+    fi
+    
+    echo ""
+    success "Phase 1.4 complete!"
+    log "Management script available at: $MANAGE_SCRIPT"
+    log "Use 'caddy-manage' command after sourcing .zshrc"
+    echo ""
+}
+
+#==============================================================================
 # Main execution
 #==============================================================================
 
@@ -255,13 +406,14 @@ main() {
     phase_1_1_install_caddy
     phase_1_2_hello_world
     phase_1_3_create_caddyfile
+    phase_1_4_management_script
     
     log "========================================="
     log "Provisioning complete!"
     log "========================================="
     echo ""
     log "Next steps:"
-    log "  - Continue with Phase 1.4 in the implementation guide"
+    log "  - Continue with Phase 1.5 in the implementation guide"
     log "  - Add additional phases to this script as you progress"
     echo ""
 }

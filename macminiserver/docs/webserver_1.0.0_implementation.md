@@ -134,12 +134,12 @@ At each phase, add the commands to your provisioning script, then review and run
 
 ### 1.4 Create Management Script
 
-- [ ] Create webserver management script directory
+- [x] Create webserver management script directory
   ```bash
   mkdir -p ~/webserver/scripts
   ```
 
-- [ ] Create the management script
+- [x] Create the management script
   ```bash
   cat > ~/webserver/scripts/manage-caddy.sh << 'EOF'
   #!/bin/bash
@@ -234,12 +234,12 @@ At each phase, add the commands to your provisioning script, then review and run
   EOF
   ```
 
-- [ ] Make script executable
+- [x] Make script executable
   ```bash
   chmod +x ~/webserver/scripts/manage-caddy.sh
   ```
 
-- [ ] Create convenient alias
+- [x] Create convenient alias
   ```bash
   echo 'alias caddy-manage="~/webserver/scripts/manage-caddy.sh"' >> ~/.zshrc
   source ~/.zshrc
