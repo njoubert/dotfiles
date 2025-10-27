@@ -403,6 +403,51 @@ At each phase, add the commands to your provisioning script, then review and run
   ~/webserver/scripts/manage-caddy.sh status
   ```
 
+### 1.6.5 Configure macOS Firewall
+
+**Why:** macOS firewall needs to allow incoming connections on ports 80 (HTTP) and 443 (HTTPS) for the webserver to be accessible from the network.
+
+- [x] Check current firewall status
+  ```bash
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate
+  # Shows if firewall is enabled
+  ```
+
+- [x] Add Caddy to firewall exceptions
+  ```bash
+  # Add Caddy binary to allowed applications
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /usr/local/bin/caddy
+  
+  # Allow incoming connections for Caddy
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --unblockapp /usr/local/bin/caddy
+  ```
+
+- [x] Verify Caddy is allowed
+  ```bash
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --listapps | grep -i caddy
+  # Should show Caddy is allowed
+  ```
+
+- [x] Test access from another machine on the network
+  ```bash
+  # From another computer on your local network:
+  curl http://<mac-mini-ip>
+  # Should now see the hello world page
+  ```
+
+- [ ] Alternative: Enable firewall if disabled (optional)
+  ```bash
+  # Only if you want to enable the firewall
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+  ```
+
+- [ ] Note about pfctl (advanced)
+  ```bash
+  # macOS also has pfctl for packet filtering, but the application firewall
+  # is usually sufficient for a home server setup. If you need more advanced
+  # rules, you can use pfctl, but that's beyond the scope of this guide.
+  ```
+
 ### 1.7 Configure Auto-Login (Required for Docker)
 
 **Why:** Docker Desktop for Mac only starts when a user logs in. To ensure Docker containers start automatically after reboot, we need to enable auto-login.

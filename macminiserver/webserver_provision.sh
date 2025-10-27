@@ -219,7 +219,10 @@ phase_1_3_create_caddyfile() {
 }
 
 # Catch-all for testing - responds to any domain/IP
+# Bind only to IPv4
 :80 {
+    bind 0.0.0.0
+    
     root * /usr/local/var/www/hello
     file_server
     
@@ -669,6 +672,77 @@ EOF
 }
 
 #==============================================================================
+# Phase 1.6.5: Configure macOS Firewall
+#==============================================================================
+
+phase_1_6_5_configure_firewall() {
+    log "Phase 1.6.5: Configure macOS Firewall"
+    echo ""
+    
+    CADDY_PATH=$(which caddy)
+    
+    # Check firewall status
+    log "Checking firewall status..."
+    FIREWALL_STATUS=$(sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate)
+    log "Firewall status: $FIREWALL_STATUS"
+    
+    # Add Caddy to firewall exceptions
+    log "Adding Caddy to firewall exceptions..."
+    
+    if sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add "$CADDY_PATH" 2>&1 | grep -q "already exists"; then
+        success "Caddy already in firewall list"
+    else
+        sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add "$CADDY_PATH"
+        success "Added Caddy to firewall"
+    fi
+    
+    # Unblock Caddy (allow incoming connections)
+    log "Allowing incoming connections for Caddy..."
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --unblockapp "$CADDY_PATH"
+    success "Caddy is allowed to accept incoming connections"
+    
+    # Verify Caddy is in the list
+    log "Verifying Caddy firewall configuration..."
+    if sudo /usr/libexec/ApplicationFirewall/socketfilterfw --listapps | grep -q caddy; then
+        success "✅ Caddy is in firewall allowed list"
+    else
+        warning "Could not verify Caddy in firewall list"
+    fi
+    
+    # Get local IP for testing
+    log "Detecting local IP address for testing..."
+    LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "unknown")
+    
+    if [[ "$LOCAL_IP" != "unknown" ]]; then
+        success "Local IP: $LOCAL_IP"
+        
+        log "Testing external access via local IP..."
+        log "Waiting a moment for firewall to apply changes..."
+        sleep 2
+        
+        if curl -s --connect-timeout 5 "http://$LOCAL_IP" > /dev/null 2>&1; then
+            success "✅ External access test passed!"
+            log "Server is accessible at http://$LOCAL_IP"
+        else
+            warning "External access test failed"
+            log "This might be normal if:"
+            log "  - You're on a network with client isolation enabled"
+            log "  - Additional firewall/router rules are blocking access"
+            log "  - Try testing from a different device on the same network"
+        fi
+    else
+        warning "Could not detect local IP address"
+        log "You can test external access manually using the Mac Mini's IP address"
+    fi
+    
+    echo ""
+    success "Phase 1.6.5 complete!"
+    log "Firewall is configured to allow Caddy traffic"
+    log "Test from another machine: curl http://$LOCAL_IP"
+    echo ""
+}
+
+#==============================================================================
 # Main execution
 #==============================================================================
 
@@ -678,6 +752,8 @@ main() {
     phase_1_3_create_caddyfile
     phase_1_4_management_script
     phase_1_5_test_caddy
+    phase_1_6_launchdaemon
+    phase_1_6_5_configure_firewall
     phase_1_6_launchdaemon
     
     log "========================================="
