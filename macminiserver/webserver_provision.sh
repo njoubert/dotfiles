@@ -506,6 +506,169 @@ phase_1_5_test_caddy() {
 }
 
 #==============================================================================
+# Phase 1.6: Setup LaunchDaemon for Auto-Start
+#==============================================================================
+
+phase_1_6_launchdaemon() {
+    log "Phase 1.6: Setup LaunchDaemon for Auto-Start"
+    echo ""
+    
+    PLIST_PATH="/Library/LaunchDaemons/com.caddyserver.caddy.plist"
+    
+    # Stop any running Caddy processes
+    log "Stopping any running Caddy processes..."
+    if pgrep -x caddy > /dev/null; then
+        pkill caddy
+        sleep 2
+        success "Stopped Caddy"
+    else
+        success "No Caddy process to stop"
+    fi
+    
+    # Find Caddy binary location
+    log "Finding Caddy binary location..."
+    CADDY_PATH=$(which caddy)
+    success "Caddy binary: $CADDY_PATH"
+    
+    # Get username and home directory
+    USERNAME=$(whoami)
+    USER_HOME="$HOME"
+    
+    log "Will run Caddy as user: $USERNAME"
+    log "Home directory: $USER_HOME"
+    
+    # Backup existing plist if present
+    if [[ -f "$PLIST_PATH" ]]; then
+        warning "LaunchDaemon plist already exists"
+        log "Backing up existing plist..."
+        sudo cp "$PLIST_PATH" "$PLIST_PATH.backup.$(date +%Y%m%d_%H%M%S)"
+        success "Backup created"
+        
+        # Unload existing LaunchDaemon
+        log "Unloading existing LaunchDaemon..."
+        sudo launchctl unload "$PLIST_PATH" 2>/dev/null || true
+        success "Unloaded existing LaunchDaemon"
+    fi
+    
+    # Create LaunchDaemon plist
+    log "Creating LaunchDaemon plist..."
+    
+    sudo tee "$PLIST_PATH" > /dev/null << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.caddyserver.caddy</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>$CADDY_PATH</string>
+        <string>run</string>
+        <string>--config</string>
+        <string>/usr/local/etc/Caddyfile</string>
+        <string>--adapter</string>
+        <string>caddyfile</string>
+    </array>
+    
+    <key>RunAtLoad</key>
+    <true/>
+    
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+    
+    <key>StandardOutPath</key>
+    <string>/usr/local/var/log/caddy/caddy-stdout.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>/usr/local/var/log/caddy/caddy-error.log</string>
+    
+    <key>WorkingDirectory</key>
+    <string>/usr/local/var/www</string>
+    
+    <key>UserName</key>
+    <string>$USERNAME</string>
+    
+    <key>GroupName</key>
+    <string>staff</string>
+    
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>HOME</key>
+        <string>$USER_HOME</string>
+    </dict>
+</dict>
+</plist>
+EOF
+    
+    success "Created LaunchDaemon plist at $PLIST_PATH"
+    
+    # Set correct permissions
+    log "Setting permissions on plist..."
+    sudo chown root:wheel "$PLIST_PATH"
+    sudo chmod 644 "$PLIST_PATH"
+    success "Permissions set (root:wheel, 644)"
+    
+    # Load the LaunchDaemon
+    log "Loading LaunchDaemon..."
+    sudo launchctl load -w "$PLIST_PATH"
+    sleep 3
+    success "LaunchDaemon loaded"
+    
+    # Verify LaunchDaemon is loaded
+    log "Verifying LaunchDaemon status..."
+    if sudo launchctl list | grep -q "com.caddyserver.caddy"; then
+        success "✅ LaunchDaemon is loaded"
+        sudo launchctl list | grep caddy
+    else
+        error "LaunchDaemon failed to load"
+        log "Checking error log:"
+        tail -20 /usr/local/var/log/caddy/caddy-error.log 2>/dev/null || echo "No error log found"
+        exit 1
+    fi
+    
+    # Verify Caddy process is running
+    log "Verifying Caddy process..."
+    sleep 2
+    if ps aux | grep -v grep | grep -q caddy; then
+        success "✅ Caddy process is running"
+        ps aux | grep -v grep | grep caddy | head -1
+    else
+        error "Caddy process is not running"
+        log "Checking error log:"
+        tail -20 /usr/local/var/log/caddy/caddy-error.log 2>/dev/null || echo "No error log found"
+        exit 1
+    fi
+    
+    # Test with management script
+    log "Testing management script..."
+    if ~/webserver/scripts/manage-caddy.sh status > /dev/null 2>&1; then
+        success "✅ Management script works"
+    else
+        warning "Management script returned warnings (may be normal)"
+    fi
+    
+    # Test localhost access
+    log "Testing localhost access..."
+    sleep 2
+    if curl -s http://localhost > /dev/null; then
+        success "✅ Localhost test passed"
+    else
+        error "Failed to access http://localhost"
+        exit 1
+    fi
+    
+    echo ""
+    success "Phase 1.6 complete!"
+    log "Caddy is now set to start automatically at boot!"
+    log "Use '~/webserver/scripts/manage-caddy.sh' to manage the service"
+    echo ""
+}
+
+#==============================================================================
 # Main execution
 #==============================================================================
 
@@ -515,14 +678,24 @@ main() {
     phase_1_3_create_caddyfile
     phase_1_4_management_script
     phase_1_5_test_caddy
+    phase_1_6_launchdaemon
     
     log "========================================="
     log "Provisioning complete!"
     log "========================================="
     echo ""
+    log "✅ Phase 1.1-1.6 Complete!"
+    log ""
+    log "Caddy webserver is now:"
+    log "  - Installed and configured"
+    log "  - Serving hello world page"
+    log "  - Set to start automatically at boot"
+    log "  - Manageable via ~/webserver/scripts/manage-caddy.sh"
+    echo ""
     log "Next steps:"
-    log "  - Continue with Phase 1.6 in the implementation guide"
-    log "  - Set up LaunchDaemon for automatic startup"
+    log "  - Test reboot: sudo reboot (then verify Caddy starts)"
+    log "  - Continue with Phase 1.7 (Auto-login configuration)"
+    log "  - Or skip to Phase 2 to add your first real site"
     echo ""
 }
 

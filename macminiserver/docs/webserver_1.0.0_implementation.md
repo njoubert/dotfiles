@@ -287,19 +287,19 @@ At each phase, add the commands to your provisioning script, then review and run
 
 **Note:** We're using a system-level LaunchDaemon (not Homebrew's LaunchAgent) so Caddy starts at boot before any user login. This is critical for a headless server setup.
 
-- [ ] Stop Caddy if running via manual start
+- [x] Stop Caddy if running via manual start
   ```bash
   pkill caddy
   ```
 
-- [ ] Find Caddy binary location
+- [x] Find Caddy binary location
   ```bash
   which caddy
   # Should show: /opt/homebrew/bin/caddy (Apple Silicon) or /usr/local/bin/caddy (Intel)
   # Save this path for the plist file
   ```
 
-- [ ] Create system LaunchDaemon plist
+- [x] Create system LaunchDaemon plist
   ```bash
   sudo tee /Library/LaunchDaemons/com.caddyserver.caddy.plist << 'EOF'
   <?xml version="1.0" encoding="UTF-8"?>
@@ -353,7 +353,7 @@ At each phase, add the commands to your provisioning script, then review and run
   EOF
   ```
 
-- [ ] **IMPORTANT: Update the plist file**
+- [x] **IMPORTANT: Update the plist file**
   ```bash
   # Replace YOUR_USERNAME with your actual username
   sudo nano /Library/LaunchDaemons/com.caddyserver.caddy.plist
@@ -364,18 +364,18 @@ At each phase, add the commands to your provisioning script, then review and run
   # - <string>/Users/YOUR_USERNAME</string> (replace with $HOME)
   ```
 
-- [ ] Set correct permissions on plist
+- [x] Set correct permissions on plist
   ```bash
   sudo chown root:wheel /Library/LaunchDaemons/com.caddyserver.caddy.plist
   sudo chmod 644 /Library/LaunchDaemons/com.caddyserver.caddy.plist
   ```
 
-- [ ] Load the LaunchDaemon
+- [x] Load the LaunchDaemon
   ```bash
   sudo launchctl load -w /Library/LaunchDaemons/com.caddyserver.caddy.plist
   ```
 
-- [ ] Verify LaunchDaemon is loaded and running
+- [x] Verify LaunchDaemon is loaded and running
   ```bash
   sudo launchctl list | grep caddy
   # Should show the service with a PID
@@ -384,7 +384,7 @@ At each phase, add the commands to your provisioning script, then review and run
   # Should show caddy process running as your user
   ```
 
-- [ ] Test with management script
+- [x] Test with management script
   ```bash
   ~/webserver/scripts/manage-caddy.sh status
   curl http://localhost
