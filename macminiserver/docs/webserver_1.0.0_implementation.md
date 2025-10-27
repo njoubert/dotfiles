@@ -390,7 +390,7 @@ At each phase, add the commands to your provisioning script, then review and run
   curl http://localhost
   ```
 
-- [ ] Test auto-start (recommended)
+- [x] Test auto-start (recommended)
   ```bash
   # Reboot the Mac Mini
   sudo reboot
@@ -436,19 +436,6 @@ At each phase, add the commands to your provisioning script, then review and run
   # From another computer on your local network:
   curl http://<mac-mini-ip>
   # Should now see the hello world page
-  ```
-
-- [ ] Alternative: Enable firewall if disabled (optional)
-  ```bash
-  # Only if you want to enable the firewall
-  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
-  ```
-
-- [ ] Note about pfctl (advanced)
-  ```bash
-  # macOS also has pfctl for packet filtering, but the application firewall
-  # is usually sufficient for a home server setup. If you need more advanced
-  # rules, you can use pfctl, but that's beyond the scope of this guide.
   ```
 
 ### 1.7 Configure Auto-Login (Required for Docker)
