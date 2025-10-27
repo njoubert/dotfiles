@@ -2,6 +2,15 @@
 
 This document provides step-by-step implementation phases for setting up the Caddy-based webserver on the Mac Mini. Each phase builds on the previous one and includes verification steps.
 
+**Implementation Approach:**
+Instead of running commands directly, **create and maintain a provisioning script** (`~/webserver/webserver_provision.sh`) that implements each phase. This approach:
+- Creates a repeatable, idempotent setup process
+- Documents exactly what was done in executable form
+- Enables easy disaster recovery or setup of additional servers
+- Allows review before execution
+
+At each phase, add the commands to your provisioning script, then review and run it. The script should be safe to re-run (idempotent) and should check prerequisites before proceeding.
+
 **Prerequisites:**
 - Mac Mini running macOS Sequoia 15.7 (Assume it is an Intel x86 mac mini!)
 - Homebrew installed
@@ -20,6 +29,7 @@ This document provides step-by-step implementation phases for setting up the Cad
   - Apple Silicon: `/opt/homebrew/bin/caddy`
   - Intel: `/usr/local/bin/caddy`
 - Use `which caddy` to find your path when creating the plist file
+- **Build your provisioning script progressively** - add each phase's commands as you go
 
 ---
 
