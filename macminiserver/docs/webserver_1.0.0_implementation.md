@@ -38,10 +38,7 @@ This document provides step-by-step implementation phases for setting up the Cad
   # Verify it's Docker Desktop (not homebrew docker)
   docker context ls
   # Should show "desktop-linux" context - this confirms Docker Desktop
-  
-  # Check that homebrew docker is NOT installed
-  brew list docker 2>/dev/null && echo "⚠️  WARNING: Homebrew docker is installed - uninstall it!" || echo "✅ Homebrew docker is not installed"
-  ```
+    ```
 
 - [ ] If homebrew docker is installed, remove it
   ```bash
