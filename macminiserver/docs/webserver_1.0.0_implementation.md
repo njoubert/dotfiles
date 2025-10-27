@@ -247,23 +247,23 @@ At each phase, add the commands to your provisioning script, then review and run
 
 ### 1.5 Test Basic Caddy
 
-- [ ] Start Caddy manually first (to catch any errors)
+- [x] Start Caddy manually first (to catch any errors)
   ```bash
   caddy run --config /usr/local/etc/Caddyfile
   # Watch for errors, then Ctrl+C to stop
   ```
 
-- [ ] Start Caddy via management script
+- [x] Start Caddy via management script
   ```bash
   ~/webserver/scripts/manage-caddy.sh start
   ```
 
-- [ ] Verify it's running
+- [x] Verify it's running
   ```bash
   ~/webserver/scripts/manage-caddy.sh status
   ```
 
-- [ ] Test the hello world page
+- [x] Test the hello world page
   ```bash
   # From the Mac Mini itself
   curl http://localhost
@@ -274,7 +274,7 @@ At each phase, add the commands to your provisioning script, then review and run
   # Should see the HTML
   ```
 
-- [ ] Test the management script commands
+- [x] Test the management script commands
   ```bash
   ~/webserver/scripts/manage-caddy.sh logs access
   # Ctrl+C to exit

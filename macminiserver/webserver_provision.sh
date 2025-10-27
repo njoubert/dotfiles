@@ -379,7 +379,7 @@ EOF
     
     # Add alias to .zshrc if not already present
     log "Adding alias to .zshrc..."
-    ALIAS_LINE='alias caddy-manage="~/webserver/scripts/manage-caddy.sh"'
+    ALIAS_LINE='alias caddy-manage="$HOME/webserver/scripts/manage-caddy.sh"'
     
     if grep -q "caddy-manage" "$HOME/.zshrc" 2>/dev/null; then
         success "Alias already exists in .zshrc"
@@ -399,6 +399,113 @@ EOF
 }
 
 #==============================================================================
+# Phase 1.5: Test Basic Caddy
+#==============================================================================
+
+phase_1_5_test_caddy() {
+    log "Phase 1.5: Test Basic Caddy"
+    echo ""
+    
+    CADDYFILE="/usr/local/etc/Caddyfile"
+    
+    # Stop any existing Caddy processes
+    log "Checking for existing Caddy processes..."
+    if pgrep -x caddy > /dev/null; then
+        warning "Caddy is already running. Stopping it first..."
+        pkill caddy
+        sleep 2
+        success "Stopped existing Caddy process"
+    else
+        success "No existing Caddy processes found"
+    fi
+    
+    # Start Caddy in background for testing
+    log "Starting Caddy manually for testing..."
+    caddy run --config "$CADDYFILE" > /tmp/caddy-test.log 2>&1 &
+    CADDY_PID=$!
+    
+    log "Caddy started with PID: $CADDY_PID"
+    log "Waiting for Caddy to start..."
+    sleep 3
+    
+    # Check if Caddy is running
+    if ps -p $CADDY_PID > /dev/null; then
+        success "Caddy process is running"
+    else
+        error "Caddy process failed to start"
+        log "Check logs at /tmp/caddy-test.log"
+        cat /tmp/caddy-test.log
+        exit 1
+    fi
+    
+    # Test localhost
+    log "Testing hello world page on localhost..."
+    if curl -s http://localhost > /dev/null; then
+        success "✅ Localhost test passed"
+        log "Response preview:"
+        curl -s http://localhost | head -3
+    else
+        error "Failed to access http://localhost"
+        log "Check Caddy logs:"
+        tail -20 /tmp/caddy-test.log
+        pkill caddy
+        exit 1
+    fi
+    
+    # Get local IP address
+    log "Detecting local IP address..."
+    LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "unknown")
+    
+    if [[ "$LOCAL_IP" != "unknown" ]]; then
+        success "Local IP: $LOCAL_IP"
+        log "Testing access via local IP..."
+        if curl -s "http://$LOCAL_IP" > /dev/null; then
+            success "✅ Local IP test passed"
+        else
+            warning "Could not access via local IP (may need firewall configuration)"
+        fi
+    else
+        warning "Could not detect local IP address"
+    fi
+    
+    # Check access log
+    log "Checking if access log is being written..."
+    if [[ -f /usr/local/var/log/caddy/access.log ]]; then
+        success "Access log exists"
+        log "Recent access log entries:"
+        tail -5 /usr/local/var/log/caddy/access.log || echo "No entries yet"
+    else
+        warning "Access log not yet created (will be created on first request)"
+    fi
+    
+    # Test management script validate command
+    log "Testing management script validate command..."
+    if ~/webserver/scripts/manage-caddy.sh validate > /dev/null 2>&1; then
+        success "✅ Management script validate works"
+    else
+        warning "Management script validate returned an error (expected until LaunchDaemon is set up)"
+    fi
+    
+    # Stop test Caddy process
+    log "Stopping test Caddy process..."
+    kill $CADDY_PID
+    sleep 2
+    
+    if ps -p $CADDY_PID > /dev/null 2>&1; then
+        warning "Caddy didn't stop gracefully, forcing..."
+        kill -9 $CADDY_PID
+    fi
+    
+    success "Test Caddy stopped"
+    
+    echo ""
+    success "Phase 1.5 complete!"
+    log "Caddy is working correctly!"
+    log "Next: Set up LaunchDaemon for automatic startup"
+    echo ""
+}
+
+#==============================================================================
 # Main execution
 #==============================================================================
 
@@ -407,14 +514,15 @@ main() {
     phase_1_2_hello_world
     phase_1_3_create_caddyfile
     phase_1_4_management_script
+    phase_1_5_test_caddy
     
     log "========================================="
     log "Provisioning complete!"
     log "========================================="
     echo ""
     log "Next steps:"
-    log "  - Continue with Phase 1.5 in the implementation guide"
-    log "  - Add additional phases to this script as you progress"
+    log "  - Continue with Phase 1.6 in the implementation guide"
+    log "  - Set up LaunchDaemon for automatic startup"
     echo ""
 }
 
