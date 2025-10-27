@@ -59,25 +59,6 @@ Internet → Router → macOS firewall → Caddy (bare metal)
                                       │  └→ App containers
 ```
 
-### How This Meets Requirements
-
-- **✅ Long-term Stability**: Caddy is mature (v2.x), actively maintained, stable releases
-- **✅ Heterogeneous Sites**: Static files served directly, dynamic apps in containers
-- **✅ SSL/TLS**: Automatic HTTPS with zero configuration (built-in Let's Encrypt)
-- **✅ Simple Addition**: Add a site block to Caddyfile, reload Caddy
-- **✅ Efficiency**: Similar to nginx for static serving, minimal overhead
-- **✅ Fast**: Modern HTTP/2, HTTP/3 support, optimized for static files
-- **✅ Maintainable**: Caddyfile is extremely readable, minimal configuration
-- **✅ Dependency Isolation**: Each app in separate Docker Compose project
-- **✅ WordPress Support**: Standard WordPress containers, reverse proxy
-- **✅ WordPress Isolation**: Each WP site in isolated container
-- **✅ Future Projects**: Easy to add new containers and proxy routes
-- **✅ Project Isolation**: Containers provide full isolation
-- **✅ Handle Traffic Spikes**: Caddy handles concurrent connections efficiently
-- **✅ Rate Limiting**: Built-in rate limiting middleware
-- **✅ Log Management**: Caddy logs + Docker json-file logging
-- **✅ Cloudflare Integration**: Native DNS challenge support
-
 **Advanced Features (v1.2+)**: Resource limits, monitoring/alerting, automated backups
 
 ### Detailed Plan
@@ -339,6 +320,7 @@ Once you choose an approach:
 7. **Plan v1.2** features based on actual usage patterns
 
 After v1.0 is stable, add advanced features:
+- **v1.0.1**: Dead simple monitoring
 - **v1.2**: Resource limits per container
 - **v1.4**: Monitoring with Prometheus + Grafana
 - **v1.6**: Automated backups with retention policies

@@ -1438,6 +1438,7 @@ Once you choose an approach:
 7. **Plan v1.2** features based on actual usage patterns
 
 After v1.0 is stable, add advanced features:
+- **v1.0.1**: Dead simple monitoring
 - **v1.2**: Resource limits per container
 - **v1.4**: Monitoring with Prometheus + Grafana
 - **v1.6**: Automated backups with retention policies
