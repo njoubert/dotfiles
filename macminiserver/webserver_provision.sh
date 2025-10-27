@@ -740,7 +740,6 @@ main() {
     phase_1_5_test_caddy
     phase_1_6_launchdaemon
     phase_1_6_5_configure_firewall
-    phase_1_6_launchdaemon
     
     log "========================================="
     log "Provisioning complete!"
