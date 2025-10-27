@@ -61,22 +61,22 @@ Internet → Router (port forward) → macOS firewall → nginx (bare metal)
 
 ### How This Meets Requirements
 
-**✅ Long-term Stability**: nginx is the most battle-tested web server (20+ years)
-**✅ Heterogeneous Sites**: Static files served directly, dynamic apps in containers
-**✅ SSL/TLS**: Certbot with Cloudflare DNS-01 challenge, auto-renewal
-**✅ Simple Addition**: Drop files in `/usr/local/var/www/`, add nginx server block
-**✅ Efficiency**: Minimal overhead for static serving, containers only for what needs isolation
-**✅ Fast**: nginx is one of the fastest static file servers available
-**✅ Maintainable**: Standard tools, well-documented, large community
-**✅ Dependency Isolation**: Each app in separate Docker Compose project
-**✅ WordPress Support**: Official WordPress Docker images, well-maintained
-**✅ WordPress Isolation**: Each WP site in isolated container with own database
-**✅ Future Projects**: Easy to add new Docker Compose projects
-**✅ Project Isolation**: Containers provide process, filesystem, and network isolation
-**✅ Handle Traffic Spikes**: nginx worker processes handle concurrent connections efficiently
-**✅ Rate Limiting**: nginx built-in rate limiting + fail2ban for system-level protection
-**✅ Log Management**: nginx logs + Docker json-file driver with rotation
-**✅ Cloudflare Integration**: DNS-01 challenge works seamlessly with your existing setup
+- **✅ Long-term Stability**: nginx is the most battle-tested web server (20+ years)
+- **✅ Heterogeneous Sites**: Static files served directly, dynamic apps in containers
+- **✅ SSL/TLS**: Certbot with Cloudflare DNS-01 challenge, auto-renewal
+- **✅ Simple Addition**: Drop files in `/usr/local/var/www/`, add nginx server block
+- **✅ Efficiency**: Minimal overhead for static serving, containers only for what needs isolation
+- **✅ Fast**: nginx is one of the fastest static file servers available
+- **✅ Maintainable**: Standard tools, well-documented, large community
+- **✅ Dependency Isolation**: Each app in separate Docker Compose project
+- **✅ WordPress Support**: Official WordPress Docker images, well-maintained
+- **✅ WordPress Isolation**: Each WP site in isolated container with own database
+- **✅ Future Projects**: Easy to add new Docker Compose projects
+- **✅ Project Isolation**: Containers provide process, filesystem, and network isolation
+- **✅ Handle Traffic Spikes**: nginx worker processes handle concurrent connections efficiently
+- **✅ Rate Limiting**: nginx built-in rate limiting + fail2ban for system-level protection
+- **✅ Log Management**: nginx logs + Docker json-file driver with rotation
+- **✅ Cloudflare Integration**: DNS-01 challenge works seamlessly with your existing setup
 
 **Advanced Features (v1.2+)**: Resource limits, monitoring/alerting, automated backups
 
@@ -488,23 +488,23 @@ docker logs --tail 100 <container-name>  # Last 100 lines
 
 ### Pros of Approach 1
 
-✅ **Maximum Performance**: nginx directly serves static files (zero overhead)
-✅ **Resource Efficient**: Static sites use ~10-20MB RAM (nginx), containers only when needed
-✅ **Battle-tested Stack**: nginx has 20+ years of production use, extremely stable
-✅ **Simple Debugging**: Clear separation - check nginx logs or Docker logs
-✅ **Flexible Scaling**: Each site scales independently based on actual traffic
-✅ **Easy Static Updates**: Edit files directly, nginx auto-reloads
-✅ **Quick v1.0**: Core functionality without complex monitoring/backup setup
-✅ **Clear Upgrade Path**: Easy to add monitoring and backups in v1.2-v1.6
+- **✅ Maximum Performance**: nginx directly serves static files (zero overhead)
+- **✅ Resource Efficient**: Static sites use ~10-20MB RAM (nginx), containers only when needed
+- **✅ Battle-tested Stack**: nginx has 20+ years of production use, extremely stable
+- **✅ Simple Debugging**: Clear separation - check nginx logs or Docker logs
+- **✅ Flexible Scaling**: Each site scales independently based on actual traffic
+- **✅ Easy Static Updates**: Edit files directly, nginx auto-reloads
+- **✅ Quick v1.0**: Core functionality without complex monitoring/backup setup
+- **✅ Clear Upgrade Path**: Easy to add monitoring and backups in v1.2-v1.6
 
 ### Cons of Approach 1
 
-❌ **Manual Configuration**: Adding sites requires editing nginx config files
-❌ **SSL Management**: Need to set up certbot correctly (one-time setup cost)
-❌ **Mixed Management**: nginx (bare metal) + Docker (containers) = two systems to manage
-❌ **No Service Discovery**: Must manually configure reverse proxy for new containers
-❌ **No Built-in Monitoring**: Need to add monitoring stack later (v1.4)
-❌ **Manual Backups**: Need to implement backup scripts later (v1.6)
+- **❌Manual Configuration**: Adding sites requires editing nginx config files
+- **❌SSL Management**: Need to set up certbot correctly (one-time setup cost)
+- **❌Mixed Management**: nginx (bare metal) + Docker (containers) = two systems to manage
+- **❌No Service Discovery**: Must manually configure reverse proxy for new containers
+- **❌No Built-in Monitoring**: Need to add monitoring stack later (v1.4)
+- **❌Manual Backups**: Need to implement backup scripts later (v1.6)
 
 ### When to Choose Approach 1
 
@@ -538,22 +538,22 @@ Internet → Router → macOS firewall → Traefik (Docker) → Docker container
 
 ### How This Meets Requirements
 
-**✅ Long-term Stability**: Container images are versioned, reproducible deployments
-**✅ Heterogeneous Sites**: All sites treated equally as containers (consistency!)
-**✅ SSL/TLS**: Traefik auto-provisions Let's Encrypt certs via DNS challenge
-**✅ Simple Addition**: Add new container with labels, zero config file edits
-**✅ Efficiency**: Lightweight alpine images, shared base layers
-**✅ Fast**: nginx:alpine is fast; Traefik adds minimal latency (~1-2ms)
-**✅ Maintainable**: Declarative configuration (labels), visual dashboard
-**✅ Dependency Isolation**: Perfect - every site is fully isolated container
-**✅ WordPress Support**: Standard WordPress containers work seamlessly
-**✅ WordPress Isolation**: Each WP site in own container with private network
-**✅ Future Projects**: Just add docker-compose.yml with Traefik labels
-**✅ Project Isolation**: Maximum isolation - network, filesystem, process
-**✅ Handle Traffic Spikes**: Traefik load balances, easy to add replicas
-**✅ Rate Limiting**: Traefik middleware for rate limiting per route
-**✅ Log Management**: Docker json-file logging with rotation
-**✅ Cloudflare Integration**: Traefik natively supports Cloudflare DNS challenge
+- **✅ Long-term Stability**: Container images are versioned, reproducible deployments
+- **✅ Heterogeneous Sites**: All sites treated equally as containers (consistency!)
+- **✅ SSL/TLS**: Traefik auto-provisions Let's Encrypt certs via DNS challenge
+- **✅ Simple Addition**: Add new container with labels, zero config file edits
+- **✅ Efficiency**: Lightweight alpine images, shared base layers
+- **✅ Fast**: nginx:alpine is fast; Traefik adds minimal latency (~1-2ms)
+- **✅ Maintainable**: Declarative configuration (labels), visual dashboard
+- **✅ Dependency Isolation**: Perfect - every site is fully isolated container
+- **✅ WordPress Support**: Standard WordPress containers work seamlessly
+- **✅ WordPress Isolation**: Each WP site in own container with private network
+- **✅ Future Projects**: Just add docker-compose.yml with Traefik labels
+- **✅ Project Isolation**: Maximum isolation - network, filesystem, process
+- **✅ Handle Traffic Spikes**: Traefik load balances, easy to add replicas
+- **✅ Rate Limiting**: Traefik middleware for rate limiting per route
+- **✅ Log Management**: Docker json-file logging with rotation
+- **✅ Cloudflare Integration**: Traefik natively supports Cloudflare DNS challenge
 
 **Advanced Features (v1.2+)**: Resource limits, monitoring/alerting, automated backups
 
@@ -1252,23 +1252,23 @@ scrape_configs:
 
 ### Pros of Approach 2
 
-✅ **Unified Management**: Everything in Docker, consistent tooling
-✅ **Automatic HTTPS**: Traefik handles Let's Encrypt automatically
-✅ **Service Discovery**: Add containers with labels, no config file edits
-✅ **Built-in Dashboard**: Traefik dashboard shows all routes and services
-✅ **Better Isolation**: Each static site in own container (security boundaries)
-✅ **Easy Development**: Spin up staging environments trivially
-✅ **Modern Architecture**: Container-native, easier to migrate to k8s later if needed
-✅ **Declarative Config**: Labels in docker-compose make intent clear
-✅ **Quick v1.0**: Core functionality working fast, easy to extend
+- **✅ Unified Management**: Everything in Docker, consistent tooling
+- **✅ Automatic HTTPS**: Traefik handles Let's Encrypt automatically
+- **✅ Service Discovery**: Add containers with labels, no config file edits
+- **✅ Built-in Dashboard**: Traefik dashboard shows all routes and services
+- **✅ Better Isolation**: Each static site in own container (security boundaries)
+- **✅ Easy Development**: Spin up staging environments trivially
+- **✅ Modern Architecture**: Container-native, easier to migrate to k8s later if needed
+- **✅ Declarative Config**: Labels in docker-compose make intent clear
+- **✅ Quick v1.0**: Core functionality working fast, easy to extend
 
 ### Cons of Approach 2
 
-❌ **Container Overhead**: Each static site needs ~20-50MB RAM (nginx:alpine)
-❌ **Slight Performance Hit**: Extra network hop vs bare metal nginx
-❌ **Docker Desktop Dependency**: More reliance on Docker Desktop for Mac
-❌ **More Containers**: More moving parts than bare metal nginx
-❌ **No Built-in Monitoring**: Need to add monitoring stack later (v1.4)
+- **❌Container Overhead**: Each static site needs ~20-50MB RAM (nginx:alpine)
+- **❌Slight Performance Hit**: Extra network hop vs bare metal nginx
+- **❌Docker Desktop Dependency**: More reliance on Docker Desktop for Mac
+- **❌More Containers**: More moving parts than bare metal nginx
+- **❌No Built-in Monitoring**: Need to add monitoring stack later (v1.4)
 
 ### When to Choose Approach 2
 
@@ -1302,22 +1302,22 @@ Internet → Router → macOS firewall → Caddy (bare metal)
 
 ### How This Meets Requirements
 
-**✅ Long-term Stability**: Caddy is mature (v2.x), actively maintained, stable releases
-**✅ Heterogeneous Sites**: Static files served directly, dynamic apps in containers
-**✅ SSL/TLS**: Automatic HTTPS with zero configuration (built-in Let's Encrypt)
-**✅ Simple Addition**: Add a site block to Caddyfile, reload Caddy
-**✅ Efficiency**: Similar to nginx for static serving, minimal overhead
-**✅ Fast**: Modern HTTP/2, HTTP/3 support, optimized for static files
-**✅ Maintainable**: Caddyfile is extremely readable, minimal configuration
-**✅ Dependency Isolation**: Each app in separate Docker Compose project
-**✅ WordPress Support**: Standard WordPress containers, reverse proxy
-**✅ WordPress Isolation**: Each WP site in isolated container
-**✅ Future Projects**: Easy to add new containers and proxy routes
-**✅ Project Isolation**: Containers provide full isolation
-**✅ Handle Traffic Spikes**: Caddy handles concurrent connections efficiently
-**✅ Rate Limiting**: Built-in rate limiting middleware
-**✅ Log Management**: Caddy logs + Docker json-file logging
-**✅ Cloudflare Integration**: Native DNS challenge support
+- **✅ Long-term Stability**: Caddy is mature (v2.x), actively maintained, stable releases
+- **✅ Heterogeneous Sites**: Static files served directly, dynamic apps in containers
+- **✅ SSL/TLS**: Automatic HTTPS with zero configuration (built-in Let's Encrypt)
+- **✅ Simple Addition**: Add a site block to Caddyfile, reload Caddy
+- **✅ Efficiency**: Similar to nginx for static serving, minimal overhead
+- **✅ Fast**: Modern HTTP/2, HTTP/3 support, optimized for static files
+- **✅ Maintainable**: Caddyfile is extremely readable, minimal configuration
+- **✅ Dependency Isolation**: Each app in separate Docker Compose project
+- **✅ WordPress Support**: Standard WordPress containers, reverse proxy
+- **✅ WordPress Isolation**: Each WP site in isolated container
+- **✅ Future Projects**: Easy to add new containers and proxy routes
+- **✅ Project Isolation**: Containers provide full isolation
+- **✅ Handle Traffic Spikes**: Caddy handles concurrent connections efficiently
+- **✅ Rate Limiting**: Built-in rate limiting middleware
+- **✅ Log Management**: Caddy logs + Docker json-file logging
+- **✅ Cloudflare Integration**: Native DNS challenge support
 
 **Advanced Features (v1.2+)**: Resource limits, monitoring/alerting, automated backups
 
@@ -1567,23 +1567,23 @@ docker ps --format "table {{.Names}}\t{{.Status}}"
 
 ### Pros of Approach 3
 
-✅ **Simplest Configuration**: Caddyfile is remarkably readable
-✅ **Automatic HTTPS**: Zero configuration, just works with Let's Encrypt
-✅ **Automatic Renewal**: Built-in, no cron jobs or LaunchDaemons needed
-✅ **Modern Defaults**: HTTP/2, HTTP/3, gzip compression, security headers
-✅ **Fast Static Serving**: Comparable to nginx for static content
-✅ **Easy Maintenance**: Config changes are straightforward, reload without downtime
-✅ **Good Documentation**: Modern, well-documented project
-✅ **Cloudflare Integration**: Native DNS challenge support
-✅ **Best for v1.0**: Get serving fast, add features later
+- **✅ Simplest Configuration**: Caddyfile is remarkably readable
+- **✅ Automatic HTTPS**: Zero configuration, just works with Let's Encrypt
+- **✅ Automatic Renewal**: Built-in, no cron jobs or LaunchDaemons needed
+- **✅ Modern Defaults**: HTTP/2, HTTP/3, gzip compression, security headers
+- **✅ Fast Static Serving**: Comparable to nginx for static content
+- **✅ Easy Maintenance**: Config changes are straightforward, reload without downtime
+- **✅ Good Documentation**: Modern, well-documented project
+- **✅ Cloudflare Integration**: Native DNS challenge support
+- **✅ Best for v1.0**: Get serving fast, add features later
 
 ### Cons of Approach 3
 
-❌ **Less Battle-tested**: Newer than nginx (but mature and stable since v2.0)
-❌ **Smaller Ecosystem**: Fewer third-party modules than nginx
-❌ **Memory Usage**: Slightly higher than nginx (~30-50MB vs ~10-20MB)
-❌ **Less Familiarity**: Most sysadmins know nginx better
-❌ **No Built-in Monitoring**: Need to add monitoring later (v1.4)
+- **❌Less Battle-tested**: Newer than nginx (but mature and stable since v2.0)
+- **❌Smaller Ecosystem**: Fewer third-party modules than nginx
+- **❌Memory Usage**: Slightly higher than nginx (~30-50MB vs ~10-20MB)
+- **❌Less Familiarity**: Most sysadmins know nginx better
+- **❌No Built-in Monitoring**: Need to add monitoring later (v1.4)
 
 ### When to Choose Approach 3
 
