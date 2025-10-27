@@ -499,12 +499,12 @@ docker logs --tail 100 <container-name>  # Last 100 lines
 
 ### Cons of Approach 1
 
-- **❌Manual Configuration**: Adding sites requires editing nginx config files
-- **❌SSL Management**: Need to set up certbot correctly (one-time setup cost)
-- **❌Mixed Management**: nginx (bare metal) + Docker (containers) = two systems to manage
-- **❌No Service Discovery**: Must manually configure reverse proxy for new containers
-- **❌No Built-in Monitoring**: Need to add monitoring stack later (v1.4)
-- **❌Manual Backups**: Need to implement backup scripts later (v1.6)
+- **❌ Manual Configuration**: Adding sites requires editing nginx config files
+- **❌ SSL Management**: Need to set up certbot correctly (one-time setup cost)
+- **❌ Mixed Management**: nginx (bare metal) + Docker (containers) = two systems to manage
+- **❌ No Service Discovery**: Must manually configure reverse proxy for new containers
+- **❌ No Built-in Monitoring**: Need to add monitoring stack later (v1.4)
+- **❌ Manual Backups**: Need to implement backup scripts later (v1.6)
 
 ### When to Choose Approach 1
 
@@ -1264,11 +1264,11 @@ scrape_configs:
 
 ### Cons of Approach 2
 
-- **❌Container Overhead**: Each static site needs ~20-50MB RAM (nginx:alpine)
-- **❌Slight Performance Hit**: Extra network hop vs bare metal nginx
-- **❌Docker Desktop Dependency**: More reliance on Docker Desktop for Mac
-- **❌More Containers**: More moving parts than bare metal nginx
-- **❌No Built-in Monitoring**: Need to add monitoring stack later (v1.4)
+- **❌ Container Overhead**: Each static site needs ~20-50MB RAM (nginx:alpine)
+- **❌ Slight Performance Hit**: Extra network hop vs bare metal nginx
+- **❌ Docker Desktop Dependency**: More reliance on Docker Desktop for Mac
+- **❌ More Containers**: More moving parts than bare metal nginx
+- **❌ No Built-in Monitoring**: Need to add monitoring stack later (v1.4)
 
 ### When to Choose Approach 2
 
@@ -1579,11 +1579,11 @@ docker ps --format "table {{.Names}}\t{{.Status}}"
 
 ### Cons of Approach 3
 
-- **❌Less Battle-tested**: Newer than nginx (but mature and stable since v2.0)
-- **❌Smaller Ecosystem**: Fewer third-party modules than nginx
-- **❌Memory Usage**: Slightly higher than nginx (~30-50MB vs ~10-20MB)
-- **❌Less Familiarity**: Most sysadmins know nginx better
-- **❌No Built-in Monitoring**: Need to add monitoring later (v1.4)
+- **❌ Less Battle-tested**: Newer than nginx (but mature and stable since v2.0)
+- **❌ Smaller Ecosystem**: Fewer third-party modules than nginx
+- **❌ Memory Usage**: Slightly higher than nginx (~30-50MB vs ~10-20MB)
+- **❌ Less Familiarity**: Most sysadmins know nginx better
+- **❌ No Built-in Monitoring**: Need to add monitoring later (v1.4)
 
 ### When to Choose Approach 3
 
