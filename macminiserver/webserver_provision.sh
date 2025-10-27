@@ -129,11 +129,75 @@ phase_1_1_install_caddy() {
 }
 
 #==============================================================================
+# Phase 1.2: Create Hello World Page
+#==============================================================================
+
+phase_1_2_hello_world() {
+    log "Phase 1.2: Create Hello World Page"
+    echo ""
+    
+    # Create hello world HTML page
+    log "Creating hello world HTML page..."
+    
+    HELLO_PAGE="/usr/local/var/www/hello/index.html"
+    
+    if [[ -f "$HELLO_PAGE" ]]; then
+        warning "Hello world page already exists at $HELLO_PAGE"
+        log "Backing up existing file..."
+        cp "$HELLO_PAGE" "$HELLO_PAGE.backup.$(date +%Y%m%d_%H%M%S)"
+        success "Backup created"
+    fi
+    
+    cat > "$HELLO_PAGE" << 'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello from Mac Mini</title>
+    <style>
+        body { 
+            font-family: system-ui; 
+            max-width: 800px; 
+            margin: 100px auto; 
+            padding: 20px;
+            text-align: center;
+        }
+        h1 { color: #2563eb; }
+    </style>
+</head>
+<body>
+    <h1>🎉 Hello from Mac Mini Webserver!</h1>
+    <p>Caddy is running successfully.</p>
+    <p><small>Served at: <code id="time"></code></small></p>
+    <script>
+        document.getElementById('time').textContent = new Date().toISOString();
+    </script>
+</body>
+</html>
+EOF
+    
+    success "Created hello world page at $HELLO_PAGE"
+    
+    # Verify file was created
+    if [[ -f "$HELLO_PAGE" ]]; then
+        FILE_SIZE=$(stat -f%z "$HELLO_PAGE")
+        success "File created successfully ($FILE_SIZE bytes)"
+    else
+        error "Failed to create hello world page"
+        exit 1
+    fi
+    
+    echo ""
+    success "Phase 1.2 complete!"
+    echo ""
+}
+
+#==============================================================================
 # Main execution
 #==============================================================================
 
 main() {
     phase_1_1_install_caddy
+    phase_1_2_hello_world
     
     log "========================================="
     log "Provisioning complete!"
