@@ -1001,6 +1001,26 @@ phase_1_7_auto_login_prompt() {
     read -p "Press Enter once you've completed these steps (or skip to continue)..."
     
     echo ""
+    
+    # Check if Docker is running
+    log "Checking if Docker Desktop is running..."
+    if docker ps >/dev/null 2>&1; then
+        success "✅ Docker Desktop is running!"
+        docker --version
+    else
+        warning "⚠️  Docker Desktop is NOT currently running!"
+        echo ""
+        log "This is expected if you just configured auto-login but haven't logged out yet."
+        log "Docker Desktop will start automatically after your next login/reboot."
+        echo ""
+        log "To start Docker Desktop now:"
+        log "  open -a Docker"
+        echo ""
+        log "Or reboot to test the full auto-login + Docker startup:"
+        log "  sudo reboot"
+        echo ""
+    fi
+    
     success "Phase 1.7 complete!"
     log "If you enabled auto-login, Docker Desktop will start after reboot."
     echo ""

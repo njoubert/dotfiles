@@ -446,19 +446,19 @@ At each phase, add the commands to your provisioning script, then review and run
 
 **Security Note:** This is standard practice for home servers. Physical security is already provided by your home. The server is behind your firewall and not directly exposed to the internet.
 
-- [ ] Open System Settings
+- [x] Open System Settings
   ```bash
   # Open System Settings directly to Users & Groups
   open "x-apple.systempreferences:com.apple.preferences.users"
   ```
 
-- [ ] Enable Automatic Login
+- [x] Enable Automatic Login
   1. Click the ⓘ button next to your username
   2. Enable "Automatically log in as this user"
   3. Enter your password when prompted
   4. Close System Settings
 
-- [ ] Alternative: Enable via command line
+- [x] Alternative: Enable via command line
   ```bash
   # Replace 'your_username' with your actual username
   sudo defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser "$(whoami)"
@@ -467,7 +467,7 @@ At each phase, add the commands to your provisioning script, then review and run
   sudo defaults read /Library/Preferences/com.apple.loginwindow autoLoginUser
   ```
 
-- [ ] Configure Docker Desktop to start at login
+- [x] Configure Docker Desktop to start at login
   ```bash
   # Open Docker Desktop settings
   open -a Docker
@@ -479,7 +479,7 @@ At each phase, add the commands to your provisioning script, then review and run
   3. Check "Start Docker Desktop when you log in"
   4. Click "Apply & Restart"
 
-- [ ] Test auto-login and Docker startup
+- [x] Test auto-login and Docker startup
   ```bash
   # Reboot the Mac Mini
   sudo reboot
@@ -502,6 +502,8 @@ At each phase, add the commands to your provisioning script, then review and run
 - ✅ Docker containers start after auto-login - **requires login**
 - ✅ Fallback: If auto-login fails, static sites still work
 - ✅ Best of both worlds: reliability + full Docker functionality
+
+**Status: ✅ COMPLETE** - Tested and verified after reboot on October 27, 2025
 
 ### 1.8 Setup Cloudflare DNS Challenge (Prepare for HTTPS)
 
