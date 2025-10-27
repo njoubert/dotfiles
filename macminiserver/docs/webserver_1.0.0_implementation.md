@@ -3,7 +3,7 @@
 This document provides step-by-step implementation phases for setting up the Caddy-based webserver on the Mac Mini. Each phase builds on the previous one and includes verification steps.
 
 **Prerequisites:**
-- Mac Mini running macOS Sequoia 15.7 (Intel or Apple Silicon)
+- Mac Mini running macOS Sequoia 15.7 (Assume it is an Intel x86 mac mini!)
 - Homebrew installed
 - **Docker Desktop for Mac** installed (NOT homebrew docker)
   - Download from: https://www.docker.com/products/docker-desktop/
@@ -29,7 +29,7 @@ This document provides step-by-step implementation phases for setting up the Cad
 
 ### 1.1 Install Caddy
 
-- [ ] Verify Docker Desktop is installed (NOT homebrew docker)
+- [ ] Verify Docker Desktop is installed (NOT the old homebrew docker)
   ```bash
   # Check if Docker Desktop is installed
   docker --version
@@ -41,14 +41,6 @@ This document provides step-by-step implementation phases for setting up the Cad
     ```
 
 - [ ] If homebrew docker is installed, remove it
-  ```bash
-  # Only run this if the check above showed homebrew docker is installed
-  brew uninstall docker docker-compose docker-machine
-  
-  # Then verify Docker Desktop still works
-  docker --version
-  docker context ls
-  ```
 
 - [ ] Install Caddy via Homebrew
   ```bash

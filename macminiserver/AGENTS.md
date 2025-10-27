@@ -81,6 +81,10 @@ Example:
 
 ## Best Practices
 
+### Assume this is an Intel Mac Mini
+- Assume this runs an x86 Intel processor
+- Always use paths for Intel locations
+
 ### File Editing
 - **Always validate syntax** before reloading services (use `caddy validate`, `docker-compose config`, etc.)
 - **Backup configuration files** before making changes (copy to `.backup` suffix)
