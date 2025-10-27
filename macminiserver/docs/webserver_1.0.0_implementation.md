@@ -114,7 +114,7 @@ At each phase, add the commands to your provisioning script, then review and run
       admin off
   }
 
-  # Catch-all for testing - responds to any domain/IP
+  # Simple :80 binding responds to all addresses (localhost, IP, etc)
   :80 {
       root * /usr/local/var/www/hello
       file_server
@@ -128,7 +128,7 @@ At each phase, add the commands to your provisioning script, then review and run
 
 - [x] Test Caddyfile syntax
   ```bash
-  caddy validate --config /usr/local/etc/Caddyfile
+  caddy validate --config /usr/local/etc/Caddyfile --adapter caddyfile
   # Should show: Valid configuration
   ```
 
@@ -405,27 +405,30 @@ At each phase, add the commands to your provisioning script, then review and run
 
 ### 1.6.5 Configure macOS Firewall
 
-**Why:** macOS firewall needs to allow incoming connections on ports 80 (HTTP) and 443 (HTTPS) for the webserver to be accessible from the network.
+**Why:** The macOS Application Firewall is designed for laptops on public WiFi, not for servers. For a home server behind a router firewall, it's best to disable it to avoid connectivity issues.
+
+**Security Note:** Your Mac Mini is protected by your router's firewall. The Application Firewall only provides application-level filtering which isn't suitable for port-based server operations.
 
 - [x] Check current firewall status
   ```bash
   sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate
-  # Shows if firewall is enabled
   ```
 
-- [x] Add Caddy to firewall exceptions
+- [x] Disable the Application Firewall
   ```bash
-  # Add Caddy binary to allowed applications
-  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /usr/local/bin/caddy
-  
-  # Allow incoming connections for Caddy
-  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --unblockapp /usr/local/bin/caddy
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate off
   ```
 
-- [x] Verify Caddy is allowed
+- [x] Verify it's disabled
   ```bash
-  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --listapps | grep -i caddy
-  # Should show Caddy is allowed
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate
+  # Should show: Firewall is disabled. (State = 0)
+  ```
+
+- [x] Test access from the Mac Mini itself
+  ```bash
+  curl http://10.2.0.1
+  # Should see the hello world page
   ```
 
 - [x] Test access from another machine on the network

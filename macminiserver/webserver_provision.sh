@@ -212,17 +212,14 @@ phase_1_3_create_caddyfile() {
     # Create basic Caddyfile (HTTP only for testing)
     log "Creating basic Caddyfile..."
     
-    sudo tee "$CADDYFILE" > /dev/null << 'EOF'
+    sudo tee "$CADDYFILE" > /dev/null << EOF
 {
     # Global options
     admin off
 }
 
-# Catch-all for testing - responds to any domain/IP
-# Bind only to IPv4
+# Simple :80 binding responds to all addresses
 :80 {
-    bind 0.0.0.0
-    
     root * /usr/local/var/www/hello
     file_server
     
@@ -676,37 +673,30 @@ EOF
 #==============================================================================
 
 phase_1_6_5_configure_firewall() {
-    log "Phase 1.6.5: Configure macOS Firewall"
+    log "Phase 1.6.5: Disable macOS Application Firewall"
     echo ""
     
-    CADDY_PATH=$(which caddy)
+    log "Note: For a home server behind a router firewall, the macOS Application"
+    log "Firewall is not necessary and can cause connectivity issues."
+    echo ""
     
     # Check firewall status
     log "Checking firewall status..."
     FIREWALL_STATUS=$(sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate)
-    log "Firewall status: $FIREWALL_STATUS"
+    log "Current status: $FIREWALL_STATUS"
     
-    # Add Caddy to firewall exceptions
-    log "Adding Caddy to firewall exceptions..."
+    # Disable the Application Firewall
+    log "Disabling Application Firewall..."
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate off
+    success "Application Firewall disabled"
     
-    if sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add "$CADDY_PATH" 2>&1 | grep -q "already exists"; then
-        success "Caddy already in firewall list"
+    # Verify it's disabled
+    log "Verifying firewall status..."
+    FIREWALL_STATUS=$(sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate)
+    if echo "$FIREWALL_STATUS" | grep -q "disabled"; then
+        success "✅ Firewall is disabled (State = 0)"
     else
-        sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add "$CADDY_PATH"
-        success "Added Caddy to firewall"
-    fi
-    
-    # Unblock Caddy (allow incoming connections)
-    log "Allowing incoming connections for Caddy..."
-    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --unblockapp "$CADDY_PATH"
-    success "Caddy is allowed to accept incoming connections"
-    
-    # Verify Caddy is in the list
-    log "Verifying Caddy firewall configuration..."
-    if sudo /usr/libexec/ApplicationFirewall/socketfilterfw --listapps | grep -q caddy; then
-        success "✅ Caddy is in firewall allowed list"
-    else
-        warning "Could not verify Caddy in firewall list"
+        warning "Firewall status unclear: $FIREWALL_STATUS"
     fi
     
     # Get local IP for testing
@@ -716,28 +706,24 @@ phase_1_6_5_configure_firewall() {
     if [[ "$LOCAL_IP" != "unknown" ]]; then
         success "Local IP: $LOCAL_IP"
         
-        log "Testing external access via local IP..."
-        log "Waiting a moment for firewall to apply changes..."
+        log "Testing local access via IP address..."
         sleep 2
         
         if curl -s --connect-timeout 5 "http://$LOCAL_IP" > /dev/null 2>&1; then
-            success "✅ External access test passed!"
+            success "✅ Local IP access test passed!"
             log "Server is accessible at http://$LOCAL_IP"
         else
-            warning "External access test failed"
-            log "This might be normal if:"
-            log "  - You're on a network with client isolation enabled"
-            log "  - Additional firewall/router rules are blocking access"
-            log "  - Try testing from a different device on the same network"
+            warning "Local IP access test failed"
+            log "This might resolve after a moment. Try: curl http://$LOCAL_IP"
         fi
     else
         warning "Could not detect local IP address"
-        log "You can test external access manually using the Mac Mini's IP address"
     fi
     
     echo ""
     success "Phase 1.6.5 complete!"
-    log "Firewall is configured to allow Caddy traffic"
+    log "Application Firewall is disabled for server operation"
+    log "Your Mac Mini is protected by your router's firewall"
     log "Test from another machine: curl http://$LOCAL_IP"
     echo ""
 }
