@@ -10,4 +10,11 @@ set shiftwidth=2
 set expandtab
 
 " Let Delete delete beyond the current insert session
-set backspace=indent,eol,start    
+set backspace=indent,eol,start
+
+
+" Show line numbers
+set number
+highlight LineNr ctermfg=242 guifg=#5c5c5c
+
+
