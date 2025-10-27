@@ -44,6 +44,7 @@ These are features we want to build in a v1.2 of the web server.
 
 - This is not a heavy duty production system. It is okay if there is a bit of downtime due to upgrades.
 - We do not need to support a full development/staging/production setup for every app, its okay to generally just have production, and if we want a staging env for a certain application, it's just an application-level decision to runit. 
+- It is acceptable if containers are not monitored and restarted or scaled automatically. For v1.0 we want to boot containers automatically on system startup, but if they die, it's okay to rely on the sysadmin to restart the container and debug what is happening.
 
 ## Approach 1: Bare Metal nginx + Docker Containers
 
