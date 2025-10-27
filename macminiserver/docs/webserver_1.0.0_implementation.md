@@ -5,12 +5,17 @@ This document provides step-by-step implementation phases for setting up the Cad
 **Prerequisites:**
 - Mac Mini running macOS Sequoia 15.7 (Intel or Apple Silicon)
 - Homebrew installed
-- Docker Desktop for Mac installed
+- **Docker Desktop for Mac** installed (NOT homebrew docker)
+  - Download from: https://www.docker.com/products/docker-desktop/
+  - Uses Apple's Virtualization.framework (much better performance)
+  - Do NOT use `brew install docker` (older, slower virtualization)
 - Cloudflare account with API token
 - Domains configured in Cloudflare DNS
 
 **Important Notes:**
-- This guide uses **system-level LaunchDaemons** (not user-level LaunchAgents) so services start at boot before any user login
+- This guide uses **system-level LaunchDaemons** for Caddy (starts at boot, no login required)
+- Docker Desktop requires **auto-login** to start automatically (standard for Mac servers)
+- **Layered availability:** Static sites work immediately at boot, Docker containers start after auto-login
 - Caddy binary location differs by architecture:
   - Apple Silicon: `/opt/homebrew/bin/caddy`
   - Intel: `/usr/local/bin/caddy`
@@ -23,6 +28,30 @@ This document provides step-by-step implementation phases for setting up the Cad
 **Goal:** Get Caddy running with a simple hello world page, proper logging, management scripts, and automatic startup.
 
 ### 1.1 Install Caddy
+
+- [ ] Verify Docker Desktop is installed (NOT homebrew docker)
+  ```bash
+  # Check if Docker Desktop is installed
+  docker --version
+  # Should show: Docker version XX.X.X, build XXXXXXX
+  
+  # Verify it's Docker Desktop (not homebrew docker)
+  docker context ls
+  # Should show "desktop-linux" context - this confirms Docker Desktop
+  
+  # Check that homebrew docker is NOT installed
+  brew list docker 2>/dev/null && echo "⚠️  WARNING: Homebrew docker is installed - uninstall it!" || echo "✅ Homebrew docker is not installed"
+  ```
+
+- [ ] If homebrew docker is installed, remove it
+  ```bash
+  # Only run this if the check above showed homebrew docker is installed
+  brew uninstall docker docker-compose docker-machine
+  
+  # Then verify Docker Desktop still works
+  docker --version
+  docker context ls
+  ```
 
 - [ ] Install Caddy via Homebrew
   ```bash
@@ -375,7 +404,72 @@ This document provides step-by-step implementation phases for setting up the Cad
   ~/webserver/scripts/manage-caddy.sh status
   ```
 
-### 1.7 Setup Cloudflare DNS Challenge (Prepare for HTTPS)
+### 1.7 Configure Auto-Login (Required for Docker)
+
+**Why:** Docker Desktop for Mac only starts when a user logs in. To ensure Docker containers start automatically after reboot, we need to enable auto-login.
+
+**Important:** This guide requires **Docker Desktop** (not homebrew docker). Docker Desktop uses Apple's native Virtualization.framework which provides much better performance and integration with macOS. Homebrew's docker package uses older virtualization technology and is not suitable for production use.
+
+**Security Note:** This is standard practice for home servers. Physical security is already provided by your home. The server is behind your firewall and not directly exposed to the internet.
+
+- [ ] Open System Settings
+  ```bash
+  # Open System Settings directly to Users & Groups
+  open "x-apple.systempreferences:com.apple.preferences.users"
+  ```
+
+- [ ] Enable Automatic Login
+  1. Click the ⓘ button next to your username
+  2. Enable "Automatically log in as this user"
+  3. Enter your password when prompted
+  4. Close System Settings
+
+- [ ] Alternative: Enable via command line
+  ```bash
+  # Replace 'your_username' with your actual username
+  sudo defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser "$(whoami)"
+  
+  # Verify the setting
+  sudo defaults read /Library/Preferences/com.apple.loginwindow autoLoginUser
+  ```
+
+- [ ] Configure Docker Desktop to start at login
+  ```bash
+  # Open Docker Desktop settings
+  open -a Docker
+  ```
+  
+  In Docker Desktop:
+  1. Click Settings (gear icon)
+  2. General tab
+  3. Check "Start Docker Desktop when you log in"
+  4. Click "Apply & Restart"
+
+- [ ] Test auto-login and Docker startup
+  ```bash
+  # Reboot the Mac Mini
+  sudo reboot
+  
+  # After reboot, Mac should:
+  # 1. Auto-login to your account
+  # 2. Start Docker Desktop automatically
+  # 3. Keep Caddy running (already started via LaunchDaemon)
+  
+  # SSH in and verify:
+  docker ps
+  # Should show Docker is running (might take 30-60 seconds after login)
+  
+  ~/webserver/scripts/manage-caddy.sh status
+  # Should show Caddy is running (started immediately at boot)
+  ```
+
+**Why this approach works:**
+- ✅ Caddy (static sites) starts at boot via LaunchDaemon - **no login required**
+- ✅ Docker containers start after auto-login - **requires login**
+- ✅ Fallback: If auto-login fails, static sites still work
+- ✅ Best of both worlds: reliability + full Docker functionality
+
+### 1.8 Setup Cloudflare DNS Challenge (Prepare for HTTPS)
 
 - [ ] Create Cloudflare API token
   - Log into Cloudflare Dashboard
@@ -433,9 +527,12 @@ This document provides step-by-step implementation phases for setting up the Cad
 - [ ] Hello world page displays at `http://<mac-mini-ip>` from another device
 - [ ] Management script works: start, stop, restart, reload, status, logs
 - [ ] LaunchDaemon starts Caddy automatically at boot (before login)
+- [ ] Auto-login is configured for your user account
+- [ ] Docker Desktop starts automatically after login
 - [ ] Cloudflare API token is configured in LaunchDaemon
 - [ ] Caddyfile validates without errors
 - [ ] Caddy runs as your user (not root) - verify with `ps aux | grep caddy`
+- [ ] After reboot: Caddy serves static content before login, Docker starts after auto-login
 
 **Phase 1 Complete! ✅**
 
@@ -1684,7 +1781,10 @@ This document provides step-by-step implementation phases for setting up the Cad
 
 ### System-Wide Checks
 
-- [ ] All services start automatically after reboot
+- [ ] Caddy starts automatically at boot (via LaunchDaemon, before login)
+- [ ] Mac Mini auto-logs in to user account
+- [ ] Docker Desktop starts automatically after login
+- [ ] All Docker containers start automatically (within 60 seconds of login)
 - [ ] All sites are accessible from external network
 - [ ] All SSL certificates are valid and auto-renewing
 - [ ] Rate limiting is working on all sites
