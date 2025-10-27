@@ -964,6 +964,49 @@ phase_1_6_7_create_symlinks() {
 }
 
 #==============================================================================
+# Phase 1.7: Configure Auto-Login (Manual Step with Confirmation)
+#==============================================================================
+
+phase_1_7_auto_login_prompt() {
+    log "Phase 1.7: Configure Auto-Login for Docker Desktop"
+    echo ""
+    
+    warning "⚠️  AUTO-LOGIN CONFIGURATION - MANUAL STEP REQUIRED"
+    echo ""
+    log "Docker Desktop for Mac only starts when a user is logged in."
+    log "To ensure Docker containers start automatically after reboot,"
+    log "you need to enable auto-login for your user account."
+    echo ""
+    log "Security implications:"
+    log "  - Your Mac will boot directly to your desktop (no password)"
+    log "  - Acceptable for: Home servers with physical security"
+    log "  - NOT recommended for: Laptops or shared environments"
+    echo ""
+    
+    log "To enable auto-login:"
+    log "  1. Open System Settings"
+    log "  2. Go to Users & Groups"
+    log "  3. Click 'Automatically log in as:' and select your user"
+    echo ""
+    log "  OR run this command:"
+    log "  sudo defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser \"\$(whoami)\""
+    echo ""
+    
+    log "After enabling auto-login, configure Docker Desktop:"
+    log "  1. Open Docker Desktop"
+    log "  2. Go to Settings → General"
+    log "  3. Enable 'Start Docker Desktop when you log in'"
+    echo ""
+    
+    read -p "Press Enter once you've completed these steps (or skip to continue)..."
+    
+    echo ""
+    success "Phase 1.7 complete!"
+    log "If you enabled auto-login, Docker Desktop will start after reboot."
+    echo ""
+}
+
+#==============================================================================
 # Main execution
 #==============================================================================
 
@@ -976,12 +1019,13 @@ main() {
     phase_1_6_launchdaemon
     phase_1_6_5_configure_firewall
     phase_1_6_7_create_symlinks
+    phase_1_7_auto_login_prompt
     
     log "========================================="
     log "Provisioning complete!"
     log "========================================="
     echo ""
-    log "✅ Phase 1.1-1.6.7 Complete!"
+    log "✅ Phase 1.1-1.7 Complete!"
     log ""
     log "Caddy webserver is now:"
     log "  - Installed and configured"
@@ -992,7 +1036,7 @@ main() {
     echo ""
     log "Next steps:"
     log "  - Test reboot: sudo reboot (then verify Caddy starts)"
-    log "  - Continue with Phase 1.7 (Auto-login configuration)"
+    log "  - Continue with Phase 1.8 (Cloudflare DNS Challenge setup)"
     log "  - Or skip to Phase 2 to add your first real site"
     echo ""
 }
