@@ -893,6 +893,77 @@ phase_1_6_5_configure_firewall() {
 }
 
 #==============================================================================
+# Phase 1.7: Create Convenient Symlinks
+#==============================================================================
+
+phase_1_7_create_symlinks() {
+    log "Phase 1.7: Create Convenient Symlinks"
+    echo ""
+    
+    SYMLINK_DIR="$HOME/webserver/symlinks"
+    
+    # Create symlinks directory
+    log "Creating symlinks directory..."
+    if [[ ! -d "$SYMLINK_DIR" ]]; then
+        mkdir -p "$SYMLINK_DIR"
+        success "Created $SYMLINK_DIR"
+    else
+        success "Directory $SYMLINK_DIR already exists"
+    fi
+    
+    # Define symlinks to create
+    # Format: "symlink_name:target_path"
+    SYMLINKS=(
+        "Caddyfile:/usr/local/etc/Caddyfile"
+        "www:/usr/local/var/www"
+        "caddy-logs:/usr/local/var/log/caddy"
+        "caddy-config:/usr/local/etc"
+        "launchdaemon-plist:/Library/LaunchDaemons/com.caddyserver.caddy.plist"
+    )
+    
+    log "Creating symlinks..."
+    
+    for symlink_def in "${SYMLINKS[@]}"; do
+        LINK_NAME="${symlink_def%%:*}"
+        TARGET_PATH="${symlink_def##*:}"
+        LINK_PATH="$SYMLINK_DIR/$LINK_NAME"
+        
+        # Check if symlink already exists and points to correct target
+        if [[ -L "$LINK_PATH" ]]; then
+            CURRENT_TARGET=$(readlink "$LINK_PATH")
+            if [[ "$CURRENT_TARGET" == "$TARGET_PATH" ]]; then
+                success "Symlink $LINK_NAME already exists and is correct"
+                continue
+            else
+                warning "Symlink $LINK_NAME exists but points to wrong target"
+                log "Current: $CURRENT_TARGET"
+                log "Expected: $TARGET_PATH"
+                log "Removing old symlink..."
+                rm "$LINK_PATH"
+            fi
+        elif [[ -e "$LINK_PATH" ]]; then
+            warning "Path $LINK_NAME exists but is not a symlink"
+            log "Backing up..."
+            mv "$LINK_PATH" "$LINK_PATH.backup.$(date +%Y%m%d_%H%M%S)"
+            success "Backup created"
+        fi
+        
+        # Create symlink
+        if [[ -e "$TARGET_PATH" ]]; then
+            ln -s "$TARGET_PATH" "$LINK_PATH"
+            success "Created symlink: $LINK_NAME -> $TARGET_PATH"
+        else
+            warning "Target does not exist, skipping: $TARGET_PATH"
+        fi
+    done
+    
+    echo ""
+    success "Phase 1.7 complete!"
+    log "Convenient symlinks available at: $SYMLINK_DIR"
+    echo ""
+}
+
+#==============================================================================
 # Main execution
 #==============================================================================
 
@@ -904,18 +975,20 @@ main() {
     phase_1_5_test_caddy
     phase_1_6_launchdaemon
     phase_1_6_5_configure_firewall
+    phase_1_7_create_symlinks
     
     log "========================================="
     log "Provisioning complete!"
     log "========================================="
     echo ""
-    log "✅ Phase 1.1-1.6 Complete!"
+    log "✅ Phase 1.1-1.7 Complete!"
     log ""
     log "Caddy webserver is now:"
     log "  - Installed and configured"
     log "  - Serving hello world page"
     log "  - Set to start automatically at boot"
     log "  - Manageable via ~/webserver/scripts/manage-caddy.sh"
+    log "  - Convenient symlinks at ~/webserver/symlinks/"
     echo ""
     log "Next steps:"
     log "  - Test reboot: sudo reboot (then verify Caddy starts)"
