@@ -10,7 +10,9 @@ This is the dotfiles folder for my old Intel Mac Mini.
 C07XKPEAJYVW
 ```
 
-## Dynamic DNS Configuration
+## Dynamic DNS Configuration on UnifiOS
+
+**Dynamic DNS is implemented on the Ubiquiti Gateway**
 
 Here is the configuration:
 
