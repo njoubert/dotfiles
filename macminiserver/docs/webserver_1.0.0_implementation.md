@@ -39,7 +39,7 @@ At each phase, add the commands to your provisioning script, then review and run
 
 ### 1.1 Install Caddy
 
-- [ ] Verify Docker Desktop is installed (NOT the old homebrew docker)
+- [x] Verify Docker Desktop is installed (NOT the old homebrew docker)
   ```bash
   # Check if Docker Desktop is installed
   docker --version
@@ -50,20 +50,20 @@ At each phase, add the commands to your provisioning script, then review and run
   # Should show "desktop-linux" context - this confirms Docker Desktop
     ```
 
-- [ ] If homebrew docker is installed, remove it
+- [x] If homebrew docker is installed, remove it
 
-- [ ] Install Caddy via Homebrew
+- [x] Install Caddy via Homebrew
   ```bash
   brew install caddy
   ```
 
-- [ ] Verify installation
+- [x] Verify installation
   ```bash
   caddy version
   # Should show: v2.x.x
   ```
 
-- [ ] Create necessary directories
+- [x] Create necessary directories
   ```bash
   sudo mkdir -p /usr/local/var/www/hello
   sudo mkdir -p /usr/local/var/log/caddy
@@ -74,7 +74,7 @@ At each phase, add the commands to your provisioning script, then review and run
 
 ### 1.2 Create Hello World Page
 
-- [ ] Create a simple HTML page
+- [x] Create a simple HTML page
   ```bash
   cat > /usr/local/var/www/hello/index.html << 'EOF'
   <!DOCTYPE html>
