@@ -35,6 +35,156 @@ warning() {
     echo -e "${YELLOW}⚠️  $1${NC}"
 }
 
+# Helper function to install a file only if it differs from expected content
+# Shows a diff and prompts user for action if file differs
+# Usage: install_file_if_changed "destination_path" "expected_content" [use_sudo]
+# Returns: 0 if file was updated or already correct, 1 on error or user chose to keep current
+install_file_if_changed() {
+    local dest_path="$1"
+    local expected_content="$2"
+    local use_sudo="${3:-false}"
+    local temp_file=$(mktemp)
+    
+    # Write expected content to temp file
+    echo "$expected_content" > "$temp_file"
+    
+    # Check if destination exists and compare
+    if [[ -f "$dest_path" ]]; then
+        local files_match=false
+        
+        if [[ "$use_sudo" == "true" ]]; then
+            sudo cmp -s "$temp_file" "$dest_path" && files_match=true
+        else
+            cmp -s "$temp_file" "$dest_path" && files_match=true
+        fi
+        
+        if [[ "$files_match" == "true" ]]; then
+            success "$(basename "$dest_path") already exists and is correct"
+            rm "$temp_file"
+            return 0
+        else
+            warning "$(basename "$dest_path") exists but differs from expected content"
+            echo ""
+            log "Showing differences (- current file, + new content):"
+            echo ""
+            
+            # Show diff
+            if [[ "$use_sudo" == "true" ]]; then
+                sudo diff -u "$dest_path" "$temp_file" || true
+            else
+                diff -u "$dest_path" "$temp_file" || true
+            fi
+            
+            echo ""
+            log "What would you like to do?"
+            echo "  [o] Overwrite with new content (current file will be backed up)"
+            echo "  [k] Keep current file (skip this update)"
+            echo "  [e] Exit provisioning script"
+            echo ""
+            read -p "Choice [o/k/e]: " -n 1 -r choice
+            echo ""
+            
+            case "$choice" in
+                o|O)
+                    log "Backing up existing file..."
+                    if [[ "$use_sudo" == "true" ]]; then
+                        sudo cp "$dest_path" "$dest_path.backup.$(date +%Y%m%d_%H%M%S)"
+                    else
+                        cp "$dest_path" "$dest_path.backup.$(date +%Y%m%d_%H%M%S)"
+                    fi
+                    success "Backup created"
+                    ;;
+                k|K)
+                    warning "Keeping current file, skipping update"
+                    rm "$temp_file"
+                    return 1
+                    ;;
+                e|E)
+                    error "User requested exit"
+                    rm "$temp_file"
+                    exit 0
+                    ;;
+                *)
+                    error "Invalid choice, keeping current file"
+                    rm "$temp_file"
+                    return 1
+                    ;;
+            esac
+        fi
+    fi
+    
+    # Install the file
+    if [[ "$use_sudo" == "true" ]]; then
+        sudo cp "$temp_file" "$dest_path"
+    else
+        cp "$temp_file" "$dest_path"
+    fi
+    rm "$temp_file"
+    
+    if [[ -f "$dest_path" ]]; then
+        success "Installed $(basename "$dest_path")"
+        return 0
+    else
+        error "Failed to install $(basename "$dest_path")"
+        return 1
+    fi
+}
+
+# Helper function to install a file from a temp file if it differs
+# Usage: install_temp_file_if_changed "temp_file_path" "destination_path" [use_sudo]
+# Returns: 0 if file was updated or already correct, 1 on error
+# Note: This function consumes (deletes) the temp file
+install_temp_file_if_changed() {
+    local temp_file="$1"
+    local dest_path="$2"
+    local use_sudo="${3:-false}"
+    
+    # Check if destination exists and compare
+    if [[ -f "$dest_path" ]]; then
+        local files_match=false
+        if [[ "$use_sudo" == "true" ]]; then
+            if sudo cmp -s "$temp_file" "$dest_path"; then
+                files_match=true
+            fi
+        else
+            if cmp -s "$temp_file" "$dest_path"; then
+                files_match=true
+            fi
+        fi
+        
+        if [[ "$files_match" == "true" ]]; then
+            success "$(basename "$dest_path") already exists and is correct"
+            rm "$temp_file"
+            return 0
+        else
+            warning "$(basename "$dest_path") exists but differs from expected content"
+            log "Backing up existing file..."
+            if [[ "$use_sudo" == "true" ]]; then
+                sudo cp "$dest_path" "$dest_path.backup.$(date +%Y%m%d_%H%M%S)"
+            else
+                cp "$dest_path" "$dest_path.backup.$(date +%Y%m%d_%H%M%S)"
+            fi
+            success "Backup created"
+        fi
+    fi
+    
+    # Install the file
+    if [[ "$use_sudo" == "true" ]]; then
+        sudo cp "$temp_file" "$dest_path"
+    else
+        cp "$temp_file" "$dest_path"
+    fi
+    rm "$temp_file"
+    
+    if [[ -f "$dest_path" ]]; then
+        success "Installed $(basename "$dest_path")"
+        return 0
+    else
+        error "Failed to install $(basename "$dest_path")"
+        return 1
+    fi
+}
+
 # Check if running on macOS
 if [[ "$(uname)" != "Darwin" ]]; then
     error "This script is designed for macOS only."
@@ -136,19 +286,10 @@ phase_1_2_hello_world() {
     log "Phase 1.2: Create Hello World Page"
     echo ""
     
-    # Create hello world HTML page
-    log "Creating hello world HTML page..."
-    
     HELLO_PAGE="/usr/local/var/www/hello/index.html"
     
-    if [[ -f "$HELLO_PAGE" ]]; then
-        warning "Hello world page already exists at $HELLO_PAGE"
-        log "Backing up existing file..."
-        cp "$HELLO_PAGE" "$HELLO_PAGE.backup.$(date +%Y%m%d_%H%M%S)"
-        success "Backup created"
-    fi
-    
-    cat > "$HELLO_PAGE" << 'EOF'
+    # Define expected content
+    read -r -d '' EXPECTED_CONTENT << 'EOF' || true
 <!DOCTYPE html>
 <html>
 <head>
@@ -175,15 +316,13 @@ phase_1_2_hello_world() {
 </html>
 EOF
     
-    success "Created hello world page at $HELLO_PAGE"
+    # Install file using helper
+    install_file_if_changed "$HELLO_PAGE" "$EXPECTED_CONTENT" false
     
-    # Verify file was created
+    # Verify file size
     if [[ -f "$HELLO_PAGE" ]]; then
         FILE_SIZE=$(stat -f%z "$HELLO_PAGE")
-        success "File created successfully ($FILE_SIZE bytes)"
-    else
-        error "Failed to create hello world page"
-        exit 1
+        log "File size: $FILE_SIZE bytes"
     fi
     
     echo ""
@@ -201,18 +340,8 @@ phase_1_3_create_caddyfile() {
     
     CADDYFILE="/usr/local/etc/Caddyfile"
     
-    # Backup existing Caddyfile if present
-    if [[ -f "$CADDYFILE" ]]; then
-        warning "Caddyfile already exists at $CADDYFILE"
-        log "Backing up existing file..."
-        sudo cp "$CADDYFILE" "$CADDYFILE.backup.$(date +%Y%m%d_%H%M%S)"
-        success "Backup created"
-    fi
-    
-    # Create basic Caddyfile (HTTP only for testing)
-    log "Creating basic Caddyfile..."
-    
-    sudo tee "$CADDYFILE" > /dev/null << EOF
+    # Define expected content
+    read -r -d '' EXPECTED_CADDYFILE << 'EOF' || true
 {
     # Global options
     admin off
@@ -229,7 +358,8 @@ phase_1_3_create_caddyfile() {
 }
 EOF
     
-    success "Created Caddyfile at $CADDYFILE"
+    # Install file using helper (with sudo)
+    install_file_if_changed "$CADDYFILE" "$EXPECTED_CADDYFILE" true
     
     # Validate Caddyfile syntax
     log "Validating Caddyfile syntax..."
@@ -269,16 +399,10 @@ phase_1_4_management_script() {
     # Create management script
     MANAGE_SCRIPT="$SCRIPTS_DIR/manage-caddy.sh"
     
-    if [[ -f "$MANAGE_SCRIPT" ]]; then
-        warning "Management script already exists at $MANAGE_SCRIPT"
-        log "Backing up existing script..."
-        cp "$MANAGE_SCRIPT" "$MANAGE_SCRIPT.backup.$(date +%Y%m%d_%H%M%S)"
-        success "Backup created"
-    fi
+    # Generate management script content to a temp file first
+    TEMP_SCRIPT=$(mktemp)
     
-    log "Creating Caddy management script..."
-    
-    cat > "$MANAGE_SCRIPT" << 'EOF'
+    cat > "$TEMP_SCRIPT" << 'EOF'
 #!/bin/bash
 # Caddy Webserver Management Script
 
@@ -370,12 +494,13 @@ case "$1" in
 esac
 EOF
     
-    success "Created management script at $MANAGE_SCRIPT"
+    # Install using helper
+    install_temp_file_if_changed "$TEMP_SCRIPT" "$MANAGE_SCRIPT" false
     
     # Make script executable
     log "Making script executable..."
     chmod +x "$MANAGE_SCRIPT"
-    success "Script is now executable"
+    success "Script is executable"
     
     # Add alias to .zshrc if not already present
     log "Adding alias to .zshrc..."
@@ -537,23 +662,13 @@ phase_1_6_launchdaemon() {
     log "Will run Caddy as user: $USERNAME"
     log "Home directory: $USER_HOME"
     
-    # Backup existing plist if present
-    if [[ -f "$PLIST_PATH" ]]; then
-        warning "LaunchDaemon plist already exists"
-        log "Backing up existing plist..."
-        sudo cp "$PLIST_PATH" "$PLIST_PATH.backup.$(date +%Y%m%d_%H%M%S)"
-        success "Backup created"
-        
-        # Unload existing LaunchDaemon
-        log "Unloading existing LaunchDaemon..."
-        sudo launchctl unload "$PLIST_PATH" 2>/dev/null || true
-        success "Unloaded existing LaunchDaemon"
-    fi
+    # Generate plist content to temp file first
+    TEMP_PLIST=$(mktemp)
     
     # Create LaunchDaemon plist
-    log "Creating LaunchDaemon plist..."
+    log "Generating LaunchDaemon plist..."
     
-    sudo tee "$PLIST_PATH" > /dev/null << EOF
+    cat > "$TEMP_PLIST" << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -604,7 +719,36 @@ phase_1_6_launchdaemon() {
 </plist>
 EOF
     
-    success "Created LaunchDaemon plist at $PLIST_PATH"
+    # Check if plist exists and differs
+    NEEDS_UPDATE=false
+    if [[ -f "$PLIST_PATH" ]]; then
+        if ! sudo cmp -s "$TEMP_PLIST" "$PLIST_PATH"; then
+            warning "LaunchDaemon plist exists but differs from expected content"
+            log "Backing up existing plist..."
+            sudo cp "$PLIST_PATH" "$PLIST_PATH.backup.$(date +%Y%m%d_%H%M%S)"
+            success "Backup created"
+            
+            # Unload existing LaunchDaemon before updating
+            log "Unloading existing LaunchDaemon..."
+            sudo launchctl unload "$PLIST_PATH" 2>/dev/null || true
+            success "Unloaded existing LaunchDaemon"
+            
+            NEEDS_UPDATE=true
+        else
+            success "LaunchDaemon plist already exists and is correct"
+            rm "$TEMP_PLIST"
+        fi
+    else
+        NEEDS_UPDATE=true
+    fi
+    
+    # Update plist if needed
+    if [[ "$NEEDS_UPDATE" == "true" ]]; then
+        log "Installing LaunchDaemon plist..."
+        sudo cp "$TEMP_PLIST" "$PLIST_PATH"
+        rm "$TEMP_PLIST"
+        success "Installed LaunchDaemon plist"
+    fi
     
     # Set correct permissions
     log "Setting permissions on plist..."
@@ -612,11 +756,21 @@ EOF
     sudo chmod 644 "$PLIST_PATH"
     success "Permissions set (root:wheel, 644)"
     
-    # Load the LaunchDaemon
-    log "Loading LaunchDaemon..."
-    sudo launchctl load -w "$PLIST_PATH"
-    sleep 3
-    success "LaunchDaemon loaded"
+    # Load the LaunchDaemon if not already loaded
+    if ! sudo launchctl list | grep -q "com.caddyserver.caddy"; then
+        log "Loading LaunchDaemon..."
+        sudo launchctl load -w "$PLIST_PATH"
+        sleep 3
+        success "LaunchDaemon loaded"
+    else
+        success "LaunchDaemon already loaded"
+        # If LaunchDaemon is loaded but process isn't running, kickstart it
+        if ! ps aux | grep -v grep | grep -q caddy; then
+            log "LaunchDaemon loaded but Caddy not running, kickstarting..."
+            sudo launchctl kickstart -k system/com.caddyserver.caddy
+            sleep 3
+        fi
+    fi
     
     # Verify LaunchDaemon is loaded
     log "Verifying LaunchDaemon status..."
@@ -630,18 +784,28 @@ EOF
         exit 1
     fi
     
-    # Verify Caddy process is running
+    # Verify Caddy process is running (with retries)
     log "Verifying Caddy process..."
-    sleep 2
-    if ps aux | grep -v grep | grep -q caddy; then
-        success "✅ Caddy process is running"
-        ps aux | grep -v grep | grep caddy | head -1
-    else
-        error "Caddy process is not running"
-        log "Checking error log:"
-        tail -20 /usr/local/var/log/caddy/caddy-error.log 2>/dev/null || echo "No error log found"
-        exit 1
-    fi
+    RETRY_COUNT=0
+    MAX_RETRIES=3
+    while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
+        if ps aux | grep -v grep | grep -q caddy; then
+            success "✅ Caddy process is running"
+            ps aux | grep -v grep | grep caddy | head -1
+            break
+        else
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; then
+                warning "Caddy not running yet, waiting... (attempt $RETRY_COUNT/$MAX_RETRIES)"
+                sleep 2
+            else
+                error "Caddy process is not running after $MAX_RETRIES attempts"
+                log "Checking error log:"
+                tail -20 /usr/local/var/log/caddy/caddy-error.log 2>/dev/null || echo "No error log found"
+                exit 1
+            fi
+        fi
+    done
     
     # Test with management script
     log "Testing management script..."
