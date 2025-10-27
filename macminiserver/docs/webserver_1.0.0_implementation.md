@@ -3,11 +3,18 @@
 This document provides step-by-step implementation phases for setting up the Caddy-based webserver on the Mac Mini. Each phase builds on the previous one and includes verification steps.
 
 **Prerequisites:**
-- Mac Mini running macOS Sequoia 15.7
+- Mac Mini running macOS Sequoia 15.7 (Intel or Apple Silicon)
 - Homebrew installed
 - Docker Desktop for Mac installed
 - Cloudflare account with API token
 - Domains configured in Cloudflare DNS
+
+**Important Notes:**
+- This guide uses **system-level LaunchDaemons** (not user-level LaunchAgents) so services start at boot before any user login
+- Caddy binary location differs by architecture:
+  - Apple Silicon: `/opt/homebrew/bin/caddy`
+  - Intel: `/usr/local/bin/caddy`
+- Use `which caddy` to find your path when creating the plist file
 
 ---
 
@@ -114,25 +121,28 @@ This document provides step-by-step implementation phases for setting up the Cad
   LOG_DIR="/usr/local/var/log/caddy"
   ERROR_LOG="$LOG_DIR/caddy-error.log"
   ACCESS_LOG="$LOG_DIR/access.log"
+  PLIST_PATH="/Library/LaunchDaemons/com.caddyserver.caddy.plist"
 
   case "$1" in
     start)
       echo "Starting Caddy..."
-      brew services start caddy
+      sudo launchctl load -w "$PLIST_PATH"
       sleep 2
-      brew services list | grep caddy
+      sudo launchctl list | grep caddy
       ;;
       
     stop)
       echo "Stopping Caddy..."
-      brew services stop caddy
+      sudo launchctl unload -w "$PLIST_PATH"
       ;;
       
     restart)
       echo "Restarting Caddy..."
-      brew services restart caddy
+      sudo launchctl unload "$PLIST_PATH"
       sleep 2
-      brew services list | grep caddy
+      sudo launchctl load "$PLIST_PATH"
+      sleep 2
+      sudo launchctl list | grep caddy
       ;;
       
     reload)
@@ -142,7 +152,12 @@ This document provides step-by-step implementation phases for setting up the Cad
       
     status)
       echo "=== Caddy Service Status ==="
-      brew services list | grep caddy
+      if sudo launchctl list | grep -q caddy; then
+        echo "✅ Caddy LaunchDaemon is loaded"
+        sudo launchctl list | grep caddy
+      else
+        echo "❌ Caddy LaunchDaemon is not loaded"
+      fi
       echo ""
       echo "=== Caddy Process ==="
       ps aux | grep -v grep | grep caddy || echo "No Caddy process found"
@@ -196,7 +211,7 @@ This document provides step-by-step implementation phases for setting up the Cad
   chmod +x ~/webserver/scripts/manage-caddy.sh
   ```
 
-- [ ] Create convenient alias (optional but recommended)
+- [ ] Create convenient alias
   ```bash
   echo 'alias caddy-manage="~/webserver/scripts/manage-caddy.sh"' >> ~/.zshrc
   source ~/.zshrc
@@ -242,37 +257,122 @@ This document provides step-by-step implementation phases for setting up the Cad
 
 ### 1.6 Setup LaunchDaemon for Auto-Start
 
+**Note:** We're using a system-level LaunchDaemon (not Homebrew's LaunchAgent) so Caddy starts at boot before any user login. This is critical for a headless server setup.
+
 - [ ] Stop Caddy if running via manual start
   ```bash
-  ~/webserver/scripts/manage-caddy.sh stop
+  pkill caddy
   ```
 
-- [ ] Verify Homebrew service configuration exists
+- [ ] Find Caddy binary location
   ```bash
-  brew services list | grep caddy
-  # Should show caddy with a status
+  which caddy
+  # Should show: /opt/homebrew/bin/caddy (Apple Silicon) or /usr/local/bin/caddy (Intel)
+  # Save this path for the plist file
   ```
 
-- [ ] Enable Caddy to start on boot
+- [ ] Create system LaunchDaemon plist
   ```bash
-  brew services start caddy
-  # This automatically creates and loads the LaunchDaemon
+  sudo tee /Library/LaunchDaemons/com.caddyserver.caddy.plist << 'EOF'
+  <?xml version="1.0" encoding="UTF-8"?>
+  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+  <plist version="1.0">
+  <dict>
+      <key>Label</key>
+      <string>com.caddyserver.caddy</string>
+      
+      <key>ProgramArguments</key>
+      <array>
+          <string>/opt/homebrew/bin/caddy</string>
+          <string>run</string>
+          <string>--config</string>
+          <string>/usr/local/etc/Caddyfile</string>
+          <string>--adapter</string>
+          <string>caddyfile</string>
+      </array>
+      
+      <key>RunAtLoad</key>
+      <true/>
+      
+      <key>KeepAlive</key>
+      <dict>
+          <key>SuccessfulExit</key>
+          <false/>
+      </dict>
+      
+      <key>StandardOutPath</key>
+      <string>/usr/local/var/log/caddy/caddy-stdout.log</string>
+      
+      <key>StandardErrorPath</key>
+      <string>/usr/local/var/log/caddy/caddy-error.log</string>
+      
+      <key>WorkingDirectory</key>
+      <string>/usr/local/var/www</string>
+      
+      <key>UserName</key>
+      <string>YOUR_USERNAME</string>
+      
+      <key>GroupName</key>
+      <string>staff</string>
+      
+      <key>EnvironmentVariables</key>
+      <dict>
+          <key>HOME</key>
+          <string>/Users/YOUR_USERNAME</string>
+      </dict>
+  </dict>
+  </plist>
+  EOF
   ```
 
-- [ ] Verify LaunchDaemon is loaded
+- [ ] **IMPORTANT: Update the plist file**
   ```bash
-  launchctl list | grep caddy
-  # Should show the service
+  # Replace YOUR_USERNAME with your actual username
+  sudo nano /Library/LaunchDaemons/com.caddyserver.caddy.plist
+  
+  # Update these lines:
+  # - <string>/opt/homebrew/bin/caddy</string> (use output from 'which caddy')
+  # - <string>YOUR_USERNAME</string> (replace with $(whoami))
+  # - <string>/Users/YOUR_USERNAME</string> (replace with $HOME)
   ```
 
-- [ ] Test auto-start (optional but recommended)
+- [ ] Set correct permissions on plist
+  ```bash
+  sudo chown root:wheel /Library/LaunchDaemons/com.caddyserver.caddy.plist
+  sudo chmod 644 /Library/LaunchDaemons/com.caddyserver.caddy.plist
+  ```
+
+- [ ] Load the LaunchDaemon
+  ```bash
+  sudo launchctl load -w /Library/LaunchDaemons/com.caddyserver.caddy.plist
+  ```
+
+- [ ] Verify LaunchDaemon is loaded and running
+  ```bash
+  sudo launchctl list | grep caddy
+  # Should show the service with a PID
+  
+  ps aux | grep caddy
+  # Should show caddy process running as your user
+  ```
+
+- [ ] Test with management script
+  ```bash
+  ~/webserver/scripts/manage-caddy.sh status
+  curl http://localhost
+  ```
+
+- [ ] Test auto-start (recommended)
   ```bash
   # Reboot the Mac Mini
   sudo reboot
   
-  # After reboot, check if Caddy started automatically
+  # After reboot (NO LOGIN REQUIRED), from another machine:
+  curl http://<mac-mini-ip>
+  # Should see the hello world page without logging in
+  
+  # Or SSH in and check:
   ~/webserver/scripts/manage-caddy.sh status
-  curl http://localhost
   ```
 
 ### 1.7 Setup Cloudflare DNS Challenge (Prepare for HTTPS)
@@ -298,32 +398,32 @@ This document provides step-by-step implementation phases for setting up the Cad
   CLOUDFLARE_API_TOKEN=your_actual_token_here
   ```
 
-- [ ] Update Homebrew service to use environment file
+- [ ] Update LaunchDaemon plist to include environment file
   ```bash
-  # Stop the service
-  brew services stop caddy
-  
-  # Edit the plist file
-  brew services edit caddy
-  # This opens the plist in your editor
+  sudo nano /Library/LaunchDaemons/com.caddyserver.caddy.plist
   ```
-
-- [ ] Add environment file to plist
+  
+  Update the `EnvironmentVariables` section to include the Cloudflare token:
   ```xml
-  <!-- Find the ProgramArguments array and add after it: -->
   <key>EnvironmentVariables</key>
   <dict>
+      <key>HOME</key>
+      <string>/Users/YOUR_USERNAME</string>
       <key>CLOUDFLARE_API_TOKEN</key>
-      <string>$(cat /usr/local/etc/caddy.env | grep CLOUDFLARE_API_TOKEN | cut -d= -f2)</string>
+      <string>YOUR_CLOUDFLARE_TOKEN_HERE</string>
   </dict>
   ```
-  
-  **Note:** If the above doesn't work, you can alternatively set the env var directly in the plist or use Caddy's `--envfile` flag by modifying ProgramArguments.
 
-- [ ] Restart Caddy service
+- [ ] Reload LaunchDaemon to apply environment changes
   ```bash
-  brew services restart caddy
+  sudo launchctl unload /Library/LaunchDaemons/com.caddyserver.caddy.plist
+  sudo launchctl load -w /Library/LaunchDaemons/com.caddyserver.caddy.plist
+  ```
+
+- [ ] Verify Caddy restarted successfully
+  ```bash
   ~/webserver/scripts/manage-caddy.sh status
+  curl http://localhost
   ```
 
 ### Phase 1 Verification Checklist
@@ -332,9 +432,10 @@ This document provides step-by-step implementation phases for setting up the Cad
 - [ ] Hello world page displays at `http://localhost`
 - [ ] Hello world page displays at `http://<mac-mini-ip>` from another device
 - [ ] Management script works: start, stop, restart, reload, status, logs
-- [ ] Caddy starts automatically after reboot
-- [ ] Cloudflare API token is configured
+- [ ] LaunchDaemon starts Caddy automatically at boot (before login)
+- [ ] Cloudflare API token is configured in LaunchDaemon
 - [ ] Caddyfile validates without errors
+- [ ] Caddy runs as your user (not root) - verify with `ps aux | grep caddy`
 
 **Phase 1 Complete! ✅**
 
