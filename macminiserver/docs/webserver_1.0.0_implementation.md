@@ -561,20 +561,25 @@ At each phase, add the commands to your provisioning script, then review and run
 
 ---
 
-## Phase 2: Setup njoubert.com Static Site
+## Phase 2: Create a Static Site Provisioning Script and Setup nimbus.wtf Static Site 
 
-**Goal:** Configure Caddy to serve njoubert.com with automatic HTTPS using Cloudflare DNS challenge.
+**Goal:** Create an idempotent static site provisioning script, `static_site_provision.sh` that we can use to stand up static sites. 
+
+**Subgoal:** Configure Caddy to serve nimbus.wtf with automatic HTTPS using Cloudflare DNS challenge.
 
 ### 2.1 Prepare Static Site Directory
 
-- [ ] Create directory for njoubert.com
+Setup the `static_site_provision.sh` script to first prompt for a site name - in this example, nimbus.wtf. 
+Then check what exists already. If the site does not exist, it creates the structure:
+
+- [ ] Create directory for nimbus.wtf
   ```bash
-  mkdir -p ~/webserver/sites/njoubert.com/public
+  mkdir -p ~/webserver/sites/nimbus.wtf/public
   ```
 
 - [ ] Create placeholder index.html
   ```bash
-  cat > ~/webserver/sites/njoubert.com/public/index.html << 'EOF'
+  cat > ~/webserver/sites/nimbus.wtf/public/index.html << 'EOF'
   <!DOCTYPE html>
   <html>
   <head>
@@ -596,16 +601,18 @@ At each phase, add the commands to your provisioning script, then review and run
   EOF
   ```
 
-- [ ] **User Action Required:** Copy actual njoubert.com static files to `~/webserver/sites/njoubert.com/public/` when ready
+- [ ] **User Action Required:** Copy actual nimbus.wtf static files to `~/webserver/sites/nimbus.wtf/public/` when ready
 
-### 2.2 Update Caddyfile for njoubert.com
+### 2.2 Update Caddyfile for nimbus.wtf
+
+Expand the static site provisioning script to do these steps:
 
 - [ ] Backup current Caddyfile
   ```bash
   cp /usr/local/etc/Caddyfile /usr/local/etc/Caddyfile.phase1.backup
   ```
 
-- [ ] Update Caddyfile to add njoubert.com
+- [ ] Update Caddyfile to add nimbus.wtf
   ```bash
   cat > /usr/local/etc/Caddyfile << 'EOF'
   {
@@ -614,9 +621,9 @@ At each phase, add the commands to your provisioning script, then review and run
       acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
   }
 
-  # Main website - njoubert.com
-  njoubert.com, www.njoubert.com {
-      root * /Users/njoubert/webserver/sites/njoubert.com/public
+  # Main website - nimbus.wtf
+  nimbus.wtf, www.nimbus.wtf {
+      root * /Users/njoubert/webserver/sites/nimbus.wtf/public
       file_server
       encode gzip
       
@@ -644,7 +651,7 @@ At each phase, add the commands to your provisioning script, then review and run
       header @static Cache-Control "public, max-age=31536000, immutable"
       
       log {
-          output file /usr/local/var/log/caddy/njoubert.com.log
+          output file /usr/local/var/log/caddy/nimbus.wtf.log
       }
   }
 
@@ -670,38 +677,40 @@ At each phase, add the commands to your provisioning script, then review and run
   ~/webserver/scripts/manage-caddy.sh reload
   ```
 
-### 2.3 Test njoubert.com
+### 2.3 Test nimbus.wtf
+
+Then have the static site provisioning script do:
 
 - [ ] Test HTTP access locally (will redirect to HTTPS)
   ```bash
-  curl -I http://njoubert.com
+  curl -I http://nimbus.wtf
   # Should see 308 redirect to https://
   ```
 
 - [ ] Test HTTPS access
   ```bash
-  curl https://njoubert.com
+  curl https://nimbus.wtf
   # Should see the HTML content
   ```
 
 - [ ] Test from browser
-  - [ ] Visit https://njoubert.com
+  - [ ] Visit https://nimbus.wtf
   - [ ] Verify SSL certificate is valid (Let's Encrypt)
-  - [ ] Verify www.njoubert.com also works
+  - [ ] Verify www.nimbus.wtf also works
 
 - [ ] Check Caddy logs for any errors
   ```bash
   ~/webserver/scripts/manage-caddy.sh logs error
   # Ctrl+C to exit
   
-  tail -20 /usr/local/var/log/caddy/njoubert.com.log
+  tail -20 /usr/local/var/log/caddy/nimbus.wtf.log
   ```
 
 ### 2.4 Verify HTTPS & Certificate
 
 - [ ] Check certificate details
   ```bash
-  echo | openssl s_client -connect njoubert.com:443 -servername njoubert.com 2>/dev/null | openssl x509 -noout -dates -subject -issuer
+  echo | openssl s_client -connect nimbus.wtf:443 -servername nimbus.wtf 2>/dev/null | openssl x509 -noout -dates -subject -issuer
   # Should show Let's Encrypt certificate with valid dates
   ```
 
@@ -715,7 +724,7 @@ At each phase, add the commands to your provisioning script, then review and run
 - [ ] Test rate limiting (optional)
   ```bash
   # Send many rapid requests
-  for i in {1..110}; do curl -s -o /dev/null -w "%{http_code}\n" https://njoubert.com; done
+  for i in {1..110}; do curl -s -o /dev/null -w "%{http_code}\n" https://nimbus.wtf; done
   # Should see some 429 (Too Many Requests) responses after ~100 requests
   ```
 
@@ -734,7 +743,7 @@ It should include the directory tree as an example:
 │   │   └── public/              # Test hello world page
 │   │       └── index.html
 │   │
-│   ├── njoubert.com/
+│   ├── nimbus.wtf/
 │   │   ├── public/              # Static files (Caddy serves from here)
 │   │   │   ├── index.html
 │   │   │   ├── css/
@@ -784,14 +793,16 @@ It should include the directory tree as an example:
 
 ### Phase 2 Verification Checklist
 
-- [ ] njoubert.com serves content over HTTPS
-- [ ] www.njoubert.com works and serves same content
+- [ ] `static_site_provision.sh` script exists 
+- [ ] `static_site_provision.sh` script is idempotent.
+- [ ] nimbus.wtf serves content over HTTPS
+- [ ] www.nimbus.wtf works and serves same content
 - [ ] SSL certificate is valid (Let's Encrypt)
 - [ ] HTTP requests redirect to HTTPS
 - [ ] Static assets are cached properly (check browser dev tools)
 - [ ] Rate limiting is active
 - [ ] Security headers are present (check browser dev tools)
-- [ ] Logs are being written to /usr/local/var/log/caddy/njoubert.com.log
+- [ ] Logs are being written to /usr/local/var/log/caddy/nimbus.wtf.log
 - [ ] A readme file that explains how a sysadmin can setup more sites.
 
 **Phase 2 Complete! ✅**
@@ -1740,7 +1751,7 @@ It should include the directory tree as an example:
       echo "Testing all sites..."
       
       sites=(
-        "https://njoubert.com"
+        "https://nimbus.wtf"
         "https://nielsshootsfilm.com"
         "https://nielsshootsfilm.com/api/health"
         "https://lydiajoubert.com"
@@ -1887,7 +1898,7 @@ It should include the directory tree as an example:
   brew install apache-bench
   
   # Test static site
-  ab -n 1000 -c 10 https://njoubert.com/
+  ab -n 1000 -c 10 https://nimbus.wtf/
   ```
 
 - [ ] Check resource usage under load
@@ -1900,7 +1911,7 @@ It should include the directory tree as an example:
 
 - [ ] Verify security headers on all sites
   ```bash
-  curl -I https://njoubert.com | grep -E "X-Frame|X-Content|X-XSS"
+  curl -I https://nimbus.wtf | grep -E "X-Frame|X-Content|X-XSS"
   curl -I https://lydiajoubert.com | grep -E "X-Frame|X-Content|X-XSS"
   ```
 
@@ -1932,7 +1943,7 @@ It should include the directory tree as an example:
 
 You now have a fully functional webserver with:
 
-✅ **Static sites** - njoubert.com with fast serving  
+✅ **Static sites** - nimbus.wtf with fast serving  
 ✅ **Hybrid site** - nielsshootsfilm.com (static + Go API)  
 ✅ **WordPress sites** - lydiajoubert.com and zs1aaz.com  
 ✅ **Automatic HTTPS** - Let's Encrypt via Cloudflare DNS  
