@@ -12,17 +12,18 @@ repos:
     -   id: check-case-conflict
 #    -   id: forbid-submodules
     -   id: check-merge-conflict
-    -   id: detect-private-key
     -   id: forbid-new-submodules
-
--   repo: https://github.com/Yelp/detect-secrets
-    rev: v1.5.0
-    hooks:
-    -   id: detect-secrets
-        name: detect secrets
 
 
 -   repo: https://github.com/mxr/sync-pre-commit-deps
     rev: v0.0.1
     hooks:
     -   id: sync-pre-commit-deps
+
+-   repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+    -   id: shellcheck
+        name: Check shell scripts with shellcheck
+        types: [shell]
+        args: ['--severity=warning']
