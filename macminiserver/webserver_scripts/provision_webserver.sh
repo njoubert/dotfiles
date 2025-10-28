@@ -450,15 +450,16 @@ section "Phase 8: Setting Up Certificate Auto-Renewal"
 
 CERTBOT_RENEW_SCRIPT="/usr/local/bin/certbot-renew.sh"
 
-read -r -d '' CERTBOT_RENEW_SCRIPT_CONTENT << 'EOF' || true
+read -r -d '' CERTBOT_RENEW_SCRIPT_CONTENT << EOF || true
 #!/bin/bash
 # Certbot renewal script with Nginx reload
+# This runs as root via LaunchDaemon, so we need explicit paths
 
-# Renew certificates
-/usr/local/bin/certbot renew --quiet --dns-cloudflare
+# Renew certificates (certbot will use credentials from certificate's renewal config)
+/usr/local/bin/certbot renew --quiet
 
 # If renewal succeeded, reload Nginx
-if [ $? -eq 0 ]; then
+if [ \$? -eq 0 ]; then
     /usr/local/bin/nginx -s reload
 fi
 EOF
