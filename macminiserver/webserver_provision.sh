@@ -1312,6 +1312,20 @@ main() {
     phase_1_7_auto_login_prompt
     phase_1_8_cloudflare_dns_setup
     
+    # Copy static site provisioning script to webserver scripts directory
+    log "Installing static site provisioning script..."
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    STATIC_SITE_SCRIPT="$SCRIPT_DIR/provision_static_site.sh"
+    
+    if [[ -f "$STATIC_SITE_SCRIPT" ]]; then
+        cp "$STATIC_SITE_SCRIPT" "$HOME/webserver/scripts/"
+        chmod +x "$HOME/webserver/scripts/provision_static_site.sh"
+        success "Installed provision_static_site.sh to ~/webserver/scripts/"
+    else
+        warning "Static site provisioning script not found at: $STATIC_SITE_SCRIPT"
+        log "You can manually copy it later if needed"
+    fi
+    
     log "========================================="
     log "Provisioning complete!"
     log "========================================="
@@ -1326,9 +1340,15 @@ main() {
     log "  - Convenient symlinks at ~/webserver/symlinks/"
     log "  - Configured with Cloudflare DNS challenge for HTTPS"
     echo ""
+    log "Management Scripts:"
+    log "  ~/webserver/scripts/manage-caddy.sh       - Manage Caddy service"
+    log "  ~/webserver/scripts/provision_static_site.sh - Deploy new static sites"
+    echo ""
     log "Next steps:"
     log "  - Test reboot: sudo reboot (then verify Caddy starts)"
-    log "  - Continue with Phase 2 to add your first real site with HTTPS!"
+    log "  - Deploy your first site:"
+    log "    cd ~/webserver/scripts"
+    log "    ./provision_static_site.sh yourdomain.com"
     echo ""
 }
 
