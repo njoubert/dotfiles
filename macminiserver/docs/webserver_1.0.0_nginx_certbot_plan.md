@@ -65,18 +65,10 @@ This plan replaces Caddy with Nginx + Certbot to achieve:
 
 **IMPORTANT:** This implementation uses an **idempotent provisioning script** as the primary method. You will NOT execute the phase steps manually. Instead:
 
-1. **First:** Complete Caddy cleanup (see `docs/caddy_cleanup.md`)
-2. **Then:** Review the phase descriptions below to understand what will happen
-3. **Finally:** Run the provisioning script which will execute all phases automatically
+1. **First:** Review the phase descriptions below to understand what will happen
+2. **Then:** Run the provisioning script which will execute all phases automatically
 
 The phases below describe what the provisioning script does, not manual steps to execute.
-
-## Prerequisites
-
-**CRITICAL:** Before running the provisioning script, you MUST complete the Caddy cleanup:
-- See `docs/caddy_cleanup.md` for complete cleanup instructions
-- Verify Caddy is fully removed and ports 80/443 are free
-- Backup existing configuration and site data
 
 ## Architecture
 
@@ -2087,23 +2079,73 @@ After completing all phases:
 
 ---
 
-## Comparison: Caddy vs This Solution
-
-| Aspect | Caddy (with plugins) | Nginx + Certbot |
-|--------|---------------------|-----------------|
-| Setup complexity | Simple config, complex build | Verbose config, simple packages |
-| Updates | Manual rebuild | Automatic via Homebrew |
-| Certificate management | Built-in (if you can use it) | Separate tool (Certbot) |
-| Cloudflare support | Requires custom build | Standard plugin |
-| Long-term maintenance | High (track updates, rebuild) | Low (Homebrew handles it) |
-| Community support | Good | Excellent |
-| "Set and forget" | No (custom builds) | Yes (standard packages) |
-
-**Winner for home server: Nginx + Certbot** ✅
-
----
-
 ## Appendix: File Locations Reference
+
+### Directory Structure Overview
+
+This is the complete directory structure showing how static sites, Docker-based dynamic apps, and system configuration files are organized:
+
+```text
+~/webserver/
+├── sites/
+│   ├── hello/
+│   │   └── public/              # Test hello world page
+│   │       └── index.html
+│   │
+│   ├── nimbus.wtf/
+│   │   ├── public/              # Static files (nginx serves from here)
+│   │   │   ├── index.html
+│   │   │   ├── css/
+│   │   │   ├── js/
+│   │   │   └── images/
+│   │   └── README.md            # Site-specific notes
+│   │
+│   ├── nielsshootsfilm.com/
+│   │   ├── public/              # Static frontend files
+│   │   │   ├── index.html
+│   │   │   └── ...
+│   │   ├── api/                 # Docker container files
+│   │   │   ├── docker-compose.yml
+│   │   │   ├── Dockerfile
+│   │   │   ├── .env
+│   │   │   └── src/
+│   │   └── README.md
+│   │
+│   ├── lydiajoubert.com/        # WordPress site
+│   │   ├── docker-compose.yml
+│   │   ├── .env
+│   │   ├── uploads.ini
+│   │   ├── wp-content/          # Volume mount
+│   │   └── README.md
+│   │
+│   └── zs1aaz.com/              # Another WordPress site
+│       ├── docker-compose.yml
+│       ├── .env
+│       ├── uploads.ini
+│       ├── wp-content/
+│       └── README.md
+│
+├── scripts/
+│   ├── provision_webserver.sh           # Main provisioning script
+│   ├── provision_static_site_nginx.sh   # Static site provisioning
+│   ├── manage-nginx.sh                  # Nginx management
+│   ├── auto_update.sh                   # Automatic updates
+│
+├── symlinks/                    # Convenient shortcuts
+│   ├── nginx.conf               → /usr/local/etc/nginx/nginx.conf
+│   ├── nginx-sites/             → /usr/local/etc/nginx/servers/
+│   ├── cloudflare.ini           → ~/.secrets/cloudflare.ini
+│   ├── nginx.plist              → /Library/LaunchDaemons/com.nginx.nginx.plist
+│   ├── certbot-renew.plist      → /Library/LaunchDaemons/com.certbot.renew.plist
+│   ├── autoupdate.plist         → /Library/LaunchDaemons/com.webserver.autoupdate.plist
+│   ├── nginx-logs/              → /usr/local/var/log/nginx/
+│   ├── certbot-renew.log        → /usr/local/var/log/certbot-renew.log
+│   ├── auto-update.log          → /usr/local/var/log/auto-update.log
+│   └── certificates/            → /etc/letsencrypt/live/
+│
+├── SITES.md                     # Guide for adding new sites (future)
+└── README.md                    # Webserver documentation (future)
+```
 
 ### Actual File Locations
 
