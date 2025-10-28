@@ -1,3 +1,51 @@
+# Mac Mini Webserver version 1.0.0
+
+## Requirements
+
+### General
+
+
+- **Long Term Supported Static File Server** We want a stable setup that can serve static websites for the next decade with minimal maintenance needed.
+- **Multiple Hetrogeneous Sites** The webserver should be able to host my multiple websites and my multiple projects, including my njoubert.com home page which is just a static site, subdomains such as rtc.njoubert.com which is a WebRTC-based video streaming experiment, files.njoubert.com which is just a firestore, and nielsshootsfilm.com which is a hybrid static-dynamic site with a static frontend and a Go API.
+- **SSL/TLS Certificates**: Must support HTTPS with automatic cert rotation (likely letsencrypt)
+- **Simple Side Addition** We want to make it easy to spin up additional static sites if needed.
+- **Efficiency** The design should use the available resources efficiently
+- **Fast** The system should be fast, especially the static file serving.
+- **Maintainable** It should be dead simple to maintain as I am the only person maintaining this.
+- **Dependency Isolation** It should keep the dependencies of different projects well-isolated. The last thing I want is to fight dependency hell between a 3 year old Wordpress website I am maintaining and a bleeding-edge Go app I am experimenting with.
+- **Wordpress Support** We want to be able to host Wordpress websites and similar blogging platforms (Ghost?)
+- **Wordpress Isolation** Wordpress websites should be well-isolated from all the other systems we might want to run. 
+- **Future Dynamic Projects** We want to be able to host my dynamic projects as I dream up ideas over the next decade.
+- **Project Isolation** We want good isolation between different projects, including isolation if there is a security vulnerability, getting a zero day on one project shouldnt expose the whole system.
+- **Support Being Shashdotted** We want to be prepared if there is an influx of traffic, and use that well for the site that is getting the traffic while the other sites idle. So we do not want to, say, have a single thread or a single process per site! Something more dynamic is needed.
+-  **Ratelimiting Hackers** We want to have rate limiting and fail2ban on the root system to protect from attackers.
+
+### Compute Environment
+
+- **Mac Mini Intel Core i3** This system must use the Macmini I have, I will not by buying new hardware.
+- **External SSDs** Support additonal storage through adding SSDs as needed.
+
+### Sysadmin
+
+- **Log Management**: Centralized logging, rotation policies (partially in provision.sh already)
+- **Sits Behind Cloudflare Dynamic DNS**: The web server is on my consumer fiber internet, exposed via port forwarding of my home gateway (Ubiquiti UniFi). 
+- **Auto-Start after Power Failure**: If the mac mini gets hard-rebooted (or soft-rebooted!) then all the sites should launch automatically without intervention.
+
+### Advance Features (v1.2+)
+
+These are features we want to build in a v1.2 of the web server.
+
+- **v1.2: Resource Limits**: Per-container CPU/memory limits to prevent one site from starving others
+    - Including individual disk space management. Per-container disk space management, so containers can be configured with a maximum disk space usage.
+- **v1.4: Monitoring & Alerting**: System health, disk space, service uptime monitoring (Grafana? Promethues? Other aps?)
+- **v1.6: Backup Strategy**: Need automated backups for containers including blogging platforms like Wordpress.
+
+### Allowances aka Non-requirements
+
+- This is not a heavy duty production system. It is okay if there is a bit of downtime due to upgrades.
+- We do not need to support a full development/staging/production setup for every app, its okay to generally just have production, and if we want a staging env for a certain application, it's just an application-level decision to runit. 
+- It is acceptable if containers are not monitored and restarted or scaled automatically. For v1.0 we want to boot containers automatically on system startup, but if they die, it's okay to rely on the sysadmin to restart the container and debug what is happening.
+
 # Nginx + Certbot + Cloudflare DNS - Implementation Plan
 
 **Date:** October 27, 2025  
@@ -8,9 +56,27 @@
 This plan replaces Caddy with Nginx + Certbot to achieve:
 - ✅ Automatic HTTPS certificates via Let's Encrypt
 - ✅ Cloudflare DNS-01 challenge (keeps Cloudflare proxy enabled)
-- ✅ Automatic updates via Homebrew (both Nginx and Certbot)
-- ✅ Automatic certificate renewals via cron
+- ✅ Automatic updates via Homebrew and pip3
+- ✅ Automatic certificate renewals via LaunchDaemon
+- ✅ Idempotent provisioning script
 - ✅ Zero manual maintenance
+
+## Implementation Approach
+
+**IMPORTANT:** This implementation uses an **idempotent provisioning script** as the primary method. You will NOT execute the phase steps manually. Instead:
+
+1. **First:** Complete Caddy cleanup (see `docs/caddy_cleanup.md`)
+2. **Then:** Review the phase descriptions below to understand what will happen
+3. **Finally:** Run the provisioning script which will execute all phases automatically
+
+The phases below describe what the provisioning script does, not manual steps to execute.
+
+## Prerequisites
+
+**CRITICAL:** Before running the provisioning script, you MUST complete the Caddy cleanup:
+- See `docs/caddy_cleanup.md` for complete cleanup instructions
+- Verify Caddy is fully removed and ports 80/443 are free
+- Backup existing configuration and site data
 
 ## Architecture
 
@@ -28,21 +94,22 @@ Internet → Cloudflare Proxy (DDoS, CDN) → Mac Mini
 1. **Nginx** - Web server (from Homebrew)
 2. **Certbot** - Certificate manager (from Homebrew)
 3. **certbot-dns-cloudflare** - Cloudflare DNS plugin (from pip3)
-4. **LaunchDaemon** - Auto-start Nginx at boot
-5. **Cron job** - Auto-renew certificates
+4. **LaunchDaemon** - Auto-start Nginx and auto-renew certificates
+5. **Provisioning Script** - Idempotent setup script with user prompts
 
 ## Why This Works
 
 ### Automatic Updates ✅
-- **Nginx updates:** `brew upgrade nginx` (Homebrew handles this)
-- **Certbot updates:** `brew upgrade certbot` (Homebrew handles this)
-- **Plugin updates:** `pip3 install --upgrade certbot-dns-cloudflare` (can add to cron)
+- **Homebrew packages:** Automated weekly updates for nginx and certbot
+- **pip3 packages:** Automated weekly updates for certbot-dns-cloudflare
+- **LaunchDaemon:** Runs weekly update checks
 - **All independent** - No custom builds, no version conflicts
 
 ### Automatic Certificate Renewal ✅
-- Certbot installs a renewal cron job automatically
-- Runs twice daily, renews certs within 30 days of expiry
+- LaunchDaemon runs daily certificate renewal checks
+- Renews certs within 30 days of expiry
 - Reloads Nginx after successful renewal
+- Logs all renewal attempts
 - No manual intervention needed
 
 ### Cloudflare Integration ✅
@@ -51,7 +118,49 @@ Internet → Cloudflare Proxy (DDoS, CDN) → Mac Mini
 - Cloudflare proxy stays enabled (orange cloud)
 - You keep DDoS protection, CDN, hidden IP
 
+### Idempotent Provisioning ✅
+- Script checks existing installations before installing
+- Shows diffs before overwriting configuration files
+- Prompts user for required inputs (Cloudflare token, etc.)
+- Safe to run multiple times
+- Can resume from any step
+- Creates convenient symlinks to all config and log files in `~/webserver/symlinks/`
+
 ---
+
+## Provisioning Script
+
+The master provisioning script is located at `~/webserver/scripts/provision_webserver.sh`.
+
+**To provision your webserver:**
+```bash
+cd ~/webserver/scripts
+./provision_webserver.sh
+```
+
+The script will:
+1. Check prerequisites (Homebrew installed)
+2. Install all required packages (nginx, certbot, certbot-dns-cloudflare)
+3. Prompt for Cloudflare API token (securely stored)
+4. Create all necessary directories
+5. Generate nginx configuration files (with diff review)
+6. Set up LaunchDaemons for auto-start and auto-renewal
+7. Configure automatic weekly updates
+8. Create convenient symlinks to all config and log files
+9. Provide next steps for adding sites
+
+**Features:**
+- ✅ **Idempotent** - Safe to run multiple times
+- ✅ **Interactive** - Shows diffs, prompts for confirmation
+- ✅ **Resumable** - Skip already-completed steps
+- ✅ **Safe** - Backs up files before overwriting
+- ✅ **Logged** - All actions logged with timestamps
+
+---
+
+## What the Provisioning Script Does
+
+The sections below describe what happens when you run the provisioning script. These are NOT manual steps - the script handles everything automatically.
 
 ## Phase 1: Install Core Components
 
@@ -232,8 +341,6 @@ http {
 EOF
 ```
 
-**Note:** Replace `njoubert` with your actual username.
-
 ### 3.3 Create Hello World Site Config
 
 ```bash
@@ -332,8 +439,6 @@ EOF
 sudo chown root:wheel /Library/LaunchDaemons/com.nginx.nginx.plist
 sudo chmod 644 /Library/LaunchDaemons/com.nginx.nginx.plist
 ```
-
-**Note:** Replace `njoubert` with your actual username and `/usr/local/bin/nginx` with output from `which nginx`.
 
 ### 4.2 Load LaunchDaemon
 
@@ -704,11 +809,906 @@ sudo tail -50 /usr/local/var/log/certbot-renew.log
 
 ---
 
-## Phase 8: Create Static Site Provisioning Script
+## Phase 8: Set Up Automatic Package Updates
 
-Now that Nginx + Certbot is set up, create a script to easily add new static sites.
+Configure automatic updates for Homebrew and pip3 packages to keep the system secure and up-to-date.
 
-### 8.1 Create provision_static_site_nginx.sh
+### 8.1 Create Update Script
+
+```bash
+# Create scripts directory if it doesn't exist
+mkdir -p ~/webserver/scripts
+
+# Create the update script
+cat > ~/webserver/scripts/auto_update.sh << 'EOF'
+#!/bin/bash
+#
+# Automatic Package Update Script
+# Updates Homebrew packages (nginx, certbot) and pip3 packages (certbot-dns-cloudflare)
+#
+# This script should be run via LaunchDaemon weekly
+#
+
+LOG_FILE="/usr/local/var/log/auto-update.log"
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+}
+
+log "=== Starting automatic update check ==="
+
+# Update Homebrew itself
+log "Updating Homebrew..."
+brew update 2>&1 | tee -a "$LOG_FILE"
+
+# Upgrade all Homebrew packages (nginx, certbot, etc.)
+log "Upgrading Homebrew packages..."
+brew upgrade 2>&1 | tee -a "$LOG_FILE"
+
+# Upgrade pip3 packages (certbot-dns-cloudflare)
+log "Upgrading pip3 packages..."
+pip3 install --upgrade certbot-dns-cloudflare 2>&1 | tee -a "$LOG_FILE"
+
+# Cleanup old versions
+log "Cleaning up old versions..."
+brew cleanup 2>&1 | tee -a "$LOG_FILE"
+
+# Check if nginx needs restart (if binary was updated)
+if pgrep -x "nginx" > /dev/null; then
+    log "Nginx is running. Checking if restart needed..."
+    NGINX_VERSION_RUNNING=$(nginx -v 2>&1 | awk -F'/' '{print $2}')
+    NGINX_VERSION_INSTALLED=$(brew list --versions nginx | awk '{print $2}')
+    
+    if [ "$NGINX_VERSION_RUNNING" != "$NGINX_VERSION_INSTALLED" ]; then
+        log "Nginx version mismatch. Reloading nginx..."
+        sudo launchctl kickstart -k system/com.nginx.nginx
+        log "Nginx reloaded to version $NGINX_VERSION_INSTALLED"
+    else
+        log "Nginx is up-to-date (version $NGINX_VERSION_RUNNING)"
+    fi
+fi
+
+log "=== Update check complete ==="
+log ""
+EOF
+
+# Make it executable
+chmod +x ~/webserver/scripts/auto_update.sh
+```
+
+### 8.2 Create LaunchDaemon for Automatic Updates
+
+```bash
+# Create the LaunchDaemon plist
+sudo tee /Library/LaunchDaemons/com.webserver.autoupdate.plist > /dev/null << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.webserver.autoupdate</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/njoubert/webserver/scripts/auto_update.sh</string>
+    </array>
+    
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Weekday</key>
+        <integer>1</integer>
+        <key>Hour</key>
+        <integer>2</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+    
+    <key>StandardErrorPath</key>
+    <string>/usr/local/var/log/auto-update-error.log</string>
+    
+    <key>StandardOutPath</key>
+    <string>/usr/local/var/log/auto-update.log</string>
+</dict>
+</plist>
+EOF
+
+# Load the LaunchDaemon
+sudo launchctl load /Library/LaunchDaemons/com.webserver.autoupdate.plist
+```
+
+**Schedule:** Updates run every Monday at 2:00 AM
+
+### 8.3 Test Update Script
+
+```bash
+# Run manually to test
+bash ~/webserver/scripts/auto_update.sh
+
+# Check the log
+tail -f /usr/local/var/log/auto-update.log
+```
+
+### 8.4 Verify LaunchDaemon
+
+```bash
+# Check if it's loaded
+sudo launchctl list | grep autoupdate
+
+# Check next run time (if available)
+sudo launchctl print system/com.webserver.autoupdate
+```
+
+**Summary:**
+- ✅ Homebrew packages (nginx, certbot) update automatically
+- ✅ pip3 packages (certbot-dns-cloudflare) update automatically
+- ✅ Nginx reloads automatically if updated
+- ✅ Runs weekly (Monday 2 AM)
+- ✅ All updates logged
+
+---
+
+## Complete Provisioning Script
+
+Below is the complete, production-ready provisioning script that implements all phases automatically.
+
+### Create ~/webserver/scripts/provision_webserver.sh
+
+```bash
+cat > ~/webserver/scripts/provision_webserver.sh << 'SCRIPT_EOF'
+#!/bin/bash
+#
+# Idempotent Web Server Provisioning Script
+# Sets up nginx + certbot + automatic updates + symlinks
+#
+# Usage: bash provision_webserver.sh
+#
+
+set -e
+
+# Colors
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+log() { echo -e "${NC}$1${NC}"; }
+success() { echo -e "${GREEN}✅ $1${NC}"; }
+warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
+error() { echo -e "${RED}❌ $1${NC}"; }
+info() { echo -e "${BLUE}ℹ️  $1${NC}"; }
+
+# Function to check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to prompt user for input
+prompt_user() {
+    local prompt="$1"
+    local var_name="$2"
+    local default="$3"
+    
+    if [ -n "$default" ]; then
+        read -p "$(echo -e ${BLUE}$prompt [default: $default]: ${NC})" input
+        eval "$var_name=\"${input:-$default}\""
+    else
+        read -p "$(echo -e ${BLUE}$prompt: ${NC})" input
+        eval "$var_name=\"$input\""
+    fi
+}
+
+# Function to show diff and ask to overwrite
+check_and_write_file() {
+    local file_path="$1"
+    local new_content="$2"
+    local sudo_required="${3:-false}"
+    
+    if [ -f "$file_path" ]; then
+        # File exists, show diff
+        local temp_file=$(mktemp)
+        echo "$new_content" > "$temp_file"
+        
+        if ! diff -u "$file_path" "$temp_file" > /dev/null 2>&1; then
+            warning "File $file_path already exists and differs from desired content"
+            echo ""
+            echo "=== DIFF ==="
+            diff -u "$file_path" "$temp_file" || true
+            echo "============"
+            echo ""
+            
+            read -p "$(echo -e ${YELLOW}Overwrite $file_path? [y/N]: ${NC})" -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                # Backup before overwriting
+                local backup_path="${file_path}.backup.$(date +%Y%m%d_%H%M%S)"
+                if [ "$sudo_required" = "true" ]; then
+                    sudo cp "$file_path" "$backup_path"
+                    echo "$new_content" | sudo tee "$file_path" > /dev/null
+                else
+                    cp "$file_path" "$backup_path"
+                    echo "$new_content" > "$file_path"
+                fi
+                info "Backup saved to $backup_path"
+                success "File $file_path updated"
+                return 0
+            else
+                info "Keeping existing $file_path"
+                rm "$temp_file"
+                return 1
+            fi
+        else
+            success "File $file_path already has correct content"
+            rm "$temp_file"
+            return 0
+        fi
+        
+        rm "$temp_file"
+    else
+        # File doesn't exist, create it
+        if [ "$sudo_required" = "true" ]; then
+            echo "$new_content" | sudo tee "$file_path" > /dev/null
+        else
+            mkdir -p "$(dirname "$file_path")"
+            echo "$new_content" > "$file_path"
+        fi
+        success "File $file_path created"
+        return 0
+    fi
+}
+
+# Function to create symlink
+create_symlink() {
+    local target="$1"
+    local link_name="$2"
+    
+    if [ -L "$link_name" ]; then
+        local current_target=$(readlink "$link_name")
+        if [ "$current_target" = "$target" ]; then
+            success "Symlink $link_name already points to $target"
+            return 0
+        else
+            warning "Symlink $link_name exists but points to $current_target"
+            read -p "$(echo -e ${YELLOW}Update symlink? [y/N]: ${NC})" -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                rm "$link_name"
+                ln -s "$target" "$link_name"
+                success "Symlink $link_name updated"
+                return 0
+            else
+                info "Keeping existing symlink"
+                return 1
+            fi
+        fi
+    elif [ -e "$link_name" ]; then
+        error "Path $link_name exists but is not a symlink"
+        return 1
+    else
+        mkdir -p "$(dirname "$link_name")"
+        ln -s "$target" "$link_name"
+        success "Symlink $link_name created"
+        return 0
+    fi
+}
+
+echo ""
+log "╔════════════════════════════════════════════════════════════╗"
+log "║   Web Server Provisioning Script - nginx + Certbot        ║"
+log "╚════════════════════════════════════════════════════════════╝"
+echo ""
+
+# Check prerequisites
+info "Checking prerequisites..."
+if ! command_exists brew; then
+    error "Homebrew not installed. Please install from https://brew.sh"
+    exit 1
+fi
+success "Homebrew found"
+
+# Phase 1: Install Core Components
+echo ""
+log "=== Phase 1: Installing Core Components ==="
+
+if command_exists nginx; then
+    success "nginx already installed ($(nginx -v 2>&1))"
+else
+    info "Installing nginx..."
+    brew install nginx
+    success "nginx installed"
+fi
+
+if command_exists certbot; then
+    success "certbot already installed ($(certbot --version))"
+else
+    info "Installing certbot..."
+    brew install certbot
+    success "certbot installed"
+fi
+
+if pip3 list 2>/dev/null | grep -q certbot-dns-cloudflare; then
+    success "certbot-dns-cloudflare already installed"
+else
+    info "Installing certbot-dns-cloudflare..."
+    pip3 install certbot-dns-cloudflare
+    success "certbot-dns-cloudflare installed"
+fi
+
+# Phase 2: Configure Cloudflare Credentials
+echo ""
+log "=== Phase 2: Configuring Cloudflare Credentials ==="
+
+CLOUDFLARE_INI="$HOME/.secrets/cloudflare.ini"
+if [ -f "$CLOUDFLARE_INI" ]; then
+    success "Cloudflare credentials already exist at $CLOUDFLARE_INI"
+    read -p "$(echo -e ${YELLOW}Update Cloudflare API token? [y/N]: ${NC})" -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        prompt_user "Enter your Cloudflare API token" CLOUDFLARE_TOKEN
+        mkdir -p "$HOME/.secrets"
+        chmod 700 "$HOME/.secrets"
+        echo "dns_cloudflare_api_token = $CLOUDFLARE_TOKEN" > "$CLOUDFLARE_INI"
+        chmod 600 "$CLOUDFLARE_INI"
+        success "Cloudflare credentials updated"
+    fi
+else
+    prompt_user "Enter your Cloudflare API token" CLOUDFLARE_TOKEN
+    mkdir -p "$HOME/.secrets"
+    chmod 700 "$HOME/.secrets"
+    echo "dns_cloudflare_api_token = $CLOUDFLARE_TOKEN" > "$CLOUDFLARE_INI"
+    chmod 600 "$CLOUDFLARE_INI"
+    success "Cloudflare credentials created at $CLOUDFLARE_INI"
+fi
+
+# Phase 3: Configure directories
+echo ""
+log "=== Phase 3: Setting Up Directory Structure ==="
+
+mkdir -p ~/webserver/scripts
+mkdir -p ~/webserver/sites
+mkdir -p ~/webserver/symlinks
+mkdir -p /usr/local/etc/nginx/servers
+mkdir -p /usr/local/var/log/nginx
+success "Directory structure created"
+
+# Phase 4: Configure nginx main config
+echo ""
+log "=== Phase 4: Configuring nginx ==="
+
+NGINX_CONF=$(cat << 'NGINX_EOF'
+user njoubert staff;
+worker_processes auto;
+
+error_log /usr/local/var/log/nginx/error.log;
+pid /usr/local/var/run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include mime.types;
+    default_type application/octet-stream;
+
+    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                    '$status $body_bytes_sent "$http_referer" '
+                    '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log /usr/local/var/log/nginx/access.log main;
+
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 4096;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript 
+               application/x-javascript application/xml+rss 
+               application/json application/javascript;
+
+    # Security headers (defaults for all sites)
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # Include all site configurations
+    include /usr/local/etc/nginx/servers/*.conf;
+}
+NGINX_EOF
+)
+
+check_and_write_file "/usr/local/etc/nginx/nginx.conf" "$NGINX_CONF" true
+
+# Create hello world site
+HELLO_CONF=$(cat << 'HELLO_EOF'
+# Hello world test site - responds to direct IP access
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    
+    server_name _;
+    
+    root /Users/njoubert/webserver/sites/hello/public;
+    index index.html;
+    
+    location / {
+        try_files $uri $uri/ =404;
+    }
+    
+    access_log /usr/local/var/log/nginx/hello.access.log;
+    error_log /usr/local/var/log/nginx/hello.error.log;
+}
+HELLO_EOF
+)
+
+check_and_write_file "/usr/local/etc/nginx/servers/hello.conf" "$HELLO_CONF" true
+
+# Create hello world content
+mkdir -p ~/webserver/sites/hello/public
+if [ ! -f ~/webserver/sites/hello/public/index.html ]; then
+    cat > ~/webserver/sites/hello/public/index.html << 'HTML_EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>nginx + Certbot</title>
+    <style>
+        body { font-family: system-ui; max-width: 800px; margin: 100px auto; padding: 20px; text-align: center; }
+        h1 { color: #2563eb; }
+    </style>
+</head>
+<body>
+    <h1>🚀 nginx + Certbot</h1>
+    <p>Web server is running!</p>
+</body>
+</html>
+HTML_EOF
+    success "Created hello world page"
+else
+    success "Hello world page already exists"
+fi
+
+# Test nginx configuration
+if nginx -t 2>&1 | grep -q "successful"; then
+    success "nginx configuration is valid"
+else
+    error "nginx configuration has errors"
+    nginx -t
+    exit 1
+fi
+
+# Phase 5: Set up nginx LaunchDaemon
+echo ""
+log "=== Phase 5: Setting Up nginx LaunchDaemon ==="
+
+NGINX_PLIST=$(cat << 'PLIST_EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.nginx.nginx</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/bin/nginx</string>
+        <string>-g</string>
+        <string>daemon off;</string>
+    </array>
+    
+    <key>RunAtLoad</key>
+    <true/>
+    
+    <key>KeepAlive</key>
+    <true/>
+    
+    <key>StandardOutPath</key>
+    <string>/usr/local/var/log/nginx/nginx-stdout.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>/usr/local/var/log/nginx/nginx-stderr.log</string>
+    
+    <key>WorkingDirectory</key>
+    <string>/usr/local/var</string>
+    
+    <key>UserName</key>
+    <string>njoubert</string>
+    
+    <key>GroupName</key>
+    <string>staff</string>
+</dict>
+</plist>
+PLIST_EOF
+)
+
+check_and_write_file "/Library/LaunchDaemons/com.nginx.nginx.plist" "$NGINX_PLIST" true
+
+if check_and_write_file "/Library/LaunchDaemons/com.nginx.nginx.plist" "$NGINX_PLIST" true; then
+    sudo chown root:wheel /Library/LaunchDaemons/com.nginx.nginx.plist
+    sudo chmod 644 /Library/LaunchDaemons/com.nginx.nginx.plist
+    
+    # Load or restart the LaunchDaemon
+    if sudo launchctl list | grep -q "com.nginx.nginx"; then
+        info "nginx LaunchDaemon already loaded, restarting..."
+        sudo launchctl kickstart -k system/com.nginx.nginx
+    else
+        info "Loading nginx LaunchDaemon..."
+        sudo launchctl load -w /Library/LaunchDaemons/com.nginx.nginx.plist
+    fi
+    
+    sleep 2
+    if ps aux | grep -v grep | grep -q nginx; then
+        success "nginx is running"
+    else
+        warning "nginx LaunchDaemon loaded but process not detected"
+    fi
+fi
+
+# Phase 6: Create nginx management script
+echo ""
+log "=== Phase 6: Creating Management Scripts ==="
+
+NGINX_MANAGE=$(cat << 'MANAGE_EOF'
+#!/bin/bash
+# Nginx Management Script
+
+PLIST_PATH="/Library/LaunchDaemons/com.nginx.nginx.plist"
+NGINX_CONF="/usr/local/etc/nginx/nginx.conf"
+ERROR_LOG="/usr/local/var/log/nginx/error.log"
+ACCESS_LOG="/usr/local/var/log/nginx/access.log"
+
+case "$1" in
+  start)
+    echo "Starting nginx..."
+    sudo launchctl load -w "$PLIST_PATH"
+    sleep 2
+    sudo launchctl list | grep nginx
+    ;;
+    
+  stop)
+    echo "Stopping nginx..."
+    sudo launchctl unload -w "$PLIST_PATH"
+    ;;
+    
+  restart)
+    echo "Restarting nginx..."
+    sudo launchctl unload "$PLIST_PATH"
+    sleep 2
+    sudo launchctl load "$PLIST_PATH"
+    sleep 2
+    sudo launchctl list | grep nginx
+    ;;
+    
+  reload)
+    echo "Reloading nginx configuration..."
+    nginx -t && nginx -s reload
+    ;;
+    
+  status)
+    echo "=== nginx Service Status ==="
+    if sudo launchctl list | grep -q nginx; then
+      echo "✅ nginx LaunchDaemon is loaded"
+      sudo launchctl list | grep nginx
+    else
+      echo "❌ nginx LaunchDaemon is not loaded"
+    fi
+    echo ""
+    echo "=== nginx Processes ==="
+    ps aux | grep -v grep | grep nginx || echo "No nginx process found"
+    echo ""
+    echo "=== Recent Error Log ==="
+    if [ -f "$ERROR_LOG" ]; then
+      tail -5 "$ERROR_LOG"
+    else
+      echo "No error log found"
+    fi
+    ;;
+    
+  logs)
+    if [ "$2" = "error" ]; then
+      echo "Tailing nginx error log (Ctrl+C to exit)..."
+      tail -f "$ERROR_LOG"
+    elif [ "$2" = "access" ]; then
+      echo "Tailing nginx access log (Ctrl+C to exit)..."
+      tail -f "$ACCESS_LOG"
+    else
+      echo "Usage: $0 logs {error|access}"
+      exit 1
+    fi
+    ;;
+    
+  test)
+    echo "Testing nginx configuration..."
+    nginx -t
+    ;;
+    
+  *)
+    echo "nginx Management Script"
+    echo ""
+    echo "Usage: $0 {start|stop|restart|reload|status|logs|test}"
+    echo ""
+    echo "  start    - Start nginx service"
+    echo "  stop     - Stop nginx service"
+    echo "  restart  - Restart nginx service"
+    echo "  reload   - Reload config (zero downtime)"
+    echo "  status   - Show service status and recent errors"
+    echo "  logs     - Tail logs (error|access)"
+    echo "  test     - Test configuration syntax"
+    exit 1
+    ;;
+esac
+MANAGE_EOF
+)
+
+check_and_write_file "$HOME/webserver/scripts/manage-nginx.sh" "$NGINX_MANAGE" false
+chmod +x "$HOME/webserver/scripts/manage-nginx.sh"
+
+# Phase 7: Set up Certbot renewal
+echo ""
+log "=== Phase 7: Setting Up Certbot Auto-Renewal ==="
+
+CERTBOT_RENEW=$(cat << 'RENEW_EOF'
+#!/bin/bash
+# Certbot renewal script with nginx reload
+
+/usr/local/bin/certbot renew --quiet --dns-cloudflare
+
+if [ $? -eq 0 ]; then
+    /usr/local/bin/nginx -s reload
+fi
+RENEW_EOF
+)
+
+check_and_write_file "/usr/local/bin/certbot-renew.sh" "$CERTBOT_RENEW" true
+sudo chmod +x /usr/local/bin/certbot-renew.sh
+
+CERTBOT_PLIST=$(cat << 'CERTBOT_PLIST_EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.certbot.renew</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/bin/certbot-renew.sh</string>
+    </array>
+    
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict>
+            <key>Hour</key>
+            <integer>2</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+        <dict>
+            <key>Hour</key>
+            <integer>14</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+    </array>
+    
+    <key>StandardOutPath</key>
+    <string>/usr/local/var/log/certbot-renew.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>/usr/local/var/log/certbot-renew-error.log</string>
+</dict>
+</plist>
+CERTBOT_PLIST_EOF
+)
+
+if check_and_write_file "/Library/LaunchDaemons/com.certbot.renew.plist" "$CERTBOT_PLIST" true; then
+    sudo chown root:wheel /Library/LaunchDaemons/com.certbot.renew.plist
+    sudo chmod 644 /Library/LaunchDaemons/com.certbot.renew.plist
+    
+    if sudo launchctl list | grep -q "com.certbot.renew"; then
+        info "Certbot renewal LaunchDaemon already loaded"
+    else
+        sudo launchctl load -w /Library/LaunchDaemons/com.certbot.renew.plist
+        success "Certbot renewal LaunchDaemon loaded"
+    fi
+fi
+
+# Phase 8: Set up automatic updates
+echo ""
+log "=== Phase 8: Setting Up Automatic Updates ==="
+
+AUTO_UPDATE=$(cat << 'UPDATE_EOF'
+#!/bin/bash
+#
+# Automatic Package Update Script
+# Updates Homebrew packages (nginx, certbot) and pip3 packages (certbot-dns-cloudflare)
+#
+
+LOG_FILE="/usr/local/var/log/auto-update.log"
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+}
+
+log "=== Starting automatic update check ==="
+
+# Update Homebrew itself
+log "Updating Homebrew..."
+brew update 2>&1 | tee -a "$LOG_FILE"
+
+# Upgrade all Homebrew packages (nginx, certbot, etc.)
+log "Upgrading Homebrew packages..."
+brew upgrade 2>&1 | tee -a "$LOG_FILE"
+
+# Upgrade pip3 packages (certbot-dns-cloudflare)
+log "Upgrading pip3 packages..."
+pip3 install --upgrade certbot-dns-cloudflare 2>&1 | tee -a "$LOG_FILE"
+
+# Cleanup old versions
+log "Cleaning up old versions..."
+brew cleanup 2>&1 | tee -a "$LOG_FILE"
+
+# Check if nginx needs restart (if binary was updated)
+if pgrep -x "nginx" > /dev/null; then
+    log "nginx is running. Checking if restart needed..."
+    NGINX_VERSION_RUNNING=$(nginx -v 2>&1 | awk -F'/' '{print $2}')
+    NGINX_VERSION_INSTALLED=$(brew list --versions nginx | awk '{print $2}')
+    
+    if [ "$NGINX_VERSION_RUNNING" != "$NGINX_VERSION_INSTALLED" ]; then
+        log "nginx version mismatch. Reloading nginx..."
+        sudo launchctl kickstart -k system/com.nginx.nginx
+        log "nginx reloaded to version $NGINX_VERSION_INSTALLED"
+    else
+        log "nginx is up-to-date (version $NGINX_VERSION_RUNNING)"
+    fi
+fi
+
+log "=== Update check complete ==="
+log ""
+UPDATE_EOF
+)
+
+check_and_write_file "$HOME/webserver/scripts/auto_update.sh" "$AUTO_UPDATE" false
+chmod +x "$HOME/webserver/scripts/auto_update.sh"
+
+UPDATE_PLIST=$(cat << 'UPDATE_PLIST_EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.webserver.autoupdate</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/njoubert/webserver/scripts/auto_update.sh</string>
+    </array>
+    
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Weekday</key>
+        <integer>1</integer>
+        <key>Hour</key>
+        <integer>2</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+    
+    <key>StandardErrorPath</key>
+    <string>/usr/local/var/log/auto-update-error.log</string>
+    
+    <key>StandardOutPath</key>
+    <string>/usr/local/var/log/auto-update.log</string>
+</dict>
+</plist>
+UPDATE_PLIST_EOF
+)
+
+if check_and_write_file "/Library/LaunchDaemons/com.webserver.autoupdate.plist" "$UPDATE_PLIST" true; then
+    sudo chown root:wheel /Library/LaunchDaemons/com.webserver.autoupdate.plist
+    sudo chmod 644 /Library/LaunchDaemons/com.webserver.autoupdate.plist
+    
+    if sudo launchctl list | grep -q "com.webserver.autoupdate"; then
+        info "Auto-update LaunchDaemon already loaded"
+    else
+        sudo launchctl load -w /Library/LaunchDaemons/com.webserver.autoupdate.plist
+        success "Auto-update LaunchDaemon loaded"
+    fi
+fi
+
+# Phase 9: Create convenient symlinks
+echo ""
+log "=== Phase 9: Creating Convenient Symlinks ==="
+
+# Config file symlinks
+create_symlink "/usr/local/etc/nginx/nginx.conf" "$HOME/webserver/symlinks/nginx.conf"
+create_symlink "/usr/local/etc/nginx/servers" "$HOME/webserver/symlinks/nginx-sites"
+create_symlink "$HOME/.secrets/cloudflare.ini" "$HOME/webserver/symlinks/cloudflare.ini"
+
+# LaunchDaemon symlinks
+create_symlink "/Library/LaunchDaemons/com.nginx.nginx.plist" "$HOME/webserver/symlinks/nginx.plist"
+create_symlink "/Library/LaunchDaemons/com.certbot.renew.plist" "$HOME/webserver/symlinks/certbot-renew.plist"
+create_symlink "/Library/LaunchDaemons/com.webserver.autoupdate.plist" "$HOME/webserver/symlinks/autoupdate.plist"
+
+# Log symlinks
+create_symlink "/usr/local/var/log/nginx" "$HOME/webserver/symlinks/nginx-logs"
+create_symlink "/usr/local/var/log/certbot-renew.log" "$HOME/webserver/symlinks/certbot-renew.log"
+create_symlink "/usr/local/var/log/auto-update.log" "$HOME/webserver/symlinks/auto-update.log"
+
+# Certificate symlinks (will be created after first cert)
+if [ -d "/etc/letsencrypt" ]; then
+    create_symlink "/etc/letsencrypt/live" "$HOME/webserver/symlinks/certificates"
+fi
+
+success "Symlinks created in ~/webserver/symlinks/"
+
+# Summary
+echo ""
+log "╔════════════════════════════════════════════════════════════╗"
+log "║                     Setup Complete!                        ║"
+log "╚════════════════════════════════════════════════════════════╝"
+echo ""
+success "✅ Core components installed (nginx, certbot, certbot-dns-cloudflare)"
+success "✅ Cloudflare credentials configured"
+success "✅ Directory structure created"
+success "✅ nginx configured and running"
+success "✅ LaunchDaemons configured (nginx, certbot renewal, auto-updates)"
+success "✅ Management scripts created"
+success "✅ Convenient symlinks created in ~/webserver/symlinks/"
+echo ""
+info "📁 Quick access to configs and logs:"
+info "   ls -la ~/webserver/symlinks/"
+echo ""
+info "🔧 Next steps:"
+info "1. Add your first site:"
+info "   cd ~/webserver/scripts"
+info "   ./provision_static_site_nginx.sh yourdomain.com"
+echo ""
+info "2. Manage nginx:"
+info "   ~/webserver/scripts/manage-nginx.sh status"
+info "   ~/webserver/scripts/manage-nginx.sh logs error"
+echo ""
+info "3. Check symlinks:"
+info "   ls -la ~/webserver/symlinks/"
+echo ""
+
+SCRIPT_EOF
+
+# Make it executable
+chmod +x ~/webserver/scripts/provision_webserver.sh
+```
+
+### Run the Provisioning Script
+
+```bash
+cd ~/webserver/scripts
+./provision_webserver.sh
+```
+
+The script will:
+1. ✅ Check prerequisites
+2. ✅ Install all required packages
+3. ✅ Prompt for Cloudflare API token
+4. ✅ Create directory structure
+5. ✅ Generate and install nginx configuration
+6. ✅ Set up all LaunchDaemons (nginx, certbot renewal, auto-updates)
+7. ✅ Create management scripts
+8. ✅ Create convenient symlinks to all configs and logs
+9. ✅ Start nginx automatically
+
+---
+
+## Static Site Provisioning Script
+
+Once the main provisioning script has set up your webserver, use this script to easily add new static sites with automatic HTTPS.
+
+### Create ~/webserver/scripts/provision_static_site_nginx.sh
 
 ```bash
 cat > ~/webserver/scripts/provision_static_site_nginx.sh << 'EOF'
@@ -897,29 +1897,13 @@ EOF
 chmod +x ~/webserver/scripts/provision_static_site_nginx.sh
 ```
 
----
-
-## Phase 9: Clean Up Caddy (Optional)
-
-Since we're switching to Nginx, we can remove Caddy:
-
-```bash
-# Stop and unload Caddy LaunchDaemon
-sudo launchctl unload -w /Library/LaunchDaemons/com.caddyserver.caddy.plist
-
-# Remove Caddy LaunchDaemon
-sudo rm /Library/LaunchDaemons/com.caddyserver.caddy.plist
-
-# Uninstall Caddy (optional - you can keep it for reference)
-brew uninstall caddy
-
-# Remove Caddy files (optional)
-sudo rm -rf /usr/local/etc/Caddyfile*
-sudo rm -rf /usr/local/var/log/caddy/
-
-# Keep the management script for reference
-# mv ~/webserver/scripts/manage-caddy.sh ~/webserver/scripts/manage-caddy.sh.old
-```
+**Summary:**
+- ✅ Creates site directory structure
+- ✅ Installs static content (or creates placeholder)
+- ✅ Requests SSL certificate via Cloudflare DNS
+- ✅ Creates nginx configuration
+- ✅ Tests and reloads nginx
+- ✅ Verifies site is live
 
 ---
 
@@ -1121,6 +2105,8 @@ After completing all phases:
 
 ## Appendix: File Locations Reference
 
+### Actual File Locations
+
 ```
 # Nginx
 /usr/local/bin/nginx                              # Nginx binary
@@ -1143,6 +2129,42 @@ After completing all phases:
 # Sites
 ~/webserver/sites/*/public/                        # Site content
 ~/webserver/scripts/                               # Management scripts
+```
+
+### Convenient Symlinks (~/webserver/symlinks/)
+
+The provisioning script creates convenient symlinks for quick access:
+
+```
+~/webserver/symlinks/
+├── nginx.conf              → /usr/local/etc/nginx/nginx.conf
+├── nginx-sites/            → /usr/local/etc/nginx/servers/
+├── cloudflare.ini          → ~/.secrets/cloudflare.ini
+├── nginx.plist             → /Library/LaunchDaemons/com.nginx.nginx.plist
+├── certbot-renew.plist     → /Library/LaunchDaemons/com.certbot.renew.plist
+├── autoupdate.plist        → /Library/LaunchDaemons/com.webserver.autoupdate.plist
+├── nginx-logs/             → /usr/local/var/log/nginx/
+├── certbot-renew.log       → /usr/local/var/log/certbot-renew.log
+├── auto-update.log         → /usr/local/var/log/auto-update.log
+└── certificates/           → /etc/letsencrypt/live/ (after first cert)
+```
+
+**Quick access examples:**
+```bash
+# View nginx config
+cat ~/webserver/symlinks/nginx.conf
+
+# Check site configs
+ls -la ~/webserver/symlinks/nginx-sites/
+
+# Tail nginx logs
+tail -f ~/webserver/symlinks/nginx-logs/error.log
+
+# View certificates
+ls -la ~/webserver/symlinks/certificates/
+
+# Check LaunchDaemons
+cat ~/webserver/symlinks/nginx.plist
 ```
 
 ---
