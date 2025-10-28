@@ -131,7 +131,8 @@ else
     SKIP_CERT=false
     
     # Request email for Let's Encrypt
-    read -p "$(echo -e ${BLUE}Email for Let's Encrypt notifications [default: njoubert@gmail.com]: ${NC})" email
+    echo -e "${BLUE}Email for Let's Encrypt notifications [default: njoubert@gmail.com]: ${NC}"
+    read email
     email="${email:-njoubert@gmail.com}"
     
     info "Requesting certificate..."
@@ -146,6 +147,13 @@ else
         --non-interactive; then
         success "Certificate obtained successfully!"
         CERT_PATH="/etc/letsencrypt/live/$DOMAIN"
+        
+        # Fix certificate directory permissions so nginx can read them
+        info "Setting certificate permissions..."
+        sudo chmod 755 /etc/letsencrypt/live /etc/letsencrypt/archive
+        sudo chmod 755 /etc/letsencrypt/archive/$DOMAIN
+        sudo chmod 644 /etc/letsencrypt/archive/$DOMAIN/*.pem
+        success "Certificate permissions configured"
     else
         error "Failed to obtain certificate!"
         error "You may need to:"
@@ -207,8 +215,9 @@ server {
 
 # $DOMAIN - HTTPS
 server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
     server_name $SERVER_NAMES;
     
     # SSL certificate
@@ -263,6 +272,13 @@ fi
 sudo cp /tmp/nginx_site.conf "$NGINX_CONF"
 sudo chown "$USER_NAME:staff" "$NGINX_CONF"
 success "Configuration installed: $NGINX_CONF"
+
+# Create log files with correct permissions
+info "Creating log files..."
+NGINX_LOGS="/usr/local/var/log/nginx"
+sudo touch "$NGINX_LOGS/$DOMAIN.access.log" "$NGINX_LOGS/$DOMAIN.error.log"
+sudo chown "$USER_NAME:staff" "$NGINX_LOGS/$DOMAIN.access.log" "$NGINX_LOGS/$DOMAIN.error.log"
+success "Log files created"
 
 # Test nginx configuration
 section "Testing Nginx Configuration"

@@ -458,8 +458,16 @@ read -r -d '' CERTBOT_RENEW_SCRIPT_CONTENT << EOF || true
 # Renew certificates (certbot will use credentials from certificate's renewal config)
 /usr/local/bin/certbot renew --quiet
 
-# If renewal succeeded, reload Nginx
+# If renewal succeeded, fix permissions and reload Nginx
 if [ \$? -eq 0 ]; then
+    # Fix permissions for all certificate directories so nginx can read them
+    chmod 755 /etc/letsencrypt/live /etc/letsencrypt/archive 2>/dev/null || true
+    for cert_dir in /etc/letsencrypt/archive/*/; do
+        chmod 755 "\$cert_dir" 2>/dev/null || true
+        chmod 644 "\$cert_dir"/*.pem 2>/dev/null || true
+    done
+    
+    # Reload nginx
     /usr/local/bin/nginx -s reload
 fi
 EOF
