@@ -507,7 +507,7 @@ At each phase, add the commands to your provisioning script, then review and run
 
 ### 1.8 Setup Cloudflare DNS Challenge (Prepare for HTTPS)
 
-- [ ] Create Cloudflare API token
+- [x] Create Cloudflare API token
   - Log into Cloudflare Dashboard
   - Go to "My Profile" → "API Tokens"
   - Create Token → "Edit zone DNS" template
@@ -515,42 +515,30 @@ At each phase, add the commands to your provisioning script, then review and run
   - Zone Resources: Include / All zones (or specific zones)
   - Copy the token
 
-- [ ] Create Caddy environment file
+- [x] Create Caddy environment file
   ```bash
   sudo touch /usr/local/etc/caddy.env
   sudo chmod 600 /usr/local/etc/caddy.env
   ```
 
-- [ ] Add Cloudflare token to environment file
+- [x] Add Cloudflare token to environment file
   ```bash
   sudo nano /usr/local/etc/caddy.env
   # Add this line:
   CLOUDFLARE_API_TOKEN=your_actual_token_here
   ```
 
-- [ ] Update LaunchDaemon plist to include environment file
-  ```bash
-  sudo nano /Library/LaunchDaemons/com.caddyserver.caddy.plist
-  ```
-  
-  Update the `EnvironmentVariables` section to include the Cloudflare token:
-  ```xml
-  <key>EnvironmentVariables</key>
-  <dict>
-      <key>HOME</key>
-      <string>/Users/YOUR_USERNAME</string>
-      <key>CLOUDFLARE_API_TOKEN</key>
-      <string>YOUR_CLOUDFLARE_TOKEN_HERE</string>
-  </dict>
-  ```
+- [x] Update LaunchDaemon plist to include environment file
 
-- [ ] Reload LaunchDaemon to apply environment changes
+  We had LaunchDaemon load the config file for Caddy
+
+- [X] Reload LaunchDaemon to apply environment changes
   ```bash
   sudo launchctl unload /Library/LaunchDaemons/com.caddyserver.caddy.plist
   sudo launchctl load -w /Library/LaunchDaemons/com.caddyserver.caddy.plist
   ```
 
-- [ ] Verify Caddy restarted successfully
+- [X] Verify Caddy restarted successfully
   ```bash
   ~/webserver/scripts/manage-caddy.sh status
   curl http://localhost
@@ -558,17 +546,17 @@ At each phase, add the commands to your provisioning script, then review and run
 
 ### Phase 1 Verification Checklist
 
-- [ ] Caddy is installed and version shows v2.x
-- [ ] Hello world page displays at `http://localhost`
-- [ ] Hello world page displays at `http://<mac-mini-ip>` from another device
-- [ ] Management script works: start, stop, restart, reload, status, logs
-- [ ] LaunchDaemon starts Caddy automatically at boot (before login)
-- [ ] Auto-login is configured for your user account
-- [ ] Docker Desktop starts automatically after login
-- [ ] Cloudflare API token is configured in LaunchDaemon
-- [ ] Caddyfile validates without errors
-- [ ] Caddy runs as your user (not root) - verify with `ps aux | grep caddy`
-- [ ] After reboot: Caddy serves static content before login, Docker starts after auto-login
+- [X] Caddy is installed and version shows v2.x
+- [X] Hello world page displays at `http://localhost`
+- [X] Hello world page displays at `http://<mac-mini-ip>` from another device
+- [x] Management script works: start, stop, restart, reload, status, logs
+- [x] LaunchDaemon starts Caddy automatically at boot (before login)
+- [x] Auto-login is configured for your user account
+- [x] Docker Desktop starts automatically after login
+- [x] Cloudflare API token is configured in LaunchDaemon
+- [x] Caddyfile validates without errors
+- [x] Caddy runs as your user (not root) - verify with `ps aux | grep caddy`
+- [x] After reboot: Caddy serves static content before login, Docker starts after auto-login
 
 **Phase 1 Complete! ✅**
 
@@ -732,6 +720,63 @@ At each phase, add the commands to your provisioning script, then review and run
   # Should see some 429 (Too Many Requests) responses after ~100 requests
   ```
 
+### 2.4 Create a readme explaning how to setup a static site
+
+Create a "SITES.md" readme in ~/webserver/ 
+
+This readme explains how you can create more sites by hand. 
+
+It should include  the directory tree as an example:
+
+```text
+~/webserver/
+├── sites/
+│   ├── njoubert.com/
+│   │   └── public/              # Static files (Caddy serves from here)
+│   │       ├── index.html
+│   │       ├── css/
+│   │       ├── js/
+│   │       └── images/
+│   │
+│   ├── nielsshootsfilm.com/
+│   │   ├── public/              # Static frontend files
+│   │   │   ├── index.html
+│   │   │   └── ...
+│   │   ├── api/                 # Docker container files
+│   │   │   ├── docker-compose.yml
+│   │   │   ├── Dockerfile
+│   │   │   ├── .env
+│   │   │   └── src/
+│   │   └── README.md
+│   │
+│   ├── lydiajoubert.com/
+│   │   ├── docker-compose.yml
+│   │   ├── .env
+│   │   ├── uploads.ini
+│   │   ├── wp-content/          # Volume mount
+│   │   └── README.md
+│   │
+│   └── zs1aaz.com/
+│       ├── docker-compose.yml
+│       ├── .env
+│       ├── uploads.ini
+│       ├── wp-content/
+│       └── README.md
+│
+├── scripts/
+│   ├── manage-caddy.sh
+│   └── manage-all.sh
+│
+├── symlinks/                    # Convenient shortcuts
+│   ├── Caddyfile -> /usr/local/etc/Caddyfile
+│   ├── caddy-env -> /usr/local/etc/caddy.env
+│   └── caddy-logs -> /usr/local/var/log/caddy
+│
+└── README.md
+```
+
+
+
 ### Phase 2 Verification Checklist
 
 - [ ] njoubert.com serves content over HTTPS
@@ -742,6 +787,7 @@ At each phase, add the commands to your provisioning script, then review and run
 - [ ] Rate limiting is active
 - [ ] Security headers are present (check browser dev tools)
 - [ ] Logs are being written to /usr/local/var/log/caddy/njoubert.com.log
+- [ ] A readme file that explains how a sysadmin can setup more sites.
 
 **Phase 2 Complete! ✅**
 

@@ -684,6 +684,8 @@ phase_1_6_launchdaemon() {
         <string>/usr/local/etc/Caddyfile</string>
         <string>--adapter</string>
         <string>caddyfile</string>
+        <string>--envfile</string>
+        <string>/usr/local/etc/caddy.env</string>
     </array>
     
     <key>RunAtLoad</key>
@@ -755,6 +757,17 @@ EOF
     sudo chown root:wheel "$PLIST_PATH"
     sudo chmod 644 "$PLIST_PATH"
     success "Permissions set (root:wheel, 644)"
+    
+    # Ensure caddy.env exists (even if empty) since LaunchDaemon references it
+    ENV_FILE="/usr/local/etc/caddy.env"
+    if [[ ! -f "$ENV_FILE" ]]; then
+        log "Creating empty caddy.env file..."
+        sudo touch "$ENV_FILE"
+        sudo chmod 600 "$ENV_FILE"
+        sudo chown "$USERNAME:staff" "$ENV_FILE"
+        success "Created empty $ENV_FILE (will be populated in Phase 1.8)"
+        log "File owned by $USERNAME:staff (matching Caddy process user)"        
+    fi
     
     # Load the LaunchDaemon if not already loaded
     if ! sudo launchctl list | grep -q "com.caddyserver.caddy"; then
@@ -915,6 +928,7 @@ phase_1_6_7_create_symlinks() {
     # Format: "symlink_name:target_path"
     SYMLINKS=(
         "Caddyfile:/usr/local/etc/Caddyfile"
+        "caddy-env:/usr/local/etc/caddy.env"
         "www:/usr/local/var/www"
         "caddy-logs:/usr/local/var/log/caddy"
         "caddy-config:/usr/local/etc"
@@ -1027,6 +1041,262 @@ phase_1_7_auto_login_prompt() {
 }
 
 #==============================================================================
+# Phase 1.8: Setup Cloudflare DNS Challenge (Prepare for HTTPS)
+#==============================================================================
+
+phase_1_8_cloudflare_dns_setup() {
+    log "Phase 1.8: Setup Cloudflare DNS Challenge for HTTPS"
+    echo ""
+    
+    ENV_FILE="/usr/local/etc/caddy.env"
+    PLIST_PATH="/Library/LaunchDaemons/com.caddyserver.caddy.plist"
+    
+    log "The Cloudflare DNS challenge allows Caddy to automatically obtain"
+    log "HTTPS certificates from Let's Encrypt using DNS validation."
+    log "This works even when your server is behind a firewall!"
+    echo ""
+    
+    log "You'll need a Cloudflare API token with DNS edit permissions."
+    log "Create one at: https://dash.cloudflare.com/profile/api-tokens"
+    log "  Template: 'Edit zone DNS'"
+    log "  Permissions: Zone / DNS / Edit"
+    log "  Zone Resources: Include / All zones (or specific zones)"
+    echo ""
+    
+    # Check if caddy.env already exists
+    CLOUDFLARE_TOKEN=""
+    NEEDS_NEW_TOKEN=true
+    
+    if [[ -f "$ENV_FILE" ]]; then
+        log "Found existing caddy.env file"
+        
+        # Try to read the existing token
+        if sudo test -r "$ENV_FILE"; then
+            EXISTING_TOKEN=$(sudo grep "CLOUDFLARE_API_TOKEN=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2)
+            
+            if [[ -n "$EXISTING_TOKEN" ]]; then
+                warning "Existing Cloudflare API token found in $ENV_FILE"
+                echo ""
+                log "Token preview: ${EXISTING_TOKEN:0:20}... (${#EXISTING_TOKEN} characters)"
+                echo ""
+                log "What would you like to do?"
+                echo "  [k] Keep existing token (continue with current configuration)"
+                echo "  [n] Enter new token (replace existing)"
+                echo "  [s] Skip this phase (leave current configuration as-is)"
+                echo ""
+                read -p "Choice [k/n/s]: " -n 1 -r token_choice
+                echo ""
+                echo ""
+                
+                case "$token_choice" in
+                    k|K)
+                        log "Keeping existing token"
+                        CLOUDFLARE_TOKEN="$EXISTING_TOKEN"
+                        NEEDS_NEW_TOKEN=false
+                        ;;
+                    n|N)
+                        log "Will prompt for new token"
+                        NEEDS_NEW_TOKEN=true
+                        ;;
+                    s|S)
+                        success "Skipping Phase 1.8 - keeping current configuration"
+                        echo ""
+                        return 0
+                        ;;
+                    *)
+                        warning "Invalid choice, defaulting to keep existing token"
+                        CLOUDFLARE_TOKEN="$EXISTING_TOKEN"
+                        NEEDS_NEW_TOKEN=false
+                        ;;
+                esac
+            fi
+        fi
+    fi
+    
+    # Prompt for new token if needed
+    if [[ "$NEEDS_NEW_TOKEN" == "true" ]]; then
+        echo ""
+        log "Please enter your Cloudflare API token:"
+        log "(Token will be stored securely in $ENV_FILE with 600 permissions)"
+        echo ""
+        read -p "Cloudflare API Token: " -r CLOUDFLARE_TOKEN
+        echo ""
+        
+        if [[ -z "$CLOUDFLARE_TOKEN" ]]; then
+            warning "No token provided. Skipping Phase 1.8."
+            log "You can run this script again or manually configure later."
+            echo ""
+            return 0
+        fi
+        
+        log "Token received (${#CLOUDFLARE_TOKEN} characters)"
+    fi
+    
+    # Create or update caddy.env file
+    log "Creating/updating $ENV_FILE..."
+    TEMP_ENV=$(mktemp)
+    echo "CLOUDFLARE_API_TOKEN=$CLOUDFLARE_TOKEN" > "$TEMP_ENV"
+    
+    sudo cp "$TEMP_ENV" "$ENV_FILE"
+    rm "$TEMP_ENV"
+    
+    # Set secure permissions (owned by user running Caddy, not root)
+    USERNAME=$(whoami)
+    sudo chmod 600 "$ENV_FILE"
+    sudo chown "$USERNAME:staff" "$ENV_FILE"
+    success "Created $ENV_FILE with secure permissions (600, $USERNAME:staff)"
+    
+    # Check if LaunchDaemon plist needs updating for --envfile flag
+    log "Checking if LaunchDaemon needs --envfile flag..."
+    
+    if sudo grep -q "\\-\\-envfile" "$PLIST_PATH" 2>/dev/null; then
+        success "LaunchDaemon already configured with --envfile flag"
+    else
+        warning "LaunchDaemon needs to be updated with --envfile flag"
+        log "This will be handled by re-running Phase 1.6"
+        log "Triggering LaunchDaemon update..."
+        
+        # Get current config
+        USERNAME=$(sudo grep -A1 "<key>UserName</key>" "$PLIST_PATH" | grep "<string>" | sed 's/.*<string>\(.*\)<\/string>.*/\1/')
+        USER_HOME=$(eval echo ~$USERNAME)
+        CADDY_PATH=$(which caddy)
+        
+        # Generate updated plist with --envfile flag
+        TEMP_PLIST=$(mktemp)
+        cat > "$TEMP_PLIST" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.caddyserver.caddy</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>$CADDY_PATH</string>
+        <string>run</string>
+        <string>--config</string>
+        <string>/usr/local/etc/Caddyfile</string>
+        <string>--adapter</string>
+        <string>caddyfile</string>
+        <string>--envfile</string>
+        <string>/usr/local/etc/caddy.env</string>
+    </array>
+    
+    <key>RunAtLoad</key>
+    <true/>
+    
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+    
+    <key>StandardOutPath</key>
+    <string>/usr/local/var/log/caddy/caddy-stdout.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>/usr/local/var/log/caddy/caddy-error.log</string>
+    
+    <key>WorkingDirectory</key>
+    <string>/usr/local/var/www</string>
+    
+    <key>UserName</key>
+    <string>$USERNAME</string>
+    
+    <key>GroupName</key>
+    <string>staff</string>
+    
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>HOME</key>
+        <string>$USER_HOME</string>
+    </dict>
+</dict>
+</plist>
+EOF
+        
+        # Backup and update
+        sudo cp "$PLIST_PATH" "$PLIST_PATH.backup.$(date +%Y%m%d_%H%M%S)"
+        sudo cp "$TEMP_PLIST" "$PLIST_PATH"
+        rm "$TEMP_PLIST"
+        
+        sudo chown root:wheel "$PLIST_PATH"
+        sudo chmod 644 "$PLIST_PATH"
+        
+        success "Updated LaunchDaemon plist with --envfile flag"
+    fi
+    
+    # Reload LaunchDaemon to apply changes
+    log "Reloading LaunchDaemon to apply environment changes..."
+    
+    if sudo launchctl list | grep -q "com.caddyserver.caddy"; then
+        log "Unloading LaunchDaemon..."
+        sudo launchctl unload "$PLIST_PATH"
+        sleep 2
+        
+        log "Loading LaunchDaemon..."
+        sudo launchctl load -w "$PLIST_PATH"
+        sleep 3
+        
+        success "LaunchDaemon reloaded"
+    else
+        log "Loading LaunchDaemon..."
+        sudo launchctl load -w "$PLIST_PATH"
+        sleep 3
+        success "LaunchDaemon loaded"
+    fi
+    
+    # Verify Caddy restarted successfully
+    log "Verifying Caddy restarted successfully..."
+    
+    RETRY_COUNT=0
+    MAX_RETRIES=3
+    while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
+        if ps aux | grep -v grep | grep -q caddy; then
+            success "✅ Caddy is running"
+            break
+        else
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; then
+                log "Caddy not yet running, waiting... (attempt $RETRY_COUNT/$MAX_RETRIES)"
+                sleep 2
+            else
+                error "Caddy failed to start after $MAX_RETRIES attempts"
+                log "Check error log:"
+                tail -20 /usr/local/var/log/caddy/caddy-error.log 2>/dev/null || echo "No error log found"
+                exit 1
+            fi
+        fi
+    done
+    
+    # Test localhost access
+    log "Testing localhost access..."
+    sleep 2
+    if curl -s http://localhost > /dev/null; then
+        success "✅ Localhost test passed"
+    else
+        error "Failed to access http://localhost"
+        log "Caddy may have failed to start. Check logs:"
+        tail -20 /usr/local/var/log/caddy/caddy-error.log 2>/dev/null || echo "No error log found"
+        exit 1
+    fi
+    
+    echo ""
+    success "Phase 1.8 complete!"
+    log "Cloudflare API token configured successfully!"
+    log "Caddy is now ready to obtain HTTPS certificates via DNS challenge"
+    log ""
+    log "Configuration:"
+    log "  - Token stored securely in: $ENV_FILE (600 permissions)"
+    log "  - Caddy loads env file with: --envfile /usr/local/etc/caddy.env"
+    log "  - Environment variable available to Caddy: CLOUDFLARE_API_TOKEN"
+    log ""
+    log "Next: Phase 2 - Add your first production site with HTTPS!"
+    echo ""
+}
+
+#==============================================================================
 # Main execution
 #==============================================================================
 
@@ -1040,12 +1310,13 @@ main() {
     phase_1_6_5_configure_firewall
     phase_1_6_7_create_symlinks
     phase_1_7_auto_login_prompt
+    phase_1_8_cloudflare_dns_setup
     
     log "========================================="
     log "Provisioning complete!"
     log "========================================="
     echo ""
-    log "✅ Phase 1.1-1.7 Complete!"
+    log "✅ Phase 1.1-1.8 Complete!"
     log ""
     log "Caddy webserver is now:"
     log "  - Installed and configured"
@@ -1053,11 +1324,11 @@ main() {
     log "  - Set to start automatically at boot"
     log "  - Manageable via ~/webserver/scripts/manage-caddy.sh"
     log "  - Convenient symlinks at ~/webserver/symlinks/"
+    log "  - Configured with Cloudflare DNS challenge for HTTPS"
     echo ""
     log "Next steps:"
     log "  - Test reboot: sudo reboot (then verify Caddy starts)"
-    log "  - Continue with Phase 1.8 (Cloudflare DNS Challenge setup)"
-    log "  - Or skip to Phase 2 to add your first real site"
+    log "  - Continue with Phase 2 to add your first real site with HTTPS!"
     echo ""
 }
 
