@@ -65,10 +65,9 @@ At each phase, add the commands to your provisioning script, then review and run
 
 - [x] Create necessary directories
   ```bash
-  sudo mkdir -p /usr/local/var/www/hello
+  mkdir -p ~/webserver/sites/hello/public
   sudo mkdir -p /usr/local/var/log/caddy
   sudo mkdir -p /usr/local/etc
-  sudo chown -R $(whoami):staff /usr/local/var/www
   sudo chown -R $(whoami):staff /usr/local/var/log/caddy
   ```
 
@@ -76,7 +75,7 @@ At each phase, add the commands to your provisioning script, then review and run
 
 - [x] Create a simple HTML page
   ```bash
-  cat > /usr/local/var/www/hello/index.html << 'EOF'
+  cat > ~/webserver/sites/hello/public/index.html << 'EOF'
   <!DOCTYPE html>
   <html>
   <head>
@@ -116,7 +115,7 @@ At each phase, add the commands to your provisioning script, then review and run
 
   # Simple :80 binding responds to all addresses (localhost, IP, etc)
   :80 {
-      root * /usr/local/var/www/hello
+      root * /Users/njoubert/webserver/sites/hello/public
       file_server
       
       log {
@@ -335,7 +334,7 @@ At each phase, add the commands to your provisioning script, then review and run
       <string>/usr/local/var/log/caddy/caddy-error.log</string>
       
       <key>WorkingDirectory</key>
-      <string>/usr/local/var/www</string>
+      <string>/Users/njoubert/webserver</string>
       
       <key>UserName</key>
       <string>YOUR_USERNAME</string>
@@ -570,12 +569,12 @@ At each phase, add the commands to your provisioning script, then review and run
 
 - [ ] Create directory for njoubert.com
   ```bash
-  mkdir -p /usr/local/var/www/njoubert.com
+  mkdir -p ~/webserver/sites/njoubert.com/public
   ```
 
 - [ ] Create placeholder index.html
   ```bash
-  cat > /usr/local/var/www/njoubert.com/index.html << 'EOF'
+  cat > ~/webserver/sites/njoubert.com/public/index.html << 'EOF'
   <!DOCTYPE html>
   <html>
   <head>
@@ -597,7 +596,7 @@ At each phase, add the commands to your provisioning script, then review and run
   EOF
   ```
 
-- [ ] **User Action Required:** Copy actual njoubert.com static files to `/usr/local/var/www/njoubert.com/` when ready
+- [ ] **User Action Required:** Copy actual njoubert.com static files to `~/webserver/sites/njoubert.com/public/` when ready
 
 ### 2.2 Update Caddyfile for njoubert.com
 
@@ -617,7 +616,7 @@ At each phase, add the commands to your provisioning script, then review and run
 
   # Main website - njoubert.com
   njoubert.com, www.njoubert.com {
-      root * /usr/local/var/www/njoubert.com
+      root * /Users/njoubert/webserver/sites/njoubert.com/public
       file_server
       encode gzip
       
@@ -651,7 +650,7 @@ At each phase, add the commands to your provisioning script, then review and run
 
   # Catch-all for testing (responds to direct IP access)
   :80 {
-      root * /usr/local/var/www/hello
+      root * /Users/njoubert/webserver/sites/hello/public
       file_server
       
       log {
@@ -726,17 +725,22 @@ Create a "SITES.md" readme in ~/webserver/
 
 This readme explains how you can create more sites by hand. 
 
-It should include  the directory tree as an example:
+It should include the directory tree as an example:
 
 ```text
 ~/webserver/
 ├── sites/
+│   ├── hello/
+│   │   └── public/              # Test hello world page
+│   │       └── index.html
+│   │
 │   ├── njoubert.com/
-│   │   └── public/              # Static files (Caddy serves from here)
-│   │       ├── index.html
-│   │       ├── css/
-│   │       ├── js/
-│   │       └── images/
+│   │   ├── public/              # Static files (Caddy serves from here)
+│   │   │   ├── index.html
+│   │   │   ├── css/
+│   │   │   ├── js/
+│   │   │   └── images/
+│   │   └── README.md            # Site-specific notes
 │   │
 │   ├── nielsshootsfilm.com/
 │   │   ├── public/              # Static frontend files
@@ -772,6 +776,7 @@ It should include  the directory tree as an example:
 │   ├── caddy-env -> /usr/local/etc/caddy.env
 │   └── caddy-logs -> /usr/local/var/log/caddy
 │
+├── SITES.md                     # Guide for adding new sites
 └── README.md
 ```
 
@@ -803,12 +808,12 @@ It should include  the directory tree as an example:
 
 - [ ] Create directory for nielsshootsfilm.com
   ```bash
-  mkdir -p /usr/local/var/www/nielsshootsfilm.com
+  mkdir -p ~/webserver/sites/nielsshootsfilm.com/public
   ```
 
 - [ ] Create placeholder index.html
   ```bash
-  cat > /usr/local/var/www/nielsshootsfilm.com/index.html << 'EOF'
+  cat > ~/webserver/sites/nielsshootsfilm.com/public/index.html << 'EOF'
   <!DOCTYPE html>
   <html>
   <head>
@@ -850,7 +855,7 @@ It should include  the directory tree as an example:
   ```caddy
   # Hybrid static + API site
   nielsshootsfilm.com, www.nielsshootsfilm.com {
-      root * /usr/local/var/www/nielsshootsfilm.com
+      root * /Users/njoubert/webserver/sites/nielsshootsfilm.com/public
       
       # API routes go to Docker container
       handle /api/* {
@@ -1033,27 +1038,27 @@ It should include  the directory tree as an example:
 - [ ] Create webserver project directory on Mac Mini
   ```bash
   # On Mac Mini
-  mkdir -p ~/webserver/nielsshootsfilm-api
+  mkdir -p ~/webserver/sites/nielsshootsfilm.com/api
   ```
 
 - [ ] Copy necessary files to Mac Mini
   ```bash
   # From development machine
-  scp -r ./* macmini:~/webserver/nielsshootsfilm-api/
+  scp -r ./* macmini:~/webserver/sites/nielsshootsfilm.com/api/
   # Or use git to clone/pull the repository
   ```
 
 - [ ] On Mac Mini: Set up environment variables
   ```bash
   # On Mac Mini
-  cd ~/webserver/nielsshootsfilm-api
+  cd ~/webserver/sites/nielsshootsfilm.com/api
   nano .env
   # Add production environment variables
   ```
 
 - [ ] Build and start on Mac Mini
   ```bash
-  cd ~/webserver/nielsshootsfilm-api
+  cd ~/webserver/sites/nielsshootsfilm.com/api
   docker-compose build
   docker-compose up -d
   ```
@@ -1085,7 +1090,7 @@ It should include  the directory tree as an example:
   tail -50 /usr/local/var/log/caddy/nielsshootsfilm.com.log
   
   # Docker logs
-  cd ~/webserver/nielsshootsfilm-api
+  cd ~/webserver/sites/nielsshootsfilm.com/api
   docker-compose logs --tail=50
   ```
 
@@ -1098,7 +1103,7 @@ It should include  the directory tree as an example:
   # Start all Docker containers
 
   echo "Starting nielsshootsfilm API..."
-  cd ~/webserver/nielsshootsfilm-api
+  cd ~/webserver/sites/nielsshootsfilm.com/api
   docker-compose up -d
 
   echo ""
@@ -1148,8 +1153,8 @@ It should include  the directory tree as an example:
 
 - [ ] Create directory structure
   ```bash
-  mkdir -p ~/webserver/wordpress-lydiajoubert
-  cd ~/webserver/wordpress-lydiajoubert
+  mkdir -p ~/webserver/sites/lydiajoubert.com
+  cd ~/webserver/sites/lydiajoubert.com
   ```
 
 #### 4.1.2 Create docker-compose.yml
@@ -1278,7 +1283,7 @@ It should include  the directory tree as an example:
   
   Copy to Mac Mini:
   ```bash
-  scp old-server:lydiajoubert-db-backup.sql ~/webserver/wordpress-lydiajoubert/
+  scp old-server:lydiajoubert-db-backup.sql ~/webserver/sites/lydiajoubert.com/
   ```
   
   Import will be done after containers are running (step 4.1.6)
@@ -1287,7 +1292,7 @@ It should include  the directory tree as an example:
 
 - [ ] Start the containers
   ```bash
-  cd ~/webserver/wordpress-lydiajoubert
+  cd ~/webserver/sites/lydiajoubert.com
   docker-compose up -d
   ```
 
@@ -1408,8 +1413,8 @@ It should include  the directory tree as an example:
 
 - [ ] Create directory structure
   ```bash
-  mkdir -p ~/webserver/wordpress-zs1aaz
-  cd ~/webserver/wordpress-zs1aaz
+  mkdir -p ~/webserver/sites/zs1aaz.com
+  cd ~/webserver/sites/zs1aaz.com
   ```
 
 #### 4.2.2 Create docker-compose.yml
@@ -1518,7 +1523,7 @@ It should include  the directory tree as an example:
 
 - [ ] Start the containers
   ```bash
-  cd ~/webserver/wordpress-zs1aaz
+  cd ~/webserver/sites/zs1aaz.com
   docker-compose up -d
   ```
 
@@ -1637,11 +1642,12 @@ It should include  the directory tree as an example:
       echo ""
       echo "2. Starting Docker containers..."
       
-      for site in wordpress-lydiajoubert wordpress-zs1aaz nielsshootsfilm-api; do
-        if [ -d "$SITES_DIR/$site" ]; then
-          echo "   Starting $site..."
-          (cd "$SITES_DIR/$site" && docker-compose up -d)
-        fi
+      # Find all docker-compose.yml files in sites directory
+      find "$SITES_DIR/sites" -name "docker-compose.yml" -type f | while read compose_file; do
+        site_dir=$(dirname "$compose_file")
+        site_name=$(basename "$site_dir")
+        echo "   Starting $site_name..."
+        (cd "$site_dir" && docker-compose up -d)
       done
       
       echo ""
@@ -1658,11 +1664,11 @@ It should include  the directory tree as an example:
       
       echo ""
       echo "1. Stopping Docker containers..."
-      for site in wordpress-lydiajoubert wordpress-zs1aaz nielsshootsfilm-api; do
-        if [ -d "$SITES_DIR/$site" ]; then
-          echo "   Stopping $site..."
-          (cd "$SITES_DIR/$site" && docker-compose down)
-        fi
+      find "$SITES_DIR/sites" -name "docker-compose.yml" -type f | while read compose_file; do
+        site_dir=$(dirname "$compose_file")
+        site_name=$(basename "$site_dir")
+        echo "   Stopping $site_name..."
+        (cd "$site_dir" && docker-compose down)
       done
       
       echo ""
@@ -1761,12 +1767,12 @@ It should include  the directory tree as an example:
       echo "Updating Docker Images"
       echo "========================================="
       
-      for site in wordpress-lydiajoubert wordpress-zs1aaz nielsshootsfilm-api; do
-        if [ -d "$SITES_DIR/$site" ]; then
-          echo ""
-          echo "Updating $site..."
-          (cd "$SITES_DIR/$site" && docker-compose pull)
-        fi
+      find "$SITES_DIR/sites" -name "docker-compose.yml" -type f | while read compose_file; do
+        site_dir=$(dirname "$compose_file")
+        site_name=$(basename "$site_dir")
+        echo ""
+        echo "Updating $site_name..."
+        (cd "$site_dir" && docker-compose pull)
       done
       
       echo ""
@@ -1810,8 +1816,7 @@ It should include  the directory tree as an example:
 - [ ] Verify all containers have `restart: always`
   ```bash
   # Check each docker-compose.yml has restart: always for all services
-  grep -r "restart:" ~/webserver/wordpress-*/docker-compose.yml
-  grep -r "restart:" ~/webserver/nielsshootsfilm-api/docker-compose.yml
+  find ~/webserver/sites -name "docker-compose.yml" -exec grep -H "restart:" {} \;
   ```
 
 - [ ] Test auto-start

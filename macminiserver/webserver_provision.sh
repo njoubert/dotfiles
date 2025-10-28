@@ -246,11 +246,11 @@ phase_1_1_install_caddy() {
     # Create necessary directories
     log "Creating directory structure..."
     
-    if [[ ! -d /usr/local/var/www/hello ]]; then
-        sudo mkdir -p /usr/local/var/www/hello
-        success "Created /usr/local/var/www/hello"
+    if [[ ! -d "$HOME/webserver/sites/hello/public" ]]; then
+        mkdir -p "$HOME/webserver/sites/hello/public"
+        success "Created $HOME/webserver/sites/hello/public"
     else
-        success "Directory /usr/local/var/www/hello already exists"
+        success "Directory $HOME/webserver/sites/hello/public already exists"
     fi
     
     if [[ ! -d /usr/local/var/log/caddy ]]; then
@@ -269,7 +269,7 @@ phase_1_1_install_caddy() {
     
     # Set ownership
     log "Setting directory ownership..."
-    sudo chown -R $(whoami):staff /usr/local/var/www
+    sudo chown -R $(whoami):staff $HOME/webserver
     sudo chown -R $(whoami):staff /usr/local/var/log/caddy
     success "Directory ownership set to $(whoami):staff"
     
@@ -286,7 +286,7 @@ phase_1_2_hello_world() {
     log "Phase 1.2: Create Hello World Page"
     echo ""
     
-    HELLO_PAGE="/usr/local/var/www/hello/index.html"
+    HELLO_PAGE="$HOME/webserver/sites/hello/public/index.html"
     
     # Define expected content
     read -r -d '' EXPECTED_CONTENT << 'EOF' || true
@@ -349,7 +349,7 @@ phase_1_3_create_caddyfile() {
 
 # Simple :80 binding responds to all addresses
 :80 {
-    root * /usr/local/var/www/hello
+    root * /Users/njoubert/webserver/sites/hello/public
     file_server
     
     log {
@@ -704,7 +704,7 @@ phase_1_6_launchdaemon() {
     <string>/usr/local/var/log/caddy/caddy-error.log</string>
     
     <key>WorkingDirectory</key>
-    <string>/usr/local/var/www</string>
+    <string>$USER_HOME/webserver</string>
     
     <key>UserName</key>
     <string>$USERNAME</string>
@@ -1199,7 +1199,7 @@ phase_1_8_cloudflare_dns_setup() {
     <string>/usr/local/var/log/caddy/caddy-error.log</string>
     
     <key>WorkingDirectory</key>
-    <string>/usr/local/var/www</string>
+    <string>$USER_HOME/webserver</string>
     
     <key>UserName</key>
     <string>$USERNAME</string>
