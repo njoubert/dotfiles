@@ -321,7 +321,7 @@ cat > "$SITE_ROOT/README.md" << EOF
 - **Domain:** $DOMAIN
 - **Public Directory:** $PUBLIC_DIR
 - **Nginx Config:** $NGINX_CONF
-- **SSL Certificate:** ${SKIP_CERT:+Not configured}${SKIP_CERT:-$CERT_PATH}
+- **SSL Certificate:** $([ "$SKIP_CERT" = true ] && echo "Not configured" || echo "$CERT_PATH")
 
 ## Deployment
 
@@ -348,13 +348,13 @@ tail -f /usr/local/var/log/nginx/$DOMAIN.error.log
 
 ## SSL Certificate
 
-${SKIP_CERT:+SSL certificate not configured. Run certbot manually to add HTTPS.}${SKIP_CERT:-Certificate is managed automatically by certbot.
+$([ "$SKIP_CERT" = true ] && echo "SSL certificate not configured. Run certbot manually to add HTTPS." || echo "Certificate is managed automatically by certbot.
 Certificate auto-renews via LaunchDaemon (runs at 2am and 2pm daily).
 
 Manual renewal test:
 \`\`\`bash
 sudo certbot renew --dry-run
-\`\`\`}
+\`\`\`")
 
 ## DNS Configuration
 
