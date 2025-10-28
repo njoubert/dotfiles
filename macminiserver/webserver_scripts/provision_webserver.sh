@@ -61,9 +61,17 @@ check_and_write_file() {
     local sudo_required="${3:-false}"
     
     if [ -f "$file_path" ]; then
-        warning "File already exists: $file_path"
         echo "$new_content" > /tmp/provision_new_file
         
+        # Check if files are identical
+        if diff -q "$file_path" /tmp/provision_new_file > /dev/null 2>&1; then
+            info "File already exists and is up-to-date: $file_path"
+            rm -f /tmp/provision_new_file
+            return 0
+        fi
+        
+        # Files differ, show diff and prompt
+        warning "File already exists: $file_path"
         info "Showing diff (existing vs new):"
         diff -u "$file_path" /tmp/provision_new_file || true
         
@@ -148,7 +156,7 @@ if pip3 list 2>/dev/null | grep -q certbot-dns-cloudflare; then
     pip3 show certbot-dns-cloudflare | grep Version
 else
     info "Installing certbot-dns-cloudflare..."
-    pip3 install certbot-dns-cloudflare
+    pip3 install --break-system-packages certbot-dns-cloudflare
     success "certbot-dns-cloudflare installed"
 fi
 
@@ -217,7 +225,8 @@ section "Phase 5: Configuring Main nginx.conf"
 NGINX_CONF="$NGINX_BASE/nginx.conf"
 
 read -r -d '' NGINX_CONF_CONTENT << EOF || true
-user $USER_NAME staff;
+# user directive not needed when running nginx as regular user via LaunchDaemon
+# user $USER_NAME staff;
 worker_processes auto;
 
 error_log $NGINX_LOGS/error.log;
@@ -543,7 +552,7 @@ brew upgrade 2>&1 | tee -a "$LOG_FILE"
 
 # Upgrade pip3 packages
 log "Upgrading pip3 packages..."
-pip3 install --upgrade certbot-dns-cloudflare 2>&1 | tee -a "$LOG_FILE"
+pip3 install --break-system-packages --upgrade certbot-dns-cloudflare 2>&1 | tee -a "$LOG_FILE"
 
 # Cleanup
 log "Cleaning up old versions..."
@@ -622,21 +631,38 @@ fi
 section "Phase 10: Creating Convenient Symlinks"
 
 SYMLINKS_DIR="$USER_HOME/webserver/symlinks"
+SYMLINKS_LOGS_DIR="$SYMLINKS_DIR/logs"
 mkdir -p "$SYMLINKS_DIR"
+mkdir -p "$SYMLINKS_LOGS_DIR"
 
+# Configuration files
 ln -sf "$NGINX_BASE/nginx.conf" "$SYMLINKS_DIR/nginx.conf"
 ln -sf "$NGINX_SERVERS" "$SYMLINKS_DIR/nginx-sites"
 ln -sf "$CLOUDFLARE_INI" "$SYMLINKS_DIR/cloudflare.ini"
+
+# LaunchDaemon plists
 ln -sf "$NGINX_PLIST" "$SYMLINKS_DIR/nginx.plist"
 ln -sf "$CERTBOT_PLIST" "$SYMLINKS_DIR/certbot-renew.plist"
 ln -sf "$AUTO_UPDATE_PLIST" "$SYMLINKS_DIR/autoupdate.plist"
-ln -sf "$NGINX_LOGS" "$SYMLINKS_DIR/nginx-logs"
 
+# Log directories and files
+ln -sf "$NGINX_LOGS" "$SYMLINKS_LOGS_DIR/nginx"
+ln -sf "$NGINX_LOGS/error.log" "$SYMLINKS_LOGS_DIR/nginx-error.log"
+ln -sf "$NGINX_LOGS/access.log" "$SYMLINKS_LOGS_DIR/nginx-access.log"
+ln -sf "$NGINX_LOGS/nginx-stdout.log" "$SYMLINKS_LOGS_DIR/nginx-stdout.log"
+ln -sf "$NGINX_LOGS/nginx-stderr.log" "$SYMLINKS_LOGS_DIR/nginx-stderr.log"
+ln -sf "$NGINX_LOGS/certbot-renew.log" "$SYMLINKS_LOGS_DIR/certbot-renew.log"
+ln -sf "$NGINX_LOGS/certbot-renew-error.log" "$SYMLINKS_LOGS_DIR/certbot-renew-error.log"
+ln -sf "$NGINX_LOGS/auto-update.log" "$SYMLINKS_LOGS_DIR/auto-update.log"
+ln -sf "$NGINX_LOGS/auto-update-error.log" "$SYMLINKS_LOGS_DIR/auto-update-error.log"
+
+# Certificates (if they exist)
 if [ -d "/etc/letsencrypt/live" ]; then
     sudo ln -sf "/etc/letsencrypt/live" "$SYMLINKS_DIR/certificates" 2>/dev/null || true
 fi
 
 success "Symlinks created in $SYMLINKS_DIR"
+info "Log files accessible in $SYMLINKS_LOGS_DIR"
 
 # Final summary
 section "✅ Provisioning Complete!"
@@ -653,7 +679,7 @@ echo ""
 info "Quick Access:"
 echo "  Config:  ~/webserver/symlinks/nginx.conf"
 echo "  Sites:   ~/webserver/symlinks/nginx-sites/"
-echo "  Logs:    ~/webserver/symlinks/nginx-logs/"
+echo "  Logs:    ~/webserver/symlinks/logs/"
 echo "  Scripts: ~/webserver/scripts/"
 
 echo ""
