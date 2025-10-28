@@ -102,17 +102,36 @@ else
     info "index.html already exists"
 fi
 
-# Ask about www subdomain
+# Ask about certificate type
 echo ""
-read -p "$(echo -e ${BLUE}Include www.$DOMAIN? [Y/n]: ${NC})" www_response
-if [[ "$www_response" =~ ^[Nn]$ ]]; then
-    INCLUDE_WWW=false
-    CERT_DOMAINS="-d $DOMAIN"
-    SERVER_NAMES="$DOMAIN"
+echo -e "${BLUE}Certificate Options:${NC}"
+echo "  1. Wildcard certificate (covers *.${DOMAIN} - all subdomains)"
+echo "  2. Specific domains only"
+echo ""
+read -p "$(echo -e ${BLUE}Use wildcard certificate? [Y/n]: ${NC})" wildcard_response
+
+if [[ "$wildcard_response" =~ ^[Nn]$ ]]; then
+    USE_WILDCARD=false
+    
+    # Ask about www subdomain
+    echo ""
+    read -p "$(echo -e ${BLUE}Include www.$DOMAIN? [Y/n]: ${NC})" www_response
+    if [[ "$www_response" =~ ^[Nn]$ ]]; then
+        INCLUDE_WWW=false
+        CERT_DOMAINS="-d $DOMAIN"
+        SERVER_NAMES="$DOMAIN"
+    else
+        INCLUDE_WWW=true
+        CERT_DOMAINS="-d $DOMAIN -d www.$DOMAIN"
+        SERVER_NAMES="$DOMAIN www.$DOMAIN"
+    fi
 else
-    INCLUDE_WWW=true
-    CERT_DOMAINS="-d $DOMAIN -d www.$DOMAIN"
-    SERVER_NAMES="$DOMAIN www.$DOMAIN"
+    USE_WILDCARD=true
+    # Build cert domains as array for proper wildcard handling
+    CERT_DOMAINS="-d $DOMAIN -d *.$DOMAIN"
+    # For nginx, use regex to match all subdomains
+    SERVER_NAMES="$DOMAIN ~^.+\.$DOMAIN\$"
+    info "Wildcard certificate will cover $DOMAIN and all subdomains"
 fi
 
 # Request SSL certificate
@@ -218,6 +237,7 @@ server {
     listen 443 ssl;
     listen [::]:443 ssl;
     http2 on;
+    # server_name: Use regex ~^.+\.$DOMAIN\$ to match all subdomains with wildcard cert
     server_name $SERVER_NAMES;
     
     # SSL certificate
