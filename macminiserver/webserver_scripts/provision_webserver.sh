@@ -37,18 +37,18 @@ prompt_user() {
     
     if [ -n "$default" ]; then
         if [ "$secret" = "true" ]; then
-            read -s -p "$(echo -e ${BLUE}$prompt [default: ****]: ${NC})" input
+            read -r -s -p "$(echo -e "${BLUE}${prompt} [default: ****]: ${NC}")" input
             echo ""
         else
-            read -p "$(echo -e ${BLUE}$prompt [default: $default]: ${NC})" input
+            read -r -p "$(echo -e "${BLUE}${prompt} [default: ${default}]: ${NC}")" input
         fi
         eval "$var_name=\"${input:-$default}\""
     else
         if [ "$secret" = "true" ]; then
-            read -s -p "$(echo -e ${BLUE}$prompt: ${NC})" input
+            read -r -s -p "$(echo -e "${BLUE}${prompt}: ${NC}")" input
             echo ""
         else
-            read -p "$(echo -e ${BLUE}$prompt: ${NC})" input
+            read -r -p "$(echo -e "${BLUE}${prompt}: ${NC}")" input
         fi
         eval "$var_name=\"$input\""
     fi
@@ -75,7 +75,7 @@ check_and_write_file() {
         info "Showing diff (existing vs new):"
         diff -u "$file_path" /tmp/provision_new_file || true
         
-        read -p "$(echo -e ${YELLOW}Overwrite this file? [y/N]: ${NC})" response
+        read -r -p "$(echo -e "${YELLOW}Overwrite this file? [y/N]: ${NC}")" response
         if [[ "$response" =~ ^[Yy]$ ]]; then
             if [ "$sudo_required" = "true" ]; then
                 echo "$new_content" | sudo tee "$file_path" > /dev/null
@@ -169,7 +169,7 @@ chmod 700 "$USER_HOME/.secrets"
 
 if [ -f "$CLOUDFLARE_INI" ]; then
     success "Cloudflare credentials file already exists: $CLOUDFLARE_INI"
-    read -p "$(echo -e ${YELLOW}Do you want to update it? [y/N]: ${NC})" response
+    read -r -p "$(echo -e "${YELLOW}Do you want to update it? [y/N]: ${NC}")" response
     if [[ "$response" =~ ^[Yy]$ ]]; then
         CREATE_CLOUDFLARE_INI=true
     else
@@ -424,7 +424,7 @@ if [ -f "$NGINX_PLIST" ]; then
     # Load the daemon
     if sudo launchctl list 2>/dev/null | grep -q com.nginx.nginx; then
         info "Nginx LaunchDaemon is already loaded"
-        read -p "$(echo -e ${YELLOW}Restart nginx now? [Y/n]: ${NC})" response
+        read -r -p "$(echo -e "${YELLOW}Restart nginx now? [Y/n]: ${NC}")" response
         if [[ ! "$response" =~ ^[Nn]$ ]]; then
             sudo launchctl unload "$NGINX_PLIST" 2>/dev/null || true
             sleep 2

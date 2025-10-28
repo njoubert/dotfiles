@@ -108,25 +108,20 @@ echo -e "${BLUE}Certificate Options:${NC}"
 echo "  1. Wildcard certificate (covers *.${DOMAIN} - all subdomains)"
 echo "  2. Specific domains only"
 echo ""
-read -p "$(echo -e ${BLUE}Use wildcard certificate? [Y/n]: ${NC})" wildcard_response
+read -r -p "$(echo -e "${BLUE}Use wildcard certificate? [Y/n]: ${NC}")" wildcard_response
 
 if [[ "$wildcard_response" =~ ^[Nn]$ ]]; then
-    USE_WILDCARD=false
-    
     # Ask about www subdomain
     echo ""
-    read -p "$(echo -e ${BLUE}Include www.$DOMAIN? [Y/n]: ${NC})" www_response
+    read -r -p "$(echo -e "${BLUE}Include www.${DOMAIN}? [Y/n]: ${NC}")" www_response
     if [[ "$www_response" =~ ^[Nn]$ ]]; then
-        INCLUDE_WWW=false
         CERT_DOMAINS="-d $DOMAIN"
         SERVER_NAMES="$DOMAIN"
     else
-        INCLUDE_WWW=true
         CERT_DOMAINS="-d $DOMAIN -d www.$DOMAIN"
         SERVER_NAMES="$DOMAIN www.$DOMAIN"
     fi
 else
-    USE_WILDCARD=true
     # Build cert domains as array for proper wildcard handling
     CERT_DOMAINS="-d $DOMAIN -d *.$DOMAIN"
     # For nginx, use regex to match all subdomains
@@ -141,7 +136,7 @@ info "This will request a certificate from Let's Encrypt using Cloudflare DNS"
 info "Domains: $CERT_DOMAINS"
 echo ""
 
-read -p "$(echo -e ${YELLOW}Proceed with certificate request? [Y/n]: ${NC})" cert_response
+read -r -p "$(echo -e "${YELLOW}Proceed with certificate request? [Y/n]: ${NC}")" cert_response
 if [[ "$cert_response" =~ ^[Nn]$ ]]; then
     warning "Skipping certificate request"
     warning "You'll need to obtain certificates manually"
@@ -151,11 +146,12 @@ else
     
     # Request email for Let's Encrypt
     echo -e "${BLUE}Email for Let's Encrypt notifications [default: njoubert@gmail.com]: ${NC}"
-    read email
+    read -r email
     email="${email:-njoubert@gmail.com}"
     
     info "Requesting certificate..."
     
+    # shellcheck disable=SC2086
     if sudo certbot certonly \
         --dns-cloudflare \
         --dns-cloudflare-credentials "$CLOUDFLARE_INI" \
@@ -170,8 +166,8 @@ else
         # Fix certificate directory permissions so nginx can read them
         info "Setting certificate permissions..."
         sudo chmod 755 /etc/letsencrypt/live /etc/letsencrypt/archive
-        sudo chmod 755 /etc/letsencrypt/archive/$DOMAIN
-        sudo chmod 644 /etc/letsencrypt/archive/$DOMAIN/*.pem
+        sudo chmod 755 "/etc/letsencrypt/archive/$DOMAIN"
+        sudo chmod 644 "/etc/letsencrypt/archive/$DOMAIN"/*.pem
         success "Certificate permissions configured"
     else
         error "Failed to obtain certificate!"
@@ -282,7 +278,7 @@ echo ""
 cat /tmp/nginx_site.conf
 echo ""
 
-read -p "$(echo -e ${YELLOW}Install this configuration? [Y/n]: ${NC})" install_response
+read -r -p "$(echo -e "${YELLOW}Install this configuration? [Y/n]: ${NC}")" install_response
 if [[ "$install_response" =~ ^[Nn]$ ]]; then
     warning "Configuration not installed"
     info "You can manually copy it from /tmp/nginx_site.conf"

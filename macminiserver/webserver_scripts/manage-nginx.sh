@@ -2,7 +2,6 @@
 # Nginx Management Script
 
 PLIST_PATH="/Library/LaunchDaemons/com.nginx.nginx.plist"
-NGINX_CONF="/usr/local/etc/nginx/nginx.conf"
 ERROR_LOG="/usr/local/var/log/nginx/error.log"
 ACCESS_LOG="/usr/local/var/log/nginx/access.log"
 
@@ -80,8 +79,8 @@ case "$1" in
     fi
     echo ""
     echo "=== Nginx Processes ==="
-    if ps aux | grep -v grep | grep nginx >/dev/null; then
-      ps aux | grep -v grep | grep nginx
+    if pgrep -f nginx >/dev/null; then
+      pgrep -fl nginx
       success "Nginx processes are running"
     else
       warning "No Nginx process found"
@@ -131,7 +130,7 @@ case "$1" in
       for conf in /usr/local/etc/nginx/servers/*.conf; do
         if [ -f "$conf" ]; then
           echo ""
-          info "$(basename $conf)"
+          info "$(basename "$conf")"
           grep -E "server_name|listen|root" "$conf" | sed 's/^/  /'
         fi
       done
