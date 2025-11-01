@@ -874,6 +874,67 @@ EOF
 
 check_and_write_file "$MONITORING_NEWSYSLOG" "$MONITORING_NEWSYSLOG_CONTENT" true
 
+# Provision Grafana Dashboards
+section "Phase 11.5: Provisioning Grafana Dashboards"
+
+# Create dashboard provisioning directory
+DASHBOARD_FILES_DIR="/usr/local/etc/grafana/provisioning/dashboards/files"
+mkdir -p "$DASHBOARD_FILES_DIR"
+
+# Create dashboard provider config
+DASHBOARD_PROVIDER="/usr/local/etc/grafana/provisioning/dashboards/default.yml"
+
+read -r -d '' DASHBOARD_PROVIDER_CONTENT << 'EOF' || true
+apiVersion: 1
+
+providers:
+  - name: 'Default'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /usr/local/etc/grafana/provisioning/dashboards/files
+      foldersFromFilesStructure: true
+EOF
+
+check_and_write_file "$DASHBOARD_PROVIDER" "$DASHBOARD_PROVIDER_CONTENT" false
+
+# Download popular dashboards
+info "Downloading recommended dashboards..."
+
+# Node Exporter Full dashboard (ID: 1860)
+if [ ! -f "$DASHBOARD_FILES_DIR/node-exporter-full.json" ]; then
+    info "Downloading Node Exporter Full dashboard..."
+    curl -sL "https://grafana.com/api/dashboards/1860/revisions/37/download" \
+        -o "$DASHBOARD_FILES_DIR/node-exporter-full.json"
+    if [ -f "$DASHBOARD_FILES_DIR/node-exporter-full.json" ]; then
+        success "Node Exporter Full dashboard downloaded"
+    else
+        warning "Failed to download Node Exporter dashboard"
+    fi
+else
+    info "Node Exporter Full dashboard already exists"
+fi
+
+# NGINX dashboard (ID: 12708)
+if [ ! -f "$DASHBOARD_FILES_DIR/nginx.json" ]; then
+    info "Downloading NGINX dashboard..."
+    curl -sL "https://grafana.com/api/dashboards/12708/revisions/1/download" \
+        -o "$DASHBOARD_FILES_DIR/nginx.json"
+    if [ -f "$DASHBOARD_FILES_DIR/nginx.json" ]; then
+        success "NGINX dashboard downloaded"
+    else
+        warning "Failed to download NGINX dashboard"
+    fi
+else
+    info "NGINX dashboard already exists"
+fi
+
+success "Dashboard provisioning configured"
+
 # Load LaunchDaemons
 section "Phase 12: Starting LGTM Stack Services"
 
@@ -1086,11 +1147,12 @@ echo ""
 info "Next Steps:"
 echo "  1. Open Grafana: http://macminiserver.local:3000"
 echo "  2. Login with credentials above"
-echo "  3. Verify data sources are connected"
-echo "  4. Import dashboards:"
-echo "     - Node Exporter Full (ID: 1860)"
-echo "     - NGINX (ID: 12708)"
-echo "  5. Create custom dashboards for your needs"
+echo "  3. Verify data sources are connected (Prometheus & Loki)"
+echo "  4. Check out the pre-installed dashboards:"
+echo "     - Node Exporter Full: Host metrics (CPU, memory, disk, network)"
+echo "     - NGINX: Web server metrics (requests, response times)"
+echo "  5. Explore Logs via 'Explore' menu (Loki data source)"
+echo "  6. Create custom dashboards for your specific needs"
 
 echo ""
 info "LAN Access:"
