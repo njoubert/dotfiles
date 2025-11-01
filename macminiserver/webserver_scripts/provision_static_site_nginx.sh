@@ -203,9 +203,6 @@ server {
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
-    
-    access_log /usr/local/var/log/nginx/$DOMAIN.access.log;
-    error_log /usr/local/var/log/nginx/$DOMAIN.error.log;
 }
 EOF
 else
@@ -264,10 +261,6 @@ server {
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
-    
-    # Logging
-    access_log /usr/local/var/log/nginx/$DOMAIN.access.log;
-    error_log /usr/local/var/log/nginx/$DOMAIN.error.log;
 }
 EOF
 fi
@@ -288,13 +281,6 @@ fi
 sudo cp /tmp/nginx_site.conf "$NGINX_CONF"
 sudo chown "$USER_NAME:staff" "$NGINX_CONF"
 success "Configuration installed: $NGINX_CONF"
-
-# Create log files with correct permissions
-info "Creating log files..."
-NGINX_LOGS="/usr/local/var/log/nginx"
-sudo touch "$NGINX_LOGS/$DOMAIN.access.log" "$NGINX_LOGS/$DOMAIN.error.log"
-sudo chown "$USER_NAME:staff" "$NGINX_LOGS/$DOMAIN.access.log" "$NGINX_LOGS/$DOMAIN.error.log"
-success "Log files created"
 
 # Test nginx configuration
 section "Testing Nginx Configuration"
@@ -335,16 +321,6 @@ After updating files, you may want to reload nginx:
 ~/webserver/scripts/manage-nginx.sh reload
 \`\`\`
 
-## Logs
-
-- Access log: \`/usr/local/var/log/nginx/$DOMAIN.access.log\`
-- Error log: \`/usr/local/var/log/nginx/$DOMAIN.error.log\`
-
-View logs:
-\`\`\`bash
-tail -f /usr/local/var/log/nginx/$DOMAIN.access.log
-tail -f /usr/local/var/log/nginx/$DOMAIN.error.log
-\`\`\`
 
 ## SSL Certificate
 

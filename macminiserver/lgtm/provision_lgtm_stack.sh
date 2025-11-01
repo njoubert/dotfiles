@@ -703,6 +703,9 @@ read -r -d '' PROMTAIL_PLIST_CONTENT << EOF || true
     <key>KeepAlive</key>
     <true/>
     
+    <key>StartInterval</key>
+    <integer>45</integer>
+    
     <key>StandardOutPath</key>
     <string>/usr/local/var/log/monitoring/promtail.log</string>
     
