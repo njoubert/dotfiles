@@ -503,25 +503,77 @@ configure_system_preferences() {
         log_info "SSH MaxAuthTries already configured"
     fi
     
-    # Disable password authentication (require SSH keys only)
-    if ! sudo grep -q "^PasswordAuthentication no" "$SSHD_CONFIG"; then
-        log_info "Disabling SSH password authentication..."
-        # Remove any existing PasswordAuthentication lines (commented or not)
-        sudo sed -i '' '/^#*PasswordAuthentication/d' "$SSHD_CONFIG"
-        echo "PasswordAuthentication no" | sudo tee -a "$SSHD_CONFIG" > /dev/null
-        log_info "SSH password authentication disabled - key-based auth only"
-        log_warn "IMPORTANT: Make sure you've added your SSH key to ~/.ssh/authorized_keys!"
-        SSH_NEEDS_RESTART=true
-    else
-        log_info "SSH password authentication already disabled"
-    fi
+    # Prompt user about disabling password authentication
+    log_info ""
+    log_info "=========================================="
+    log_info "SSH Security Configuration"
+    log_info "=========================================="
+    log_info "For enhanced security, password-based SSH authentication should be disabled."
+    log_info "Only SSH key-based authentication will be allowed."
+    log_warn "IMPORTANT: Make sure you have added your SSH public key to ~/.ssh/authorized_keys!"
+    log_info ""
     
-    # Also disable challenge-response authentication
-    if ! sudo grep -q "^ChallengeResponseAuthentication no" "$SSHD_CONFIG"; then
-        sudo sed -i '' '/^#*ChallengeResponseAuthentication/d' "$SSHD_CONFIG"
-        echo "ChallengeResponseAuthentication no" | sudo tee -a "$SSHD_CONFIG" > /dev/null
-        log_info "SSH challenge-response authentication disabled"
-        SSH_NEEDS_RESTART=true
+    # Check current state
+    if sudo grep -q "^PasswordAuthentication no" "$SSHD_CONFIG" && \
+       sudo grep -q "^ChallengeResponseAuthentication no" "$SSHD_CONFIG" && \
+       sudo grep -q "^PubkeyAuthentication yes" "$SSHD_CONFIG"; then
+        log_info "Password authentication is already disabled - SSH is configured for key-based auth only"
+    else
+        # Prompt user
+        read -p "Do you want to disable password-based SSH logins? (y/n) [y]: " -n 1 -r
+        echo
+        REPLY=${REPLY:-y}  # Default to 'y' if user just presses Enter
+        
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            log_info "Disabling password-based SSH authentication..."
+            
+            # Disable password authentication
+            if ! sudo grep -q "^PasswordAuthentication no" "$SSHD_CONFIG"; then
+                # Remove any existing PasswordAuthentication lines (commented or not)
+                sudo sed -i '' '/^#*PasswordAuthentication/d' "$SSHD_CONFIG"
+                echo "PasswordAuthentication no" | sudo tee -a "$SSHD_CONFIG" > /dev/null
+                log_info "✓ PasswordAuthentication disabled"
+                SSH_NEEDS_RESTART=true
+            else
+                log_info "✓ PasswordAuthentication already disabled"
+            fi
+            
+            # Disable challenge-response authentication
+            if ! sudo grep -q "^ChallengeResponseAuthentication no" "$SSHD_CONFIG"; then
+                sudo sed -i '' '/^#*ChallengeResponseAuthentication/d' "$SSHD_CONFIG"
+                echo "ChallengeResponseAuthentication no" | sudo tee -a "$SSHD_CONFIG" > /dev/null
+                log_info "✓ ChallengeResponseAuthentication disabled"
+                SSH_NEEDS_RESTART=true
+            else
+                log_info "✓ ChallengeResponseAuthentication already disabled"
+            fi
+            
+            # Ensure public key authentication is enabled
+            if ! sudo grep -q "^PubkeyAuthentication yes" "$SSHD_CONFIG"; then
+                sudo sed -i '' '/^#*PubkeyAuthentication/d' "$SSHD_CONFIG"
+                echo "PubkeyAuthentication yes" | sudo tee -a "$SSHD_CONFIG" > /dev/null
+                log_info "✓ PubkeyAuthentication enabled"
+                SSH_NEEDS_RESTART=true
+            else
+                log_info "✓ PubkeyAuthentication already enabled"
+            fi
+            
+            # Disable root login
+            if ! sudo grep -q "^PermitRootLogin no" "$SSHD_CONFIG"; then
+                sudo sed -i '' '/^#*PermitRootLogin/d' "$SSHD_CONFIG"
+                echo "PermitRootLogin no" | sudo tee -a "$SSHD_CONFIG" > /dev/null
+                log_info "✓ Root login disabled"
+                SSH_NEEDS_RESTART=true
+            else
+                log_info "✓ Root login already disabled"
+            fi
+            
+            log_info "SSH configured for key-based authentication only"
+            log_warn "Password-based SSH login is now DISABLED"
+        else
+            log_warn "Skipping SSH password authentication disabling"
+            log_warn "Your server will still accept password-based SSH logins"
+        fi
     fi
     
     # Restart SSH daemon if configuration changed
