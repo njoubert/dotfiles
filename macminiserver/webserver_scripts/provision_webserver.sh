@@ -636,8 +636,34 @@ if [ -f "$AUTO_UPDATE_PLIST" ]; then
     success "Automatic updates configured (runs every Monday at 2am)"
 fi
 
+# Configure log rotation
+section "Phase 10: Configuring Log Rotation"
+
+info "Configuring nginx log rotation..."
+
+NGINX_NEWSYSLOG="/etc/newsyslog.d/nginx.conf"
+
+read -r -d '' NGINX_NEWSYSLOG_CONTENT << EOF || true
+# NGINX logs - rotate when 10MB, keep 7 files, compress
+# IMPORTANT: User must match the user running nginx (check with: ps aux | grep nginx)
+# After rotation, send USR1 signal to nginx to reopen log files
+/usr/local/var/log/nginx/access.log     $USER_NAME:staff  644  7  10000  *  GZ  /var/run/nginx.pid  30
+/usr/local/var/log/nginx/access.json    $USER_NAME:staff  644  7  10000  *  GZ  /var/run/nginx.pid  30
+/usr/local/var/log/nginx/error.log      $USER_NAME:staff  644  7  10000  *  GZ  /var/run/nginx.pid  30
+EOF
+
+check_and_write_file "$NGINX_NEWSYSLOG" "$NGINX_NEWSYSLOG_CONTENT" true
+
+# Ensure nginx log directory exists and has correct permissions
+sudo mkdir -p /usr/local/var/log/nginx
+sudo chown -R "$USER_NAME:staff" /usr/local/var/log/nginx
+
+success "Nginx log rotation configured for user: $USER_NAME"
+info "Logs will rotate daily at 2:00 AM when > 10MB"
+info "Nginx will receive USR1 signal after rotation to reopen log files"
+
 # Create convenient symlinks
-section "Phase 10: Creating Convenient Symlinks"
+section "Phase 11: Creating Convenient Symlinks"
 
 SYMLINKS_DIR="$USER_HOME/webserver/symlinks"
 SYMLINKS_LOGS_DIR="$SYMLINKS_DIR/logs"

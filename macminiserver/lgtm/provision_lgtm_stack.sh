@@ -850,22 +850,7 @@ fi
 # Configure log rotation
 section "Phase 11: Configuring Log Rotation"
 
-NGINX_NEWSYSLOG="/etc/newsyslog.d/nginx.conf"
-
-if [ ! -f "$NGINX_NEWSYSLOG" ]; then
-    info "Creating newsyslog configuration for NGINX logs..."
-    
-read -r -d '' NGINX_NEWSYSLOG_CONTENT << 'EOF' || true
-# NGINX logs - rotate when 10MB, keep 7 files, compress
-/usr/local/var/log/nginx/access.log     _www:wheel  644  7  10000  *  GZ
-/usr/local/var/log/nginx/access.json    _www:wheel  644  7  10000  *  GZ
-/usr/local/var/log/nginx/error.log      _www:wheel  644  7  10000  *  GZ
-EOF
-
-    check_and_write_file "$NGINX_NEWSYSLOG" "$NGINX_NEWSYSLOG_CONTENT" true
-else
-    info "NGINX newsyslog configuration already exists"
-fi
+info "NGINX log rotation is managed by provision_webserver.sh"
 
 MONITORING_NEWSYSLOG="/etc/newsyslog.d/monitoring.conf"
 

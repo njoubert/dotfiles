@@ -681,8 +681,10 @@ EOF
         log_info "Log rotation already configured"
     fi
     
-    # macOS uses newsyslog by default, which runs daily
-    log_info "System logs will be rotated daily by newsyslog"
+    log_info "NGINX log rotation is managed by provision_webserver.sh"
+    
+    # macOS uses newsyslog by default, which runs daily at 2:00 AM
+    log_info "System logs will be rotated daily at 2:00 AM by newsyslog"
 }
 
 ################################################################################

@@ -89,6 +89,57 @@ case "$1" in
     echo "=== Configuration Test ==="
     nginx -t
     echo ""
+    echo "=== HTTP Health Checks ==="
+    # Get local LAN IP
+    LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "127.0.0.1")
+    
+    # Check all configured sites
+    if [ -d "/usr/local/etc/nginx/servers" ]; then
+      for conf in /usr/local/etc/nginx/servers/*.conf; do
+        if [ -f "$conf" ]; then
+          # Extract server_name from HTTPS server blocks (skip comments)
+          server_names=$(grep -A 20 "listen 443" "$conf" | grep "server_name" | grep -v "^[[:space:]]*#" | head -1 | sed 's/.*server_name //; s/;//' | tr ' ' '\n' | grep -v "^$")
+          
+          for domain in $server_names; do
+            # Skip wildcard patterns, regex patterns, www variants, and comments
+            if [[ "$domain" != *"*"* ]] && [[ "$domain" != "~"* ]] && [[ "$domain" != "www."* ]] && [[ "$domain" != "#"* ]]; then
+              
+              # Test 1: Local LAN (bypasses Cloudflare)
+              echo -n "  Local  https://$domain ($LOCAL_IP) ... "
+              http_code=$(curl -k -s -o /dev/null -w "%{http_code}" --max-time 5 \
+                --resolve "$domain:443:$LOCAL_IP" \
+                "https://$domain" 2>/dev/null)
+              
+              if [ "$http_code" = "200" ]; then
+                success "OK ($http_code)"
+              elif [ "$http_code" = "301" ] || [ "$http_code" = "302" ]; then
+                info "Redirect ($http_code)"
+              elif [ -z "$http_code" ]; then
+                error "Failed"
+              else
+                warning "HTTP $http_code"
+              fi
+              
+              # Test 2: Public endpoint (through Cloudflare)
+              echo -n "  Public https://$domain (cloudflare) ... "
+              http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "https://$domain" 2>/dev/null)
+              
+              if [ "$http_code" = "200" ]; then
+                success "OK ($http_code)"
+              elif [ "$http_code" = "301" ] || [ "$http_code" = "302" ]; then
+                info "Redirect ($http_code)"
+              elif [ -z "$http_code" ]; then
+                error "Failed"
+              else
+                warning "HTTP $http_code"
+              fi
+              
+            fi
+          done
+        fi
+      done
+    fi
+    echo ""
     echo "=== Recent Error Log (last 10 lines) ==="
     if [ -f "$ERROR_LOG" ]; then
       tail -10 "$ERROR_LOG"
