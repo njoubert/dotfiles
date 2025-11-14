@@ -132,18 +132,34 @@ fi
 # Request SSL certificate
 section "Requesting SSL Certificate"
 
-info "This will request a certificate from Let's Encrypt using Cloudflare DNS"
-info "Domains: $CERT_DOMAINS"
-echo ""
+# Check if wildcard certificate already exists
+if [ -d "/etc/letsencrypt/live/nielsshootsfilm.com" ] && sudo certbot certificates 2>/dev/null | grep -A 3 "Certificate Name: nielsshootsfilm.com" | grep -q "\*.nielsshootsfilm.com"; then
+    info "Wildcard certificate found for *.nielsshootsfilm.com!"
+    info "This certificate can be used for $DOMAIN"
+    echo ""
+    read -r -p "$(echo -e "${YELLOW}Use existing wildcard certificate instead of requesting a new one? [Y/n]: ${NC}")" use_wildcard
+    if [[ ! "$use_wildcard" =~ ^[Nn]$ ]]; then
+        info "Using wildcard certificate"
+        CERT_PATH="/etc/letsencrypt/live/nielsshootsfilm.com"
+        SKIP_CERT=true
+        success "Will use wildcard certificate"
+    fi
+fi
+
+if [ "$SKIP_CERT" != "true" ]; then
+    info "This will request a certificate from Let's Encrypt using Cloudflare DNS"
+    info "Domains: $CERT_DOMAINS"
+    echo ""
+fi
 
 read -r -p "$(echo -e "${YELLOW}Proceed with certificate request? [Y/n]: ${NC}")" cert_response
 if [[ "$cert_response" =~ ^[Nn]$ ]]; then
     warning "Skipping certificate request"
     warning "You'll need to obtain certificates manually"
     SKIP_CERT=true
-else
-    SKIP_CERT=false
-    
+fi
+
+if [ "$SKIP_CERT" != "true" ]; then
     # Request email for Let's Encrypt
     echo -e "${BLUE}Email for Let's Encrypt notifications [default: njoubert@gmail.com]: ${NC}"
     read -r email
