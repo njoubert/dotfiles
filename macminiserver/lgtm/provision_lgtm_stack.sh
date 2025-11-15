@@ -402,6 +402,12 @@ read -r -d '' PROMETHEUS_PLIST_CONTENT << EOF || true
     
     <key>WorkingDirectory</key>
     <string>/usr/local/var/prometheus</string>
+    
+    <key>UserName</key>
+    <string>$USER_NAME</string>
+    
+    <key>GroupName</key>
+    <string>staff</string>
 </dict>
 </plist>
 EOF
@@ -443,6 +449,12 @@ read -r -d '' NODE_EXPORTER_PLIST_CONTENT << EOF || true
     
     <key>StandardErrorPath</key>
     <string>/usr/local/var/log/monitoring/node_exporter-error.log</string>
+    
+    <key>UserName</key>
+    <string>$USER_NAME</string>
+    
+    <key>GroupName</key>
+    <string>staff</string>
 </dict>
 </plist>
 EOF
@@ -485,6 +497,12 @@ read -r -d '' NGINX_EXPORTER_PLIST_CONTENT << EOF || true
     
     <key>StandardErrorPath</key>
     <string>/usr/local/var/log/monitoring/nginx_exporter-error.log</string>
+    
+    <key>UserName</key>
+    <string>$USER_NAME</string>
+    
+    <key>GroupName</key>
+    <string>staff</string>
 </dict>
 </plist>
 EOF
@@ -594,6 +612,12 @@ read -r -d '' LOKI_PLIST_CONTENT << EOF || true
     
     <key>WorkingDirectory</key>
     <string>/usr/local/var/loki</string>
+    
+    <key>UserName</key>
+    <string>$USER_NAME</string>
+    
+    <key>GroupName</key>
+    <string>staff</string>
 </dict>
 </plist>
 EOF
@@ -711,6 +735,12 @@ read -r -d '' PROMTAIL_PLIST_CONTENT << EOF || true
     
     <key>StandardErrorPath</key>
     <string>/usr/local/var/log/monitoring/promtail-error.log</string>
+    
+    <key>UserName</key>
+    <string>$USER_NAME</string>
+    
+    <key>GroupName</key>
+    <string>staff</string>
 </dict>
 </plist>
 EOF
@@ -836,6 +866,12 @@ read -r -d '' GRAFANA_PLIST_CONTENT << EOF || true
     
     <key>WorkingDirectory</key>
     <string>/usr/local/var/lib/grafana</string>
+    
+    <key>UserName</key>
+    <string>$USER_NAME</string>
+    
+    <key>GroupName</key>
+    <string>staff</string>
 </dict>
 </plist>
 EOF
