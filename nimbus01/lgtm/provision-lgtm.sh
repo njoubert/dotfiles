@@ -239,6 +239,61 @@ EOF
 }
 
 ################################################################################
+# Configure Promtail
+################################################################################
+configure_promtail() {
+    log_section "Configuring Promtail..."
+    
+    local config_file="/etc/promtail/config.yml"
+    
+    # Add promtail user to required groups for journal and log access
+    log_info "Adding promtail user to systemd-journal and adm groups..."
+    usermod -aG systemd-journal,adm promtail 2>/dev/null || true
+    
+    # Write Promtail config with journald scraping
+    local promtail_content
+    read -r -d '' promtail_content << 'EOF' || true
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://localhost:3100/loki/api/v1/push
+
+scrape_configs:
+  # Scrape journald logs
+  - job_name: journal
+    journal:
+      max_age: 12h
+      labels:
+        job: systemd-journal
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+      - source_labels: ['__journal__hostname']
+        target_label: 'hostname'
+      - source_labels: ['__journal_syslog_identifier']
+        target_label: 'syslog_identifier'
+      - source_labels: ['__journal_priority_keyword']
+        target_label: 'level'
+
+  # Also scrape traditional log files
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          __path__: /var/log/*.log
+EOF
+    
+    check_and_write_file "$config_file" "$promtail_content" true
+}
+
+################################################################################
 # Configure Grafana datasources
 ################################################################################
 configure_grafana() {
@@ -386,6 +441,7 @@ main() {
     configure_prometheus
     configure_node_exporter
     configure_loki
+    configure_promtail
     configure_grafana
     start_services
     
