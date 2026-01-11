@@ -6,8 +6,15 @@ AMD Ryzen™ 9 9955HX
 96GB RAM
 2TB SSD
 ```
+## Log
 
-## Initial Linux Installation
+### 2026.01.11 
+
+Installed LGTM stack, documented in `lgtm/`
+
+Renamed machine to `nimbus01`
+
+### 2026.01.10 Initial Linux Installation
 
 It was a real pain getting Linux running on this box.
 * Disable secure boot.
@@ -16,3 +23,5 @@ It was a real pain getting Linux running on this box.
 
 For SSH:
 - Disable password logins, only Public Keys.
+
+
