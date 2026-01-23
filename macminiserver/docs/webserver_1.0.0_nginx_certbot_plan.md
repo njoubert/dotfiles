@@ -8,7 +8,7 @@
 - **Long Term Supported Static File Server** We want a stable setup that can serve static websites for the next decade with minimal maintenance needed.
 - **Multiple Hetrogeneous Sites** The webserver should be able to host my multiple websites and my multiple projects, including my njoubert.com home page which is just a static site, subdomains such as rtc.njoubert.com which is a WebRTC-based video streaming experiment, files.njoubert.com which is just a firestore, and nielsshootsfilm.com which is a hybrid static-dynamic site with a static frontend and a Go API.
 - **SSL/TLS Certificates**: Must support HTTPS with automatic cert rotation (likely letsencrypt)
-- **Simple Side Addition** We want to make it easy to spin up additional static sites if needed.
+- **Simple Site Addition** We want to make it easy to spin up additional static sites if needed.
 - **Efficiency** The design should use the available resources efficiently
 - **Fast** The system should be fast, especially the static file serving.
 - **Maintainable** It should be dead simple to maintain as I am the only person maintaining this.

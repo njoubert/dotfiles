@@ -8,7 +8,26 @@ AMD Ryzen™ 9 9955HX
 ```
 ## Log
 
-### 2026.01.11 
+### 2026.01.22 nginx install, reverse proxy nielsshootsfilm.com and nimbus.wtf
+
+Installed nginx, along with fail2ban and certbot (with dns-cloudflare plugin for DNS-01 validation).
+
+**Architecture:** nimbus01 is now the single public-facing webserver. It terminates SSL for all domains and reverse proxies to internal LAN servers.
+
+| Domain | Handling |
+|--------|----------|
+| `weshootfilm.com` | Served directly by nimbus01 |
+| `nimbus.wtf` | SSL terminated here, proxied to 10.1.0.2 (HTTP) |
+| `nielsshootsfilm.com` | SSL terminated here, proxied to 10.1.0.2 (HTTP) |
+
+**Key configs:**
+- `/etc/nginx/sites-available/` - site configs
+- `/etc/letsencrypt/cloudflare/credentials.ini` - Cloudflare API token
+- Certbot auto-renewal via systemd timer
+
+See `webserver/` for detailed plan and provisioning scripts.
+
+### 2026.01.11  LGTM install
 
 Installed LGTM stack, documented in `lgtm/`
 
