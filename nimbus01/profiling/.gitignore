@@ -2,6 +2,9 @@
 sample_input/
 sample_output/
 
+# Python virtual environment
+venv/
+
 # Python cache
 __pycache__/
 *.pyc
