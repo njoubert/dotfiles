@@ -6,6 +6,15 @@ AMD Ryzen™ 9 9955HX
 96GB RAM
 2TB SSD
 ```
+
+# Important: IPv6 Disabled
+
+⚠️ **IPv6 is disabled on this server** via GRUB kernel parameters.
+
+Applications and services (nginx, etc.) must **not** attempt to bind to IPv6 addresses (`[::]` or `::1`). This will cause them to fail to start.
+
+**For nginx configs:** Do not use `listen [::]:80` or `listen [::]:443` directives.
+
 # Log
 
 ## 2026.01.23 Upgrade to Ubuntu 24.04 LTS

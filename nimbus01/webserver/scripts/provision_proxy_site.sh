@@ -139,7 +139,6 @@ upstream ${UPSTREAM_NAME}_upstream {
 # HTTP - redirect to HTTPS
 server {
     listen 80;
-    listen [::]:80;
     server_name $DOMAIN;
     return 301 https://\$server_name\$request_uri;
 }
@@ -147,7 +146,6 @@ server {
 # HTTPS - reverse proxy
 server {
     listen 443 ssl http2;
-    listen [::]:443 ssl http2;
     server_name $DOMAIN;
 
     # SSL certificates (Let's Encrypt)
