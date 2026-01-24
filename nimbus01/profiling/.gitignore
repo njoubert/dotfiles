@@ -1,0 +1,7 @@
+# Generated test data
+sample_input/
+sample_output/
+
+# Python cache
+__pycache__/
+*.pyc
