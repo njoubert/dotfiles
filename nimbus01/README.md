@@ -13,6 +13,11 @@ AMD Ryzen™ 9 9955HX
 Many of our packages are old on 22.04 and it sucks. Upgraded.
 
 After upgrade we did have issues with the network. Fixed that as follows:
+* disabled ipv6 in GRUB config
+* disabld cloud-init network management
+* deleted cloud-init completely
+
+We are also having issues with loki and promtail
 
 ### Disabling Cloud-Init Network Management on Ubuntu 24.04
 
