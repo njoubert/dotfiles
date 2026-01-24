@@ -2,6 +2,31 @@
 
 This folder contains scripts to profile image processing performance, particularly for benchmarking the VIPS library.
 
+## Results on 2026.01.23
+
+### VIPS Benchmark: M4 vs AMD Ryzen 9955HX (48MP Images, 8485×5657)
+
+| Operation | Format | M4 Mac | Ryzen 9955HX | Δ (M4 faster) |
+|-----------|--------|--------|--------------|---------------|
+| Thumbnail | JPEG | 147.6 ms | 119 ms | -24% ❌ |
+| Thumbnail | WebP | 42.1 ms | 53 ms | +26% ✅ |
+| Display | JPEG | 32.1 ms | 44 ms | +37% ✅ |
+| Display | WebP | 383.6 ms | 468 ms | +22% ✅ |
+
+#### Summary
+
+| Metric | M4 Mac | Ryzen 9955HX | Winner |
+|--------|--------|--------------|--------|
+| **JPEG Avg** | 89.8 ms | 81.5 ms | Ryzen (+10%) |
+| **WebP Avg** | 212.8 ms | 260.5 ms | M4 (+22%) |
+| **All Operations** | 151.3 ms | 171 ms | M4 (+13%) |
+
+#### Takeaways
+- **M4 wins on WebP encoding** - significantly faster at both thumbnail and display sizes
+- **Ryzen wins on JPEG thumbnails** - 24% faster, likely due to different libjpeg-turbo optimizations
+- **M4 display JPEG is surprisingly fast** - 37% faster than Ryzen
+- **Overall**: M4 is ~13% faster across all operations, primarily due to WebP performance
+
 ## Dependencies
 
 ```bash
