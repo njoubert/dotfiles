@@ -28,6 +28,34 @@ After upgrade we did have issues with the network. Fixed that as follows:
 
 We are also having issues with loki and promtail
 
+### Fixing nginx IPv6 binding failures
+
+After disabling IPv6, nginx failed to start due to `listen [::]:80` directives. Removed all IPv6 listen directives from `/etc/nginx/sites-available/` configs.
+
+### Fixing Loki gRPC message size errors
+
+Pattern ingester was failing with `grpc: received message larger than max (5481676 vs. 4194304)`. Added to `/etc/loki/config.yml` under `server:`:
+
+```yaml
+  grpc_server_max_recv_msg_size: 16777216
+  grpc_server_max_send_msg_size: 16777216
+```
+
+### Fixing promtail shutdown hang
+
+Promtail was hanging on shutdown because it tried to send logs to Loki after Loki had already stopped. Added systemd ordering so promtail stops before loki:
+
+```bash
+# In /etc/systemd/system/promtail.service, changed:
+After=network-online.target
+# To:
+After=network-online.target loki.service
+
+sudo systemctl daemon-reload
+```
+
+This ensures: startup = loki → promtail, shutdown = promtail → loki.
+
 ### Disabling Cloud-Init Network Management on Ubuntu 24.04
 
 After upgrading from Ubuntu 22.04 to 24.04, cloud-init was managing network configuration and overwriting custom netplan settings, causing network interfaces to not come up properly.
