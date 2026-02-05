@@ -41,6 +41,39 @@ Internet → Cloudflare → Router:443 → nimbus01 (10.1.0.x)
 
 ---
 
+## Important: Upload Size Limits
+
+By default nginx limits request body size to 1MB, causing `413 Request Entity Too Large` errors for photo uploads. The fix must be applied on **both** servers.
+
+### On nimbus01 (reverse proxy)
+
+Set `client_max_body_size` globally in `/etc/nginx/nginx.conf` inside the `http` block so it covers **all** sites (proxied and directly served):
+
+```nginx
+http {
+    # Basic Settings
+    ...
+    server_tokens off;
+
+    # Max upload size (default is 1MB, too small for photo uploads)
+    client_max_body_size 100M;
+    ...
+}
+```
+
+> **Note:** Don't put this in `proxy-params.conf` — that only applies to reverse proxy locations, not directly served sites like weshootfilm.com.
+
+### On 10.1.0.2 (backend)
+
+If the backend also runs nginx, add the same directive to its config (globally or per-site):
+
+```nginx
+# In http, server, or location block
+client_max_body_size 100M;
+```
+
+---
+
 ## Part 1: Configure nimbus01 (Reverse Proxy)
 
 ### 1.1 Request Certificates

@@ -235,6 +235,9 @@ http {
     types_hash_max_size 2048;
     server_tokens off;
 
+    # Max upload size (default is 1MB, too small for photo uploads)
+    client_max_body_size 100M;
+
     # MIME types
     include /etc/nginx/mime.types;
     default_type application/octet-stream;
