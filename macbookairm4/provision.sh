@@ -15,7 +15,7 @@ echo "DNS resolver configured"
 
 # Brew source installs
 PACKAGES=(
- shellcheck
+ shellcheck exiftool imagemagick
 )
 for pkg in "${PACKAGES[@]}"; do
   brew install "$pkg" || true
