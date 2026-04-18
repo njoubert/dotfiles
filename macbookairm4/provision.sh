@@ -23,7 +23,7 @@ done
 
 # Brew cask installs
 CASKS=(
-  iterm2 signal whatsapp visual-studio-code rectangle iina alfred
+  iterm2 signal whatsapp visual-studio-code rectangle iina alfred spotify
 )
 for cask in "${CASKS[@]}"; do
   brew install --cask "$cask" || true
